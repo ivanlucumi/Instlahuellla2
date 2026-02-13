@@ -1,0 +1,399 @@
+/**** Template CSS ****/
+:root {
+    --primary: #000000;
+    --secondary: #FFFFFF;
+    --light: #9CA3AF;
+    --dark: #F5F5F5;
+}
+
+body {
+    background: #F5F5F5 !important;
+    color: #1F2937 !important;
+}
+
+.back-to-top {
+    position: fixed;
+    display: none;
+    right: 45px;
+    bottom: 45px;
+    z-index: 99;
+}
+
+
+/*** Spinner ***/
+#spinner {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .5s ease-out, visibility 0s linear .5s;
+    z-index: 9999;
+}
+
+#spinner.show {
+    transition: opacity .5s ease-out, visibility 0s linear 0s;
+    visibility: visible;
+    opacity: 1;
+}
+
+
+/*** Button ***/
+.btn {
+    transition: .5s;
+}
+
+.btn-square {
+    width: 38px;
+    height: 38px;
+}
+
+.btn-sm-square {
+    width: 32px;
+    height: 32px;
+}
+
+.btn-lg-square {
+    width: 48px;
+    height: 48px;
+}
+
+.btn-square,
+.btn-sm-square,
+.btn-lg-square {
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: normal;
+    border-radius: 50px;
+}
+
+
+/*** Layout ***/
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 250px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #FFFFFF !important;
+    transition: 0.5s;
+    z-index: 999;
+    border-right: 1px solid #E5E7EB;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+}
+
+.content {
+    margin-left: 250px;
+    min-height: 100vh;
+    background: #F5F5F5 !important;
+    transition: 0.5s;
+}
+
+@media (min-width: 992px) {
+    .sidebar {
+        margin-left: 0;
+    }
+
+    .sidebar.open {
+        margin-left: -250px;
+    }
+
+    .content {
+        width: calc(100% - 250px);
+    }
+
+    .content.open {
+        width: 100%;
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .sidebar {
+        margin-left: -250px;
+    }
+
+    .sidebar.open {
+        margin-left: 0;
+    }
+
+    .content {
+        width: 100%;
+        margin-left: 0;
+    }
+}
+
+
+/*** Navbar ***/
+.sidebar .navbar {
+    background: #FFFFFF !important;
+}
+
+.sidebar .navbar .navbar-nav .nav-link {
+    padding: 7px 20px;
+    color: #1F2937 !important;
+    font-weight: 500;
+    border-left: 3px solid transparent;
+    border-radius: 0 30px 30px 0;
+    outline: none;
+}
+
+.sidebar .navbar .navbar-nav .nav-link:hover,
+.sidebar .navbar .navbar-nav .nav-link.active {
+    color: #000000 !important;
+    background: #E5E5E5 !important;
+    border-color: #000000;
+}
+
+.sidebar .navbar .navbar-nav .nav-link i {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #E5E5E5;
+    border-radius: 40px;
+}
+
+.sidebar .navbar .navbar-nav .nav-link:hover i,
+.sidebar .navbar .navbar-nav .nav-link.active i {
+    background: #D1D5DB;
+}
+
+.sidebar .navbar .dropdown-toggle::after {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    border: none;
+    content: "\f107";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    transition: .5s;
+}
+
+.sidebar .navbar .dropdown-toggle[aria-expanded=true]::after {
+    transform: rotate(-180deg);
+}
+
+.sidebar .navbar .dropdown-item {
+    padding-left: 25px;
+    border-radius: 0 30px 30px 0;
+    color: #1F2937 !important;
+}
+
+.sidebar .navbar .dropdown-item:hover,
+.sidebar .navbar .dropdown-item.active {
+    background: #E5E5E5 !important;
+}
+
+.sidebar .navbar .dropdown-menu {
+    background: #FFFFFF !important;
+}
+
+.content .navbar {
+    background: #FFFFFF !important;
+}
+
+.content .navbar .navbar-nav .nav-link {
+    margin-left: 25px;
+    padding: 12px 0;
+    color: #1F2937 !important;
+    outline: none;
+}
+
+.content .navbar .navbar-nav .nav-link:hover,
+.content .navbar .navbar-nav .nav-link.active {
+    color: #000000 !important;
+}
+
+.content .navbar .sidebar-toggler,
+.content .navbar .navbar-nav .nav-link i {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #E5E5E5;
+    border-radius: 40px;
+}
+
+.content .navbar .dropdown-item {
+    color: #1F2937 !important;
+}
+
+.content .navbar .dropdown-item:hover,
+.content .navbar .dropdown-item.active {
+    background: #E5E5E5 !important;
+}
+
+.content .navbar .dropdown-menu {
+    background: #FFFFFF !important;
+}
+
+.content .navbar .dropdown-toggle::after {
+    margin-left: 6px;
+    vertical-align: middle;
+    border: none;
+    content: "\f107";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    transition: .5s;
+}
+
+.content .navbar .dropdown-toggle[aria-expanded=true]::after {
+    transform: rotate(-180deg);
+}
+
+@media (max-width: 575.98px) {
+    .content .navbar .navbar-nav .nav-link {
+        margin-left: 15px;
+    }
+}
+
+/* Forzar fondos claros en todas las secciones */
+.bg-secondary {
+    background: #FFFFFF !important;
+}
+
+.bg-dark {
+    background: #F5F5F5 !important;
+}
+
+/* Textos */
+.text-white {
+    color: #1F2937 !important;
+}
+
+h1, h2, h3, h4, h5, h6, p, span, small {
+    color: #1F2937 !important;
+}
+
+/* Inputs */
+.form-control {
+    background: #FFFFFF !important;
+    border: 1px solid #D1D5DB !important;
+    color: #1F2937 !important;
+}
+
+.form-control:focus {
+    background: #FFFFFF !important;
+    border-color: #000000 !important;
+    color: #1F2937 !important;
+}
+
+/* Tablas */
+.table {
+    color: #1F2937 !important;
+}
+
+.table-bordered {
+    border-color: #E5E7EB !important;
+}
+
+.table thead tr {
+    background: #F9FAFB !important;
+}
+
+/* Links */
+a {
+    color: #1F2937 !important;
+}
+
+a:hover {
+    color: #000000 !important;
+}
+
+/*** Date Picker ***/
+.bootstrap-datetimepicker-widget.bottom {
+    top: auto !important;
+}
+
+.bootstrap-datetimepicker-widget .table * {
+    border-bottom-width: 0px;
+}
+
+.bootstrap-datetimepicker-widget .table th {
+    font-weight: 500;
+}
+
+.bootstrap-datetimepicker-widget.dropdown-menu {
+    padding: 10px;
+    border-radius: 2px;
+    background: #FFFFFF !important;
+}
+
+.bootstrap-datetimepicker-widget table td.active,
+.bootstrap-datetimepicker-widget table td.active:hover {
+    background: #000000 !important;
+    color: #FFFFFF !important;
+}
+
+.bootstrap-datetimepicker-widget table td.today::before {
+    border-bottom-color: #000000;
+}
+
+
+/*** Testimonial ***/
+.progress .progress-bar {
+    width: 0px;
+    transition: 2s;
+}
+
+
+/*** Testimonial ***/
+.testimonial-carousel .owl-dots {
+    margin-top: 24px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.testimonial-carousel .owl-dot {
+    position: relative;
+    display: inline-block;
+    margin: 0 5px;
+    width: 15px;
+    height: 15px;
+    border: 5px solid #000000;
+    border-radius: 15px;
+    transition: .5s;
+}
+
+.testimonial-carousel .owl-dot.active {
+    background: #F5F5F5;
+    border-color: #000000;
+}
+
+.boletin-table {
+    font-size: 0.9rem;
+}
+
+.boletin-table th,
+.boletin-table td {
+    padding: 6px 8px;
+    vertical-align: middle;
+}
+
+.boletin-table th {
+    white-space: nowrap;
+}
+
+.boletin-table td {
+    line-height: 1.2;
+}
+
+.boletin-table .nota {
+    font-weight: 600;
+}
+
+
+.btn-periodo {
+    background: linear-gradient(135deg, #5dade2, #3498db);
+    color: #fff;
+    border: none;
+}
+
+.btn-periodo:hover {
+    background: linear-gradient(135deg, #3498db, #2e86c1);
+}

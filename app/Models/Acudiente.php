@@ -1,0 +1,33 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Acudiente extends Model
+{
+    //
+    protected $table = 'acudientes';
+    protected $fillable = [
+        'user_id',
+        'celular_acudiente',
+        'direccion_acudiente',
+        'genero_acudiente',
+        'parentesco_acudiente',
+        'estado_acudiente'
+    ];
+
+    protected $casts = [
+        'estado_acudiente' => 'boolean',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function estudiantes()
+    {
+        return $this->hasMany(Estudiante::class);
+    }
+}
