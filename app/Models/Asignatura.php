@@ -17,6 +17,7 @@ class Asignatura extends Model
         'nivel_educativo',
         'sede_id',
         'hilo_id',
+        'grado_id',
         'descripcion',
         'creditos',
         'docente_id',

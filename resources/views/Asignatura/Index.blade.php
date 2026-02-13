@@ -28,6 +28,7 @@
                                 <th scope="col">Nivel Educativo</th>
                                 <th scope="col">Sede</th>
                                 <th scope="col">Hilo</th>
+                                <th scope="col">Grado</th>
                                 <th scope="col">Docente</th>
                                 <th scope="col">Créditos</th>
                                 <th scope="col">Estado</th>
@@ -47,6 +48,9 @@
                                     <td>{{ $asignatura->sede->nombre_sede ?? 'N/A' }}</td>
                                     <td>
                                         <span class="badge bg-info">{{ $asignatura->hilo->nombre_hilo ?? 'N/A' }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-dark">{{ $asignatura->grado->nombre_grado ?? 'General' }}</span>
                                     </td>
                                     <td>{{ $asignatura->docente->name ?? 'N/A' }}</td>
                                     <td>

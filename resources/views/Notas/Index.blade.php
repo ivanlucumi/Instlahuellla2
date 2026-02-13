@@ -16,22 +16,32 @@
                     <table class="table text-start align-middle table-bordered table-hover mb-0">
                         <thead>
                             <tr class="text-white">
-                                <th scope="col">ID</th>
                                 <th scope="col">Estudiante</th>
                                 <th scope="col">Asignatura</th>
-                                <th scope="col">Período</th>
-                                <th scope="col">Nota</th>
+                                <th scope="col">Grado</th>
+                                <th scope="col">P1</th>
+                                <th scope="col">P2</th>
+                                <th scope="col">P3</th>
+                                <th scope="col">P4</th>
+                                <th scope="col">Definitiva</th>
                                 <th scope="col">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($notas as $nota)
                                 <tr>
-                                    <td>{{ $nota->id }}</td>
-                                    <td>{{ $nota->estudiante->user->name ?? 'N/A' }}</td>
+                                    <td>{{ $nota->matriculado->estudiante->user->name ?? 'N/A' }}</td>
                                     <td>{{ $nota->asignatura->nombre_asignatura ?? 'N/A' }}</td>
-                                    <td>{{ $nota->periodoAcademico->nombre_periodo ?? 'N/A' }}</td>
-                                    <td>{{ $nota->nota }}</td>
+                                    <td>{{ $nota->matriculado->grado->nombre_grado ?? 'N/A' }}</td>
+                                    <td>{{ $nota->nota1 ?? '-' }}</td>
+                                    <td>{{ $nota->nota2 ?? '-' }}</td>
+                                    <td>{{ $nota->nota3 ?? '-' }}</td>
+                                    <td>{{ $nota->nota4 ?? '-' }}</td>
+                                    <td>
+                                        <span class="badge {{ ($nota->nota_definitiva ?? 0) >= 3 ? 'bg-success' : 'bg-danger' }}">
+                                            {{ number_format($nota->nota_definitiva ?? 0, 2) }}
+                                        </span>
+                                    </td>
                                     <td>
                                         <div class="btn-group" role="group">
                                             <a href="{{ route('admin.notas.edit', $nota->id) }}" 

@@ -12,7 +12,7 @@ class AsignaturaController extends Controller
      */
     public function index()
     {
-        $asignaturas = Asignatura::with(['sede', 'hilo', 'docente'])->orderBy('id')->paginate(15);
+        $asignaturas = Asignatura::with(['sede', 'hilo', 'docente', 'grado'])->orderBy('id')->paginate(15);
         return view('Asignatura.Index', compact('asignaturas'));
     }
 
@@ -24,7 +24,8 @@ class AsignaturaController extends Controller
         $sedes = \App\Models\Sede::orderBy('nombre_sede')->get();
         $hilos = \App\Models\Hilo::where('estado', 'activo')->orderBy('nombre_hilo')->get();
         $docentes = \App\Models\User::whereHas('docente')->orderBy('name')->get();
-        return view('Asignatura.Create', compact('sedes', 'hilos', 'docentes'));
+        $grados = \App\Models\GradoAcademico::orderBy('nombre_grado')->get();
+        return view('Asignatura.Create', compact('sedes', 'hilos', 'docentes', 'grados'));
     }
 
     /**
@@ -37,6 +38,7 @@ class AsignaturaController extends Controller
             'nivel_educativo'   => 'required|in:primaria,secundaria',
             'sede_id'           => 'required|exists:sedes,id',
             'hilo_id'           => 'required|exists:hilos,id',
+            'grado_id'          => 'nullable|exists:grado_academicos,id',
             'descripcion'       => 'required|string',
             'creditos'          => 'required|integer|min:1|max:10',
             'docente_id'        => 'required|exists:users,id',
@@ -68,7 +70,8 @@ class AsignaturaController extends Controller
         $sedes = \App\Models\Sede::orderBy('nombre_sede')->get();
         $hilos = \App\Models\Hilo::where('estado', 'activo')->orderBy('nombre_hilo')->get();
         $docentes = \App\Models\User::whereHas('docente')->orderBy('name')->get();
-        return view('Asignatura.Edit', compact('asignatura', 'sedes', 'hilos', 'docentes'));
+        $grados = \App\Models\GradoAcademico::orderBy('nombre_grado')->get();
+        return view('Asignatura.Edit', compact('asignatura', 'sedes', 'hilos', 'docentes', 'grados'));
     }
 
     /**
@@ -81,6 +84,7 @@ class AsignaturaController extends Controller
             'nivel_educativo'   => 'required|in:primaria,secundaria',
             'sede_id'           => 'required|exists:sedes,id',
             'hilo_id'           => 'required|exists:hilos,id',
+            'grado_id'           => 'nullable|exists:grado_academicos,id',
             'descripcion'       => 'required|string',
             'creditos'          => 'required|integer|min:1|max:10',
             'docente_id'        => 'required|exists:users,id',
@@ -145,10 +149,10 @@ class AsignaturaController extends Controller
 
     public function list()
     {
-        $asignaturas = Asignatura::all()->map(function($a) {
+        $asignaturas = Asignatura::with('hilo')->get()->map(function($a) {
             return [
                 'id' => $a->id,
-                'text' => $a->nombre_asignatura . ' (' . ucfirst($a->nivel_educativo) . ')'
+                'text' => $a->nombre_asignatura . ' (' . ($a->hilo->nombre_hilo ?? 'N/A') . ') - ' . ucfirst($a->nivel_educativo)
             ];
         });
         return response()->json($asignaturas);

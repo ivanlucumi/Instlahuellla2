@@ -88,7 +88,7 @@
             @foreach($asignaturas as $asignatura)
                 <option value="{{ $asignatura->id }}"
                     @selected(old('asignatura_id', $gradoAcademico->asignatura_id ?? '') == $asignatura->id)>
-                    {{ $asignatura->nombre_asignatura }}
+                    {{ $asignatura->nombre_asignatura }} ({{ $asignatura->hilo->nombre_hilo ?? 'N/A' }})
                 </option>
             @endforeach
         </select>

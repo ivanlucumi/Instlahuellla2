@@ -171,7 +171,10 @@ Route::middleware(['auth','rol:DOCENTE'])
     Route::get('/docente/grado/{grado}/calificar', [App\Http\Controllers\DocenteController::class, 'calificarEstudianteFinal'])->name('docente.listado.calificar');
     Route::post('/docente/guardar-notas', [App\Http\Controllers\DocenteController::class, 'guardarNotas'])->name('docente.guardarNotas');
 
-
-    });
+    // Nuevas rutas solicitadas
+    Route::get('/asignatura/{asignatura}/estudiantes', [App\Http\Controllers\DocenteController::class, 'estudiantesAsignatura'])->name('docente.asignatura.estudiantes');
+    Route::post('/notas/update', [App\Http\Controllers\DocenteController::class, 'updateNotas'])->name('docente.notas.update');
+    Route::post('/estudiantes/promover', [App\Http\Controllers\DocenteController::class, 'promoverEstudiantes'])->name('docente.estudiantes.promover');
+});
 
 

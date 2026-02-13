@@ -72,7 +72,7 @@
 
 <div class="row">
     <div class="col-md-6 mb-3">
-        <label class="form-label">Docente</label>
+        <label class="form-label">Docente Responsable</label>
         <select name="docente_id" 
                 class="form-select @error('docente_id') is-invalid @enderror" 
                 required>
@@ -85,6 +85,24 @@
             @endforeach
         </select>
         @error('docente_id')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Grado Académico (Opcional)</label>
+        <select name="grado_id" 
+                class="form-select @error('grado_id') is-invalid @enderror">
+            <option value="">Asignatura General (Sin grado específico)</option>
+            @foreach($grados as $grado)
+                <option value="{{ $grado->id }}"
+                    @selected(old('grado_id', $asignatura->grado_id ?? '') == $grado->id)>
+                    {{ $grado->nombre_grado }} - {{ $grado->bloque }} ({{ $grado->sede->nombre_sede ?? 'N/A' }})
+                </option>
+            @endforeach
+        </select>
+        <small class="text-muted">Asigne un grado si esta asignatura es específica para uno.</small>
+        @error('grado_id')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
     </div>

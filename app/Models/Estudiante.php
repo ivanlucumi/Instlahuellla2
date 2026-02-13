@@ -49,4 +49,9 @@ class Estudiante extends Model
     {
         return $this->hasMany(Matriculado::class);
     }
+
+    public function notas()
+    {
+        return $this->hasMany(Notas::class);
+    }
 }

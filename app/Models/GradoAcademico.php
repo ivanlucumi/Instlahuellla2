@@ -29,7 +29,7 @@ class GradoAcademico extends Model
 
     public function docente()
     {
-        return $this->belongsTo(Docente::class, 'id');
+        return $this->belongsTo(Docente::class, 'docente_id');
     }
 
     public function curso()

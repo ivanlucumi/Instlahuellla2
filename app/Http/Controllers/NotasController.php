@@ -12,33 +12,50 @@ class NotasController extends Controller
      */
     public function index()
     {
-        $notas = Notas::with(['periodoAcademico', 'grado', 'estudiante.user', 'asignatura'])->orderBy('id')->paginate(15);
+        $notas = Notas::with(['matriculado.estudiante.user', 'matriculado.grado', 'asignatura'])->orderBy('id')->paginate(15);
         return view('Notas.Index', compact('notas'));
     }
 
     public function create()
     {
-        $periodos = \App\Models\PeriodoAcademico::orderBy('nombre_periodo')->get();
-        $grados = \App\Models\GradoAcademico::orderBy('nombre_grado')->get();
-        // Cargar estudiantes con relacion user
-        $estudiantes = \App\Models\Estudiante::with('user')->get()->sortBy('user.name');
+        $matriculados = \App\Models\Matriculado::with(['estudiante.user', 'grado'])->get();
         $asignaturas = \App\Models\Asignatura::orderBy('nombre_asignatura')->get();
 
-        return view('Notas.Create', compact('periodos', 'grados', 'estudiantes', 'asignaturas'));
+        return view('Notas.Create', compact('matriculados', 'asignaturas'));
     }
 
     public function store(Request $request)
     {
+        $notas = [$request->nota1, $request->nota2, $request->nota3, $request->nota4];
+        $hasNotes = count(array_filter($notas, fn($n) => $n !== null && $n !== '')) > 0;
+
+        if (!$hasNotes) {
+            return back()->with('swal', [
+                'icon'  => 'info',
+                'title' => 'Sin notas',
+                'text'  => 'Debe ingresar al menos una nota para registrar.'
+            ])->withInput();
+        }
+
         $request->validate([
-            'periodo_academico_id' => 'required|exists:periodo_academicos,id',
-            'grado_id'             => 'required|exists:grado_academicos,id',
-            'estudiante_id'        => 'required|exists:estudiantes,id',
-            'asignatura_id'        => 'required|exists:asignaturas,id',
-            'nota'                 => 'required|numeric|min:0|max:5', // Asumiendo escala de 0 a 5
-            'observaciones'        => 'nullable|string|max:255',
+            'matriculado_id' => 'required|exists:matriculados,id',
+            'asignatura_id'  => 'required|exists:asignaturas,id',
+            'nota1'          => 'nullable|numeric|min:0|max:5',
+            'nota2'          => 'nullable|numeric|min:0|max:5',
+            'nota3'          => 'nullable|numeric|min:0|max:5',
+            'nota4'          => 'nullable|numeric|min:0|max:5',
+            'observaciones'  => 'required|string|max:255',
+        ], [
+            'observaciones.required' => 'Las observaciones son obligatorias al asignar calificaciones.'
         ]);
 
-        Notas::create($request->all());
+        $data = $request->all();
+        
+        // Calcular definitiva
+        $validNotas = array_filter($notas, fn($n) => $n !== null && $n !== '');
+        $data['nota_definitiva'] = count($validNotas) > 0 ? array_sum($validNotas) / count($validNotas) : 0;
+
+        Notas::create($data);
 
         return redirect()->route('admin.notas.index')->with('swal', [
             'icon'  => 'success',
@@ -54,26 +71,44 @@ class NotasController extends Controller
 
     public function edit(Notas $nota)
     {
-        $periodos = \App\Models\PeriodoAcademico::orderBy('nombre_periodo')->get();
-        $grados = \App\Models\GradoAcademico::orderBy('nombre_grado')->get();
-        $estudiantes = \App\Models\Estudiante::with('user')->get()->sortBy('user.name');
+        $matriculados = \App\Models\Matriculado::with(['estudiante.user', 'grado'])->get();
         $asignaturas = \App\Models\Asignatura::orderBy('nombre_asignatura')->get();
 
-        return view('Notas.Edit', compact('nota', 'periodos', 'grados', 'estudiantes', 'asignaturas'));
+        return view('Notas.Edit', compact('nota', 'matriculados', 'asignaturas'));
     }
 
     public function update(Request $request, Notas $nota)
     {
+        $notas = [$request->nota1, $request->nota2, $request->nota3, $request->nota4];
+        $hasNotes = count(array_filter($notas, fn($n) => $n !== null && $n !== '')) > 0;
+
+        if (!$hasNotes) {
+            return back()->with('swal', [
+                'icon'  => 'info',
+                'title' => 'Sin notas',
+                'text'  => 'Debe ingresar al menos una nota o mantener las existentes.'
+            ])->withInput();
+        }
+
         $request->validate([
-            'periodo_academico_id' => 'required|exists:periodo_academicos,id',
-            'grado_id'             => 'required|exists:grado_academicos,id',
-            'estudiante_id'        => 'required|exists:estudiantes,id',
-            'asignatura_id'        => 'required|exists:asignaturas,id',
-            'nota'                 => 'required|numeric|min:0|max:5',
-            'observaciones'        => 'nullable|string|max:255',
+            'matriculado_id' => 'required|exists:matriculados,id',
+            'asignatura_id'  => 'required|exists:asignaturas,id',
+            'nota1'          => 'nullable|numeric|min:0|max:5',
+            'nota2'          => 'nullable|numeric|min:0|max:5',
+            'nota3'          => 'nullable|numeric|min:0|max:5',
+            'nota4'          => 'nullable|numeric|min:0|max:5',
+            'observaciones'  => 'required|string|max:255',
+        ], [
+            'observaciones.required' => 'Las observaciones son obligatorias al asignar calificaciones.'
         ]);
 
-        $nota->update($request->all());
+        $data = $request->all();
+
+        // Calcular definitiva
+        $validNotas = array_filter($notas, fn($n) => $n !== null && $n !== '');
+        $data['nota_definitiva'] = count($validNotas) > 0 ? array_sum($validNotas) / count($validNotas) : 0;
+
+        $nota->update($data);
 
         return redirect()->route('admin.notas.index')->with('swal', [
             'icon'  => 'success',

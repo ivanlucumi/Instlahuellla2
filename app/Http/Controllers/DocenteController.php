@@ -6,6 +6,8 @@ use App\Models\Docente;
 use App\Models\GradoAcademico;
 use App\Models\Matriculado;
 use App\Models\Notas;
+use App\Models\Asignatura;
+use App\Models\Estudiante;
 use Illuminate\Http\Request;
 
 class DocenteController extends Controller
@@ -178,13 +180,195 @@ class DocenteController extends Controller
 
     public function asignaturaDocente()
     {
-        $docente = auth()->user();
-
-        $asignaturas = $docente->asignaturas()->get();
-
-       //dd($asignaturas);
+        $user = auth()->user();
+        $asignaturas = Asignatura::with(['hilo', 'sede'])
+            ->where('docente_id', $user->id)
+            ->get();
 
         return view('Docente.asignatura.asignatura_docente', compact('asignaturas'));
+    }
+
+    public function estudiantesAsignatura($asignaturaId)
+    {
+        $asignatura = Asignatura::with(['hilo', 'sede'])->findOrFail($asignaturaId);
+        
+        $grados = auth()->user()->docente->grados;
+        
+        $estudiantes = Estudiante::with(['user', 'notas' => function($query) use ($asignaturaId) {
+            $query->where('asignatura_id', $asignaturaId);
+        }])
+        ->whereIn('grado_academico_id', $grados->pluck('id'))
+        ->get();
+
+        $all_graded = $estudiantes->isNotEmpty();
+        foreach ($estudiantes as $estudiante) {
+            $nota = $estudiante->notas->first();
+            if (!$nota || $nota->nota_definitiva === null || $nota->nota_definitiva == 0) {
+                $all_graded = false;
+                break;
+            }
+        }
+
+        $todosLosGrados = GradoAcademico::all();
+
+        return view('Docente.asignatura.estudiantes_asignatura', compact('asignatura', 'estudiantes', 'todosLosGrados', 'all_graded'));
+    }
+
+    public function updateNotas(Request $request)
+    {
+        $request->validate([
+            'asignatura_id' => 'required|exists:asignaturas,id',
+            'notas' => 'required|array',
+        ]);
+
+        $errors = [];
+        $savedCount = 0;
+
+        foreach ($request->notas as $estudianteId => $notasData) {
+            $nota1 = $notasData['nota1'] ?? null;
+            $nota2 = $notasData['nota2'] ?? null;
+            $nota3 = $notasData['nota3'] ?? null;
+            $nota4 = $notasData['nota4'] ?? null;
+            $observaciones = $notasData['observaciones'] ?? null;
+
+            if ($nota1 === null && $nota2 === null && $nota3 === null && $nota4 === null) {
+                continue;
+            }
+
+            if (empty($observaciones)) {
+                $estudiante = Estudiante::find($estudianteId);
+                $nombre = $estudiante ? $estudiante->user->name : "ID: $estudianteId";
+                $errors[] = "Las observaciones son obligatorias para el estudiante $nombre.";
+                continue;
+            }
+
+            $estudiante = Estudiante::findOrFail($estudianteId);
+            
+            // Auto-matriculación si no existe
+            $matricula = Matriculado::firstOrCreate(
+                [
+                    'estudiante_id' => $estudianteId,
+                    'grado_id' => $estudiante->grado_academico_id
+                ],
+                [
+                    'acudiente_id' => $estudiante->acudiente_id ?? 1, // Fallback a ID 1 si no hay acudiente
+                    'fecha_matricula' => now(),
+                    'estado_matricula' => 'activo'
+                ]
+            );
+
+            $notas = [$nota1, $nota2, $nota3, $nota4];
+            $validNotas = array_filter($notas, fn($n) => $n !== null && $n !== '');
+            $definitiva = count($validNotas) > 0 ? array_sum($validNotas) / count($validNotas) : 0;
+
+            Notas::updateOrCreate(
+                [
+                    'matriculado_id' => $matricula->id,
+                    'asignatura_id' => $request->asignatura_id,
+                ],
+                [
+                    'estudiante_id' => $estudianteId,
+                    'grado_id' => $estudiante->grado_academico_id,
+                    'nota1' => $nota1,
+                    'nota2' => $nota2,
+                    'nota3' => $nota3,
+                    'nota4' => $nota4,
+                    'nota_definitiva' => $definitiva,
+                    'observaciones' => $observaciones,
+                ]
+            );
+            $savedCount++;
+        }
+
+        if (count($errors) > 0) {
+            return back()->with('swal', [
+                'icon' => 'warning',
+                'title' => 'Atención',
+                'text' => implode('\n', $errors)
+            ])->withErrors($errors);
+        }
+
+        if ($savedCount === 0) {
+            return back()->with('swal', [
+                'icon' => 'info',
+                'title' => 'Sin cambios',
+                'text' => 'No se ingresaron notas para guardar.'
+            ]);
+        }
+
+        return back()->with('swal', [
+            'icon' => 'success',
+            'title' => '¡Éxito!',
+            'text' => 'Las calificaciones han sido actualizadas.'
+        ]);
+    }
+
+    public function promoverEstudiantes(Request $request)
+    {
+        $request->validate([
+            'estudiantes' => 'required|array',
+            'grado_destino_id' => 'required|exists:grado_academicos,id',
+            'asignatura_id' => 'required|exists:asignaturas,id',
+        ]);
+
+        $errors = [];
+        $promotedCount = 0;
+        $gradoDestino = GradoAcademico::findOrFail($request->grado_destino_id);
+
+        foreach ($request->estudiantes as $estudianteId) {
+            $estudiante = Estudiante::findOrFail($estudianteId);
+            
+            // Validar que sea un grado "superior" (ID mayor, lógica simple por ahora)
+            if ($gradoDestino->id <= $estudiante->grado_academico_id) {
+                $errors[] = "El estudiante {$estudiante->user->name} solo puede ser promovido a un grado superior.";
+                continue;
+            }
+
+            $nota = Notas::where('estudiante_id', $estudianteId)
+                ->where('asignatura_id', $request->asignatura_id)
+                ->where('grado_id', $estudiante->grado_academico_id)
+                ->first();
+
+            if (!$nota || $nota->nota_definitiva < 3) {
+                $defVal = $nota ? $nota->nota_definitiva : 'N/A';
+                $errors[] = "{$estudiante->user->name} no cumple el requisito (Nota: $defVal).";
+                continue;
+            }
+
+            // Actualizar estudiante
+            $estudiante->update([
+                'grado_academico_id' => $request->grado_destino_id
+            ]);
+
+            // Crear nueva matrícula para el nuevo grado
+            Matriculado::updateOrCreate(
+                [
+                    'estudiante_id' => $estudianteId,
+                    'grado_id' => $request->grado_destino_id
+                ],
+                [
+                    'fecha_matricula' => now(),
+                    'estado_matricula' => 'activo',
+                    'acudiente_id' => $estudiante->acudiente_id ?? 1
+                ]
+            );
+
+            $promotedCount++;
+        }
+
+        if (count($errors) > 0) {
+            return back()->with('swal', [
+                'icon' => $promotedCount > 0 ? 'warning' : 'error',
+                'title' => $promotedCount > 0 ? 'Promoción Parcial' : 'Error',
+                'text' => implode('\n', $errors)
+            ]);
+        }
+
+        return back()->with('swal', [
+            'icon' => 'success',
+            'title' => '¡Éxito!',
+            'text' => "Se han promovido $promotedCount estudiantes y se han generado sus nuevas matrículas."
+        ]);
     }
 
     public function asignatura_grado_docente()

@@ -127,6 +127,16 @@ class MenuSeeder extends Seeder
         );
 
         Menu::updateOrCreate(
+            ['nombre' => 'Mis Asignaturas'],
+            ['icono' => 'fa fa-book-reader', 'url' => 'docente.dashboard', 'tipo' => 'sencillo', 'estado' => 1, 'rol_id' => Rol::where('nombre', 'DOCENTE')->first()?->id ?? 4, 'orden' => 1]
+        );
+
+        Menu::updateOrCreate(
+            ['nombre' => 'Calificar Estudiantes'],
+            ['icono' => 'fa fa-edit', 'url' => 'docente.dashboard', 'tipo' => 'sencillo', 'estado' => 1, 'rol_id' => Rol::where('nombre', 'DOCENTE')->first()?->id ?? 4, 'orden' => 20]
+        );
+
+        Menu::updateOrCreate(
             ['nombre' => 'Paz y Salvo'],
             ['icono' => 'fa fa-file', 'url' => 'admin.pazysalvo.index', 'tipo' => 'sencillo', 'estado' => 1, 'rol_id' => $adminRolId, 'orden' => 19]
         );

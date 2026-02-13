@@ -54,7 +54,7 @@
                 <option value="">Seleccione una asignatura</option>
                 @foreach($asignaturas as $asignatura)
                     <option value="{{ $asignatura->id }}" @selected(old('asignatura_id', $matriculado->asignatura_id ?? '') == $asignatura->id)>
-                        {{ $asignatura->nombre_asignatura }} ({{ ucfirst($asignatura->nivel_educativo) }})
+                        {{ $asignatura->nombre_asignatura }} ({{ $asignatura->hilo->nombre_hilo ?? 'N/A' }}) - {{ ucfirst($asignatura->nivel_educativo) }}
                     </option>
                 @endforeach
             </select>
