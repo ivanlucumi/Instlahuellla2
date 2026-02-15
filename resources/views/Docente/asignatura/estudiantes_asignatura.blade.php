@@ -9,7 +9,10 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <h4 class="text-white">{{ $asignatura->nombre_asignatura }}</h4>
-                    <p class="text-muted mb-0">
+                    <p class="text-primary mb-0 fw-bold">
+                        <i class="fa fa-users me-1"></i> Grado: {{ $grado->nombre_grado }} - {{ $grado->bloque }}
+                    </p>
+                    <p class="text-muted mb-0 small">
                         <span class="badge bg-info">{{ $asignatura->hilo->nombre_hilo ?? 'N/A' }}</span> | 
                         Sede: {{ $asignatura->sede->nombre_sede ?? 'N/A' }}
                     </p>
@@ -27,6 +30,7 @@
                 <form action="{{ route('docente.notas.update') }}" method="POST">
                     @csrf
                     <input type="hidden" name="asignatura_id" value="{{ $asignatura->id }}">
+                    <input type="hidden" name="grado_id" value="{{ $grado->id }}">
                     
                     <div class="table-responsive">
                         <table class="table table-hover text-white">
@@ -131,6 +135,7 @@
                         <form action="{{ route('docente.estudiantes.promover') }}" method="POST" id="promote-form">
                             @csrf
                             <input type="hidden" name="asignatura_id" value="{{ $asignatura->id }}">
+                            <input type="hidden" name="grado_origen_id" value="{{ $grado->id }}">
                             <div id="selected-students-container"></div>
                             
                             <div class="row g-3 align-items-end">

@@ -13,8 +13,6 @@ class GradoAcademico extends Model
         'bloque',
         'sede_id',
         'docente_id',
-        'curso_id',
-        'asignatura_id',
         'estado_grado_academico'
     ];
 
@@ -32,18 +30,12 @@ class GradoAcademico extends Model
         return $this->belongsTo(Docente::class, 'docente_id');
     }
 
-    public function curso()
-    {
-        return $this->belongsTo(Curso::class);
-    }
 
-    public function asignatura()
-    {
-        return $this->belongsTo(Asignatura::class);
-    }
 
     public function asignaturas()
     {
-        return $this->hasMany(Asignatura::class, 'grado_id');
+        return $this->belongsToMany(Asignatura::class, 'asignatura_grado_docente', 'grado_academico_id', 'asignatura_id')
+                    ->withPivot('docente_id')
+                    ->withTimestamps();
     }
 }

@@ -12,20 +12,19 @@ class AsignaturaController extends Controller
      */
     public function index()
     {
-        $asignaturas = Asignatura::with(['sede', 'hilo', 'docente', 'grado'])->orderBy('id')->paginate(15);
+        $asignaturas = Asignatura::with(['hilo', 'grados'])->orderBy('id')->paginate(15);
         return view('Asignatura.Index', compact('asignaturas'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        $sedes = \App\Models\Sede::orderBy('nombre_sede')->get();
         $hilos = \App\Models\Hilo::where('estado', 'activo')->orderBy('nombre_hilo')->get();
-        $docentes = \App\Models\User::whereHas('docente')->orderBy('name')->get();
         $grados = \App\Models\GradoAcademico::orderBy('nombre_grado')->get();
-        return view('Asignatura.Create', compact('sedes', 'hilos', 'docentes', 'grados'));
+        $selectedGradoId = $request->query('grado_id');
+        return view('Asignatura.Create', compact('hilos', 'grados', 'selectedGradoId'));
     }
 
     /**
@@ -36,12 +35,7 @@ class AsignaturaController extends Controller
         $request->validate([
             'nombre_asignatura' => 'required|string|max:255',
             'nivel_educativo'   => 'required|in:primaria,secundaria',
-            'sede_id'           => 'required|exists:sedes,id',
             'hilo_id'           => 'required|exists:hilos,id',
-            'grado_id'          => 'nullable|exists:grado_academicos,id',
-            'descripcion'       => 'required|string',
-            'creditos'          => 'required|integer|min:1|max:10',
-            'docente_id'        => 'required|exists:users,id',
             'estado'            => 'required|in:activo,inactivo',
         ]);
 
@@ -67,11 +61,9 @@ class AsignaturaController extends Controller
      */
     public function edit(Asignatura $asignatura)
     {
-        $sedes = \App\Models\Sede::orderBy('nombre_sede')->get();
         $hilos = \App\Models\Hilo::where('estado', 'activo')->orderBy('nombre_hilo')->get();
-        $docentes = \App\Models\User::whereHas('docente')->orderBy('name')->get();
         $grados = \App\Models\GradoAcademico::orderBy('nombre_grado')->get();
-        return view('Asignatura.Edit', compact('asignatura', 'sedes', 'hilos', 'docentes', 'grados'));
+        return view('Asignatura.Edit', compact('asignatura', 'hilos', 'grados'));
     }
 
     /**
@@ -82,12 +74,7 @@ class AsignaturaController extends Controller
         $request->validate([
             'nombre_asignatura' => 'required|string|max:255',
             'nivel_educativo'   => 'required|in:primaria,secundaria',
-            'sede_id'           => 'required|exists:sedes,id',
             'hilo_id'           => 'required|exists:hilos,id',
-            'grado_id'           => 'nullable|exists:grado_academicos,id',
-            'descripcion'       => 'required|string',
-            'creditos'          => 'required|integer|min:1|max:10',
-            'docente_id'        => 'required|exists:users,id',
             'estado'            => 'required|in:activo,inactivo',
         ]);
 
@@ -123,17 +110,10 @@ class AsignaturaController extends Controller
         ]);
 
         try {
-            $sede = \App\Models\Sede::first();
-            $docente = \App\Models\User::whereHas('docente')->first() ?? \App\Models\User::first();
-
             $asignatura = Asignatura::create([
                 'nombre_asignatura' => $request->nombre_asignatura,
                 'nivel_educativo'   => $request->nivel_educativo,
-                'sede_id'           => $sede->id ?? 1,
                 'hilo_id'           => $request->hilo_id,
-                'descripcion'       => 'Creada desde matrícula rápida',
-                'creditos'          => 1,
-                'docente_id'        => $docente->id ?? 1,
                 'estado'            => 'activo',
             ]);
 

@@ -12,7 +12,7 @@ class GradoAcademicoController extends Controller
      */
     public function index()
     {
-        $grados = GradoAcademico::with(['sede', 'docente.user', 'curso', 'asignatura'])->orderBy('id')->paginate(15);
+        $grados = GradoAcademico::with(['sede', 'docente.user', 'asignaturas'])->orderBy('id')->paginate(15);
         return view('GradoAcademico.Index', compact('grados'));
     }
 
@@ -22,10 +22,10 @@ class GradoAcademicoController extends Controller
     public function create()
     {
         $sedes = \App\Models\Sede::orderBy('nombre_sede')->get();
-        $docentes = \App\Models\Docente::with('user')->get();
-        $cursos = \App\Models\Curso::orderBy('nombre_curso')->get();
+        $docentes = \App\Models\Docente::with('user')->get(); // For Director de Grado
+        $users = \App\Models\User::whereHas('docente')->orderBy('name')->get(); // For Specialist Teachers
         $asignaturas = \App\Models\Asignatura::orderBy('nombre_asignatura')->get();
-        return view('GradoAcademico.Create', compact('sedes', 'docentes', 'cursos', 'asignaturas'));
+        return view('GradoAcademico.Create', compact('sedes', 'docentes', 'users', 'asignaturas'));
     }
 
     /**
@@ -35,29 +35,61 @@ class GradoAcademicoController extends Controller
     {
         $request->validate([
             'nombre_grado'           => 'required|string|max:255',
-            'bloque'                 => 'required|string|max:255',
-            'sede_id'                => 'required|exists:sedes,id',
-            'docente_id'             => 'required|exists:docentes,id',
-            'curso_id'               => 'nullable|exists:cursos,id',
-            'asignatura_id'          => 'nullable|exists:asignaturas,id',
+            'bloque'                 => 'nullable|string|max:255',
+            'sede_id'                => 'nullable|exists:sedes,id',
+            'docente_id'             => 'nullable|exists:docentes,id',
             'estado_grado_academico' => 'nullable|boolean',
+            'asignaturas'            => 'nullable|array',
+            'asignaturas.*.id'       => 'required|exists:asignaturas,id',
+            'asignaturas.*.docente_id'=> 'nullable|exists:users,id',
         ]);
 
-        GradoAcademico::create([
-            'nombre_grado'           => $request->nombre_grado,
-            'bloque'                 => $request->bloque,
-            'sede_id'                => $request->sede_id,
-            'docente_id'             => $request->docente_id,
-            'curso_id'               => $request->curso_id,
-            'asignatura_id'          => $request->asignatura_id,
-            'estado_grado_academico' => $request->has('estado_grado_academico') ? 1 : 0,
-        ]);
+        // Check for duplicate subjects in the request
+        if ($request->has('asignaturas')) {
+            $subjectIds = array_column($request->asignaturas, 'id');
+            if (count($subjectIds) !== count(array_unique($subjectIds))) {
+                return back()->withErrors(['asignaturas' => 'No puedes asignar la misma asignatura más de una vez.'])->withInput();
+            }
+        }
 
-        return redirect()->route('admin.gradoacademico.index')->with('swal', [
-            'icon'  => 'success',
-            'title' => '¡Éxito!',
-            'text'  => 'El grado académico fue registrado correctamente.'
-        ]);
+        try {
+            \Illuminate\Support\Facades\DB::beginTransaction();
+
+            $gradoAcademico = GradoAcademico::create([
+                'nombre_grado'           => $request->nombre_grado,
+                'bloque'                 => $request->bloque,
+                'sede_id'                => $request->sede_id,
+                'docente_id'             => $request->docente_id,
+                'estado_grado_academico' => $request->has('estado_grado_academico') ? 1 : 0,
+            ]);
+
+            // Sync subjects with pivot data
+            if ($request->has('asignaturas')) {
+                $syncData = [];
+                foreach ($request->asignaturas as $asig) {
+                    if (isset($asig['id'])) {
+                        $syncData[$asig['id']] = ['docente_id' => $asig['docente_id'] ?? null];
+                    }
+                }
+                $gradoAcademico->asignaturas()->sync($syncData);
+            }
+
+            \Illuminate\Support\Facades\DB::commit();
+
+            return redirect()->route('admin.gradoacademico.index')->with('swal', [
+                'icon'  => 'success',
+                'title' => '¡Éxito!',
+                'text'  => 'El grado académico fue registrado correctamente.'
+            ]);
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
+            return back()->with('swal', [
+                'icon'  => 'error',
+                'title' => 'Error',
+                'text'  => 'Ocurrió un error al guardar el grado: ' . $e->getMessage()
+            ])->withInput();
+        }
     }
 
     /**
@@ -74,10 +106,10 @@ class GradoAcademicoController extends Controller
     public function edit(GradoAcademico $gradoAcademico)
     {
         $sedes = \App\Models\Sede::orderBy('nombre_sede')->get();
-        $docentes = \App\Models\Docente::with('user')->get();
-        $cursos = \App\Models\Curso::orderBy('nombre_curso')->get();
+        $docentes = \App\Models\Docente::with('user')->get(); // For Director de Grado
+        $users = \App\Models\User::whereHas('docente')->orderBy('name')->get(); // For Specialist Teachers
         $asignaturas = \App\Models\Asignatura::orderBy('nombre_asignatura')->get();
-        return view('GradoAcademico.Edit', compact('gradoAcademico', 'sedes', 'docentes', 'cursos', 'asignaturas'));
+        return view('GradoAcademico.Edit', compact('gradoAcademico', 'sedes', 'docentes', 'users', 'asignaturas'));
     }
 
     /**
@@ -87,29 +119,63 @@ class GradoAcademicoController extends Controller
     {
         $request->validate([
             'nombre_grado'           => 'required|string|max:255',
-            'bloque'                 => 'required|string|max:255',
-            'sede_id'                => 'required|exists:sedes,id',
-            'docente_id'             => 'required|exists:docentes,id',
-            'curso_id'               => 'nullable|exists:cursos,id',
-            'asignatura_id'          => 'nullable|exists:asignaturas,id',
+            'bloque'                 => 'nullable|string|max:255',
+            'sede_id'                => 'nullable|exists:sedes,id',
+            'docente_id'             => 'nullable|exists:docentes,id',
             'estado_grado_academico' => 'nullable|boolean',
+            'asignaturas'            => 'nullable|array',
+            'asignaturas.*.id'       => 'required|exists:asignaturas,id',
+            'asignaturas.*.docente_id'=> 'nullable|exists:users,id',
         ]);
 
-        $gradoAcademico->update([
-            'nombre_grado'           => $request->nombre_grado,
-            'bloque'                 => $request->bloque,
-            'sede_id'                => $request->sede_id,
-            'docente_id'             => $request->docente_id,
-            'curso_id'               => $request->curso_id,
-            'asignatura_id'          => $request->asignatura_id,
-            'estado_grado_academico' => $request->has('estado_grado_academico') ? 1 : 0,
-        ]);
+         // Check for duplicate subjects in the request
+         if ($request->has('asignaturas')) {
+            $subjectIds = array_column($request->asignaturas, 'id');
+            if (count($subjectIds) !== count(array_unique($subjectIds))) {
+                return back()->withErrors(['asignaturas' => 'No puedes asignar la misma asignatura más de una vez.'])->withInput();
+            }
+        }
 
-        return redirect()->route('admin.gradoacademico.index')->with('swal', [
-            'icon'  => 'success',
-            'title' => '¡Proceso exitoso!',
-            'text'  => 'El grado académico fue actualizado correctamente.'
-        ]);
+        try {
+            \Illuminate\Support\Facades\DB::beginTransaction();
+
+            $gradoAcademico->update([
+                'nombre_grado'           => $request->nombre_grado,
+                'bloque'                 => $request->bloque,
+                'sede_id'                => $request->sede_id,
+                'docente_id'             => $request->docente_id,
+                'estado_grado_academico' => $request->has('estado_grado_academico') ? 1 : 0,
+            ]);
+
+            // Sync subjects with pivot data
+            if ($request->has('asignaturas')) {
+                $syncData = [];
+                foreach ($request->asignaturas as $asig) {
+                    if (isset($asig['id'])) {
+                        $syncData[$asig['id']] = ['docente_id' => $asig['docente_id'] ?? null];
+                    }
+                }
+                $gradoAcademico->asignaturas()->sync($syncData);
+            } else {
+                $gradoAcademico->asignaturas()->sync([]);
+            }
+
+            \Illuminate\Support\Facades\DB::commit();
+
+            return redirect()->route('admin.gradoacademico.index')->with('swal', [
+                'icon'  => 'success',
+                'title' => '¡Proceso exitoso!',
+                'text'  => 'El grado académico fue actualizado correctamente.'
+            ]);
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
+            return back()->with('swal', [
+                'icon'  => 'error',
+                'title' => 'Error',
+                'text'  => 'Ocurrió un error al actualizar el grado: ' . $e->getMessage()
+            ])->withInput();
+        }
     }
 
     /**

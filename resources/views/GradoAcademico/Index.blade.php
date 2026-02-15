@@ -28,8 +28,6 @@
                                 <th scope="col">Bloque</th>
                                 <th scope="col">Sede</th>
                                 <th scope="col">Director</th>
-                                <th scope="col">Curso</th>
-                                <th scope="col">Asignatura</th>
                                 <th scope="col">Estado</th>
                                 <th scope="col">Acciones</th>
                             </tr>
@@ -42,8 +40,6 @@
                                     <td>{{ $grado->bloque }}</td>
                                     <td>{{ $grado->sede->nombre_sede ?? 'N/A' }}</td>
                                     <td>{{ $grado->docente->user->name ?? 'N/A' }}</td>
-                                    <td>{{ $grado->curso->nombre_curso ?? 'Sin Curso' }}</td>
-                                    <td>{{ $grado->asignatura->nombre_asignatura ?? 'Sin Asignatura' }}</td>
                                     <td>
                                         <span class="badge {{ $grado->estado_grado_academico ? 'bg-success' : 'bg-danger' }}">
                                             {{ $grado->estado_grado_academico ? 'Activo' : 'Inactivo' }}

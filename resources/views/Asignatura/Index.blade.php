@@ -26,11 +26,8 @@
                                 <th scope="col">#</th>
                                 <th scope="col">Nombre</th>
                                 <th scope="col">Nivel Educativo</th>
-                                <th scope="col">Sede</th>
                                 <th scope="col">Hilo</th>
                                 <th scope="col">Grado</th>
-                                <th scope="col">Docente</th>
-                                <th scope="col">Créditos</th>
                                 <th scope="col">Estado</th>
                                 <th scope="col">Acciones</th>
                             </tr>
@@ -45,16 +42,15 @@
                                             {{ ucfirst($asignatura->nivel_educativo) }}
                                         </span>
                                     </td>
-                                    <td>{{ $asignatura->sede->nombre_sede ?? 'N/A' }}</td>
                                     <td>
                                         <span class="badge bg-info">{{ $asignatura->hilo->nombre_hilo ?? 'N/A' }}</span>
                                     </td>
                                     <td>
-                                        <span class="badge bg-dark">{{ $asignatura->grado->nombre_grado ?? 'General' }}</span>
-                                    </td>
-                                    <td>{{ $asignatura->docente->name ?? 'N/A' }}</td>
-                                    <td>
-                                        <span class="badge bg-primary">{{ $asignatura->creditos }}</span>
+                                        @forelse($asignatura->grados as $g)
+                                            <span class="badge bg-dark">{{ $g->nombre_grado }} ({{ $g->bloque }})</span>
+                                        @empty
+                                            <span class="badge bg-secondary">General</span>
+                                        @endforelse
                                     </td>
                                     <td>
                                         <span class="badge {{ $asignatura->estado == 'activo' ? 'bg-success' : 'bg-danger' }}">
@@ -81,7 +77,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="9" class="text-center">
+                                    <td colspan="6" class="text-center">
                                         <div class="alert alert-warning mb-0">
                                             <i class="fa fa-exclamation-triangle me-2"></i>
                                             No hay asignaturas registradas.

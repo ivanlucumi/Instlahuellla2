@@ -12,12 +12,11 @@
     </div>
 
     <div class="col-md-6 mb-3">
-        <label class="form-label">Bloque / Sección</label>
+        <label class="form-label">Bloque / Sección (Opcional)</label>
         <input type="text"
                name="bloque"
                class="form-control @error('bloque') is-invalid @enderror"
-               value="{{ old('bloque', $gradoAcademico->bloque ?? '') }}"
-               required>
+               value="{{ old('bloque', $gradoAcademico->bloque ?? '') }}">
         @error('bloque')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
@@ -26,10 +25,9 @@
 
 <div class="row">
     <div class="col-md-6 mb-3">
-        <label class="form-label">Sede</label>
+        <label class="form-label">Sede (Opcional)</label>
         <select name="sede_id" 
-                class="form-select @error('sede_id') is-invalid @enderror" 
-                required>
+                class="form-select @error('sede_id') is-invalid @enderror">
             <option value="">Seleccione una sede</option>
             @foreach($sedes as $sede)
                 <option value="{{ $sede->id }}"
@@ -44,10 +42,9 @@
     </div>
 
     <div class="col-md-6 mb-3">
-        <label class="form-label">Director de Grado (Docente)</label>
+        <label class="form-label">Director de Grado (Docente - Opcional)</label>
         <select name="docente_id" 
-                class="form-select @error('docente_id') is-invalid @enderror" 
-                required>
+                class="form-select @error('docente_id') is-invalid @enderror">
             <option value="">Seleccione un docente</option>
             @foreach($docentes as $docente)
                 <option value="{{ $docente->id }}"
@@ -62,41 +59,7 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-6 mb-3">
-        <label class="form-label">Curso</label>
-        <select name="curso_id" 
-                class="form-select @error('curso_id') is-invalid @enderror">
-            <option value="">Seleccione un curso (Opcional)</option>
-            @foreach($cursos as $curso)
-                <option value="{{ $curso->id }}"
-                    @selected(old('curso_id', $gradoAcademico->curso_id ?? '') == $curso->id)>
-                    {{ $curso->nombre_curso }}
-                </option>
-            @endforeach
-        </select>
-        @error('curso_id')
-            <div class="invalid-feedback">{{ $message }}</div>
-        @enderror
-    </div>
 
-    <div class="col-md-6 mb-3">
-        <label class="form-label">Asignatura</label>
-        <select name="asignatura_id" 
-                class="form-select @error('asignatura_id') is-invalid @enderror">
-            <option value="">Seleccione una asignatura (Opcional)</option>
-            @foreach($asignaturas as $asignatura)
-                <option value="{{ $asignatura->id }}"
-                    @selected(old('asignatura_id', $gradoAcademico->asignatura_id ?? '') == $asignatura->id)>
-                    {{ $asignatura->nombre_asignatura }} ({{ $asignatura->hilo->nombre_hilo ?? 'N/A' }})
-                </option>
-            @endforeach
-        </select>
-        @error('asignatura_id')
-            <div class="invalid-feedback">{{ $message }}</div>
-        @enderror
-    </div>
-</div>
 
 <div class="row">
     <div class="col-md-6 mb-3">

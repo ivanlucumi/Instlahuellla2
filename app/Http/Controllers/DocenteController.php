@@ -181,23 +181,40 @@ class DocenteController extends Controller
     public function asignaturaDocente()
     {
         $user = auth()->user();
-        $asignaturas = Asignatura::with(['hilo', 'sede'])
-            ->where('docente_id', $user->id)
-            ->get();
+        
+        // Obtenemos todos los grados donde este docente dicta alguna materia
+        $gradosConMaterias = GradoAcademico::whereHas('asignaturas', function($q) use ($user) {
+            $q->where('asignatura_grado_docente.docente_id', $user->id);
+        })->with(['asignaturas' => function($q) use ($user) {
+            $q->where('asignatura_grado_docente.docente_id', $user->id)->with('hilo');
+        }])->get();
 
-        return view('Docente.asignatura.asignatura_docente', compact('asignaturas'));
+        // Aplanamos para la vista
+        $assignments = collect();
+        foreach ($gradosConMaterias as $grado) {
+            foreach ($grado->asignaturas as $asig) {
+                $assignments->push((object)[
+                    'id'                => $asig->id,
+                    'nombre_asignatura' => $asig->nombre_asignatura,
+                    'hilo_nombre'       => $asig->hilo->nombre_hilo ?? 'N/A',
+                    'grado_id'          => $grado->id,
+                    'grado_nombre'      => $grado->nombre_grado . ' - ' . $grado->bloque,
+                ]);
+            }
+        }
+
+        return view('Docente.asignatura.asignatura_docente', compact('assignments'));
     }
 
-    public function estudiantesAsignatura($asignaturaId)
+    public function estudiantesAsignatura($asignaturaId, $gradoId)
     {
         $asignatura = Asignatura::with(['hilo', 'sede'])->findOrFail($asignaturaId);
+        $grado = GradoAcademico::findOrFail($gradoId);
         
-        $grados = auth()->user()->docente->grados;
-        
-        $estudiantes = Estudiante::with(['user', 'notas' => function($query) use ($asignaturaId) {
-            $query->where('asignatura_id', $asignaturaId);
+        $estudiantes = Estudiante::with(['user', 'notas' => function($query) use ($asignaturaId, $gradoId) {
+            $query->where('asignatura_id', $asignaturaId)->where('grado_id', $gradoId);
         }])
-        ->whereIn('grado_academico_id', $grados->pluck('id'))
+        ->where('grado_academico_id', $gradoId)
         ->get();
 
         $all_graded = $estudiantes->isNotEmpty();
@@ -211,14 +228,15 @@ class DocenteController extends Controller
 
         $todosLosGrados = GradoAcademico::all();
 
-        return view('Docente.asignatura.estudiantes_asignatura', compact('asignatura', 'estudiantes', 'todosLosGrados', 'all_graded'));
+        return view('Docente.asignatura.estudiantes_asignatura', compact('asignatura', 'grado', 'estudiantes', 'todosLosGrados', 'all_graded'));
     }
 
     public function updateNotas(Request $request)
     {
         $request->validate([
             'asignatura_id' => 'required|exists:asignaturas,id',
-            'notas' => 'required|array',
+            'grado_id'      => 'required|exists:grado_academicos,id',
+            'notas'         => 'required|array',
         ]);
 
         $errors = [];
@@ -248,7 +266,7 @@ class DocenteController extends Controller
             $matricula = Matriculado::firstOrCreate(
                 [
                     'estudiante_id' => $estudianteId,
-                    'grado_id' => $estudiante->grado_academico_id
+                    'grado_id' => $request->grado_id
                 ],
                 [
                     'acudiente_id' => $estudiante->acudiente_id ?? 1, // Fallback a ID 1 si no hay acudiente
@@ -268,7 +286,7 @@ class DocenteController extends Controller
                 ],
                 [
                     'estudiante_id' => $estudianteId,
-                    'grado_id' => $estudiante->grado_academico_id,
+                    'grado_id' => $request->grado_id,
                     'nota1' => $nota1,
                     'nota2' => $nota2,
                     'nota3' => $nota3,
