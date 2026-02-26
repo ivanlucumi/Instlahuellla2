@@ -76,6 +76,7 @@ Route::middleware(['auth', 'rol:SUPERADMIN,ADMIN'])
         Route::get('/gradoacademico', [App\Http\Controllers\GradoAcademicoController::class, 'index'])->name('admin.gradoacademico.index');
         Route::get('/gradoacademico/crear', [App\Http\Controllers\GradoAcademicoController::class, 'create'])->name('admin.gradoacademico.create');
         Route::post('/gradoacademico', [App\Http\Controllers\GradoAcademicoController::class, 'store'])->name('admin.gradoacademico.store');
+        Route::get('/gradoacademico/{gradoAcademico}', [App\Http\Controllers\GradoAcademicoController::class, 'show'])->name('admin.gradoacademico.show');
         Route::get('/gradoacademico/{gradoAcademico}/editar', [App\Http\Controllers\GradoAcademicoController::class, 'edit'])->name('admin.gradoacademico.edit');
         Route::put('/gradoacademico/{gradoAcademico}', [App\Http\Controllers\GradoAcademicoController::class, 'update'])->name('admin.gradoacademico.update');
         Route::delete('/gradoacademico/{gradoAcademico}', [App\Http\Controllers\GradoAcademicoController::class, 'destroy'])->name('admin.gradoacademico.destroy');
@@ -155,7 +156,7 @@ Route::middleware(['auth', 'rol:ESTUDIANTE'])
             ->name('estudiante.notasPeriodo');
     });
 
-Route::middleware(['auth','rol:DOCENTE'])
+Route::middleware(['auth','rol:SUPERADMIN,ADMIN,DOCENTE'])
     ->prefix('docente')
     ->group(function () {
 

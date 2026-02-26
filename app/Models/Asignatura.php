@@ -28,5 +28,16 @@ class Asignatura extends Model
                     ->withPivot('docente_id')
                     ->withTimestamps();
     }
+    public function sede()
+    {
+        return $this->belongsTo(Sede::class, 'sede_id');
+    }
+
+    public function docentes()
+    {
+        return $this->belongsToMany(User::class, 'asignatura_grado_docente', 'asignatura_id', 'docente_id')
+                    ->withPivot('grado_academico_id')
+                    ->withTimestamps();
+    }
     
 }

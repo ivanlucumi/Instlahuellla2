@@ -6,14 +6,14 @@
 <div class="container-fluid pt-4 px-4">
     <div class="row mb-4">
         <div class="col-12">
-            <h4 class="text-white">Mis Asignaturas</h4>
-            <p class="text-muted">Seleccione una asignatura para ver el listado de estudiantes y gestionar calificaciones.</p>
+            <h4 class="text-white">{{ $isSuperAdmin ? 'Panel de Control - Todas las Asignaturas' : 'Mis Asignaturas' }}</h4>
+            <p class="text-muted">{{ $isSuperAdmin ? 'Visualizando todas las asignaciones docentes del sistema.' : 'Seleccione una asignatura para ver el listado de estudiantes y gestionar calificaciones.' }}</p>
         </div>
     </div>
 
     @if($assignments->isEmpty())
         <div class="alert alert-info">
-            <i class="fa fa-info-circle me-2"></i> No tienes materias asignadas en ningún grado en este momento.
+            <i class="fa fa-info-circle me-2"></i> {{ $isSuperAdmin ? 'No hay materias asignadas en el sistema todavía.' : 'No tienes materias asignadas en ningún grado en este momento.' }}
         </div>
     @else
         <div class="row g-4">
@@ -23,11 +23,14 @@
                         <i class="fa fa-book fa-3x text-primary opacity-50"></i>
                         <div class="ms-3 text-end">
                             <h6 class="mb-1 text-white">{{ $asig->nombre_asignatura }}</h6>
-                            <p class="mb-2 text-primary small fw-bold"><i class="fa fa-users me-1"></i>{{ $asig->grado_nombre }}</p>
+                            <p class="mb-1 text-primary small fw-bold"><i class="fa fa-users me-1"></i>{{ $asig->grado_nombre }}</p>
+                            @if($isSuperAdmin)
+                                <p class="mb-1 text-warning small"><i class="fa fa-user-tie me-1"></i>Docente: {{ $asig->docente_nombre }}</p>
+                            @endif
                             <span class="badge bg-dark-info border border-info mb-3">{{ $asig->hilo_nombre }}</span>
                             <br>
                             <a href="{{ route('docente.asignatura.estudiantes', [$asig->id, $asig->grado_id]) }}" class="btn btn-primary btn-sm">
-                                <i class="fa fa-edit me-1"></i> Calificar Grupo
+                                <i class="fa fa-edit me-1"></i> {{ $isSuperAdmin ? 'Ver/Calificar' : 'Calificar Grupo' }}
                             </a>
                         </div>
                     </div>

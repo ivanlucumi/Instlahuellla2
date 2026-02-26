@@ -97,7 +97,18 @@ class GradoAcademicoController extends Controller
      */
     public function show(GradoAcademico $gradoAcademico)
     {
-        //
+        $gradoAcademico->load([
+            'sede', 
+            'docente.user', 
+            'asignaturas.hilo',
+            'asignaturas.docentes'
+        ]);
+
+        $estudiantes = \App\Models\Estudiante::where('grado_academico_id', $gradoAcademico->id)
+            ->with('user')
+            ->get();
+
+        return view('GradoAcademico.Show', compact('gradoAcademico', 'estudiantes'));
     }
 
     /**

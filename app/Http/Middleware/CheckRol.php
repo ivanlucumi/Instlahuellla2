@@ -17,7 +17,7 @@ class CheckRol
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
         // Usuario no autenticado
         if (!auth()->check()) {
@@ -36,5 +36,7 @@ class CheckRol
             ->exists()) {
             abort(403);
         }
+
+        return $next($request);
     }
 }

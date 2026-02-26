@@ -46,8 +46,13 @@
                                         </span>
                                     </td>
                                     <td>
+                                        <a href="{{ route('admin.gradoacademico.show', $grado) }}" 
+                                           class="btn btn-info btn-sm" title="Ver detalles">
+                                            <i class="fa fa-eye"></i>
+                                        </a>
+
                                         <a href="{{ route('admin.gradoacademico.edit', $grado) }}" 
-                                           class="btn btn-warning btn-sm">
+                                           class="btn btn-warning btn-sm" title="Editar">
                                             <i class="fa fa-edit"></i>
                                         </a>
                                         

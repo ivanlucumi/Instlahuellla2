@@ -181,29 +181,53 @@ class DocenteController extends Controller
     public function asignaturaDocente()
     {
         $user = auth()->user();
+        $isSuperAdmin = $user->roles()->whereIn('nombre', ['SUPERADMIN', 'ADMIN'])->exists();
         
-        // Obtenemos todos los grados donde este docente dicta alguna materia
-        $gradosConMaterias = GradoAcademico::whereHas('asignaturas', function($q) use ($user) {
-            $q->where('asignatura_grado_docente.docente_id', $user->id);
-        })->with(['asignaturas' => function($q) use ($user) {
-            $q->where('asignatura_grado_docente.docente_id', $user->id)->with('hilo');
-        }])->get();
+        if ($isSuperAdmin) {
+            // SuperAdmin/Admin ve todas las asignaciones de todos los docentes
+            $gradosConMaterias = GradoAcademico::with(['asignaturas' => function($q) {
+                $q->with(['hilo', 'docentes']);
+            }])->get();
+        } else {
+            // El docente solo ve sus propias materias
+            $gradosConMaterias = GradoAcademico::whereHas('asignaturas', function($q) use ($user) {
+                $q->where('asignatura_grado_docente.docente_id', $user->id);
+            })->with(['asignaturas' => function($q) use ($user) {
+                $q->where('asignatura_grado_docente.docente_id', $user->id)->with('hilo');
+            }])->get();
+        }
 
         // Aplanamos para la vista
         $assignments = collect();
         foreach ($gradosConMaterias as $grado) {
             foreach ($grado->asignaturas as $asig) {
+                // Para SuperAdmin, buscamos quién es el docente de esta materia en este grado
+                $docenteNombre = 'N/A';
+                if ($isSuperAdmin) {
+                    // Obtenemos el docente desde la tabla pivote manualmente o via relación corregida
+                    $pivot = \DB::table('asignatura_grado_docente')
+                        ->where('grado_academico_id', $grado->id)
+                        ->where('asignatura_id', $asig->id)
+                        ->first();
+                    
+                    if ($pivot && $pivot->docente_id) {
+                        $u = \App\Models\User::find($pivot->docente_id);
+                        $docenteNombre = $u ? $u->name : 'N/A';
+                    }
+                }
+
                 $assignments->push((object)[
                     'id'                => $asig->id,
                     'nombre_asignatura' => $asig->nombre_asignatura,
                     'hilo_nombre'       => $asig->hilo->nombre_hilo ?? 'N/A',
                     'grado_id'          => $grado->id,
                     'grado_nombre'      => $grado->nombre_grado . ' - ' . $grado->bloque,
+                    'docente_nombre'    => $isSuperAdmin ? $docenteNombre : null,
                 ]);
             }
         }
 
-        return view('Docente.asignatura.asignatura_docente', compact('assignments'));
+        return view('Docente.asignatura.asignatura_docente', compact('assignments', 'isSuperAdmin'));
     }
 
     public function estudiantesAsignatura($asignaturaId, $gradoId)
@@ -271,13 +295,10 @@ class DocenteController extends Controller
                 [
                     'acudiente_id' => $estudiante->acudiente_id ?? 1, // Fallback a ID 1 si no hay acudiente
                     'fecha_matricula' => now(),
-                    'estado_matricula' => 'activo'
+                    'estado' => 'activo',
+                    'acudiente_id' => $estudiante->acudiente_id ?? 1
                 ]
             );
-
-            $notas = [$nota1, $nota2, $nota3, $nota4];
-            $validNotas = array_filter($notas, fn($n) => $n !== null && $n !== '');
-            $definitiva = count($validNotas) > 0 ? array_sum($validNotas) / count($validNotas) : 0;
 
             Notas::updateOrCreate(
                 [
@@ -366,7 +387,7 @@ class DocenteController extends Controller
                 ],
                 [
                     'fecha_matricula' => now(),
-                    'estado_matricula' => 'activo',
+                    'estado' => 'activo',
                     'acudiente_id' => $estudiante->acudiente_id ?? 1
                 ]
             );
@@ -402,7 +423,7 @@ class DocenteController extends Controller
 
     public function listadoClases($gradoId)
     {
-        $grado = GradoAcademico::with('asignatura')
+        $grado = GradoAcademico::with('asignaturas')
                 ->findOrFail($gradoId);
 
     $estudiantes = Matriculado::with('estudiante.user')
@@ -425,7 +446,7 @@ class DocenteController extends Controller
     
     public function calificarEstudianteFinal($gradoId)
     {
-        $grado = GradoAcademico::with('asignatura')
+        $grado = GradoAcademico::with('asignaturas')
                 ->findOrFail($gradoId);
 
     $estudiantes = Matriculado::with('estudiante.user')
@@ -438,27 +459,52 @@ class DocenteController extends Controller
     public function guardarNotas(Request $request)
     {
         $request->validate([
-            'notas.*.nota' => 'required|numeric|min:0|max:5',
-            'notas.*.observaciones' => 'nullable|string|max:500'
+            'asignatura_id' => 'required|exists:asignaturas,id',
+            'grado_id'      => 'required|exists:grado_academicos,id',
+            'notas'         => 'required|array',
+            'periodo_academico_id' => 'nullable|exists:periodo_academicos,id',
         ]);
 
         foreach ($request->notas as $estudianteId => $data) {
+            $notaValue = $data['nota'] ?? null;
+            $observaciones = $data['observaciones'] ?? null;
+
+            if ($notaValue === null) continue;
+
+            // Buscamos si ya existe una nota para este estudiante/asignatura/grado
+            // para no sobreescribir los periodos incorrectamente si la vista solo manda uno.
+            // Si la vista es la simplificada de 1 periodo, la guardamos en 'nota' (legacy) 
+            // y tratamos de mapearla a nota1 si es posible, o mantenemos la lógica actual.
+            
+            // Según el requerimiento, usemos la tabla notas con el formato mejorado.
+            $estudiante = Estudiante::findOrFail($estudianteId);
+            $matricula = Matriculado::firstOrCreate(
+                ['estudiante_id' => $estudianteId, 'grado_id' => $request->grado_id],
+                ['acudiente_id' => $estudiante->acudiente_id ?? 1, 'fecha_matricula' => now(), 'estado' => 'activo']
+            );
 
             Notas::updateOrCreate(
+                [
+                    'matriculado_id' => $matricula->id,
+                    'asignatura_id' => $request->asignatura_id,
+                ],
                 [
                     'periodo_academico_id' => $request->periodo_academico_id,
                     'grado_id'             => $request->grado_id,
                     'estudiante_id'        => $estudianteId,
-                    'asignatura_id'        => $request->asignatura_id,
-                ],
-                [
-                    'nota'          => $data['nota'],
-                    'observaciones' => $data['observaciones'] ?? null,
+                    'nota'                 => $notaValue, // Compatibilidad
+                    'nota1'                => $notaValue, // Asumimos P1 si viene de la vista simple
+                    'nota_definitiva'      => $notaValue,
+                    'observaciones'        => $observaciones,
                 ]
             );
         }
 
-        return back()->with('success', 'Notas guardadas correctamente');
+        return back()->with('swal', [
+            'icon' => 'success',
+            'title' => '¡Éxito!',
+            'text' => 'Las calificaciones han sido guardadas correctamente.'
+        ]);
     }
 
 
