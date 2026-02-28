@@ -19,7 +19,10 @@ class DatabaseSeeder extends Seeder
             RolSeeder::class,
             UserSeeder::class,
             RolUserSeeder::class,
+            InstitucionSeeder::class,
+            SedeSeeder::class,
             HiloSeeder::class,
+            AcudienteSeeder::class,
             AsignaturaSeeder::class,
             MenuSeeder::class,
         ]);
