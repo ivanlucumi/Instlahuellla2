@@ -181,23 +181,27 @@ class GradoAcademicoController extends Controller
         
         $anoLectivo = $currentAnhoObj->nombre_anho_escolar ?? date('Y');
 
-        // 2. Otros cursos (bloques) del mismo nivel (e.g., todos los 6° grados)
+        // Determinar si el año seleccionado es el año en curso
+        $anhoActual = date('Y');
+        $esAnhoActual = ((string)$anoLectivo === (string)$anhoActual);
+
+        // 2. Otros cursos (bloques) del mismo nivel
         $cursosDisponibles = GradoAcademico::where('nombre_grado', $gradoAcademico->nombre_grado)
             ->with('curso')
             ->get();
 
-        // 3. Cargar relaciones del grado actual
+        // 3. Cargar relaciones base del grado
         $gradoAcademico->load([
             'sede', 
             'docente.user', 
             'asignaturas.hilo',
-            'asignaturas.docentes'
+            'asignaturas.docentes',
         ]);
 
         // Preferimos el nombre_curso de la relación si existe, sino bloque
         $cursoTarget = $gradoAcademico->curso->nombre_curso ?? $gradoAcademico->bloque;
 
-        // 4. Estudiantes matriculados según el contexto de Año Lectivo y Curso (Bloque)
+        // 4. Estudiantes matriculados según Año Lectivo
         $matriculadosMF = \App\Models\MatriculaFinal::where('id_grado', $gradoAcademico->id)
             ->where('ano_lectivo', $anoLectivo)
             ->where('curso', $cursoTarget)
@@ -205,19 +209,30 @@ class GradoAcademicoController extends Controller
         
         $documentosMatriculados = $matriculadosMF->pluck('documento_estudiante');
 
-        // Filtrar asignaturas: Solo las que tienen registros en NotasDefinitivas para esta matrícula
-        $asignaturasActivasIds = \App\Models\NotasDefinitivas::whereIn('id_matricula', $matriculadosMF->pluck('id'))
-            ->distinct()
-            ->pluck('asignatura_id')
-            ->toArray();
+        // 5. Asignaturas: 
+        //    - Año actual → desde la tabla pivot asignatura_grado_docente (ya cargada en ->asignaturas)
+        //    - Otros años → desde notas_definitivas relacionadas a las matrículas de ese año
+        if ($esAnhoActual) {
+            // Asignaturas del pivot: ya están cargadas en $gradoAcademico->asignaturas
+            // No sobreescribimos la relación.
+        } else {
+            // Asignaturas que aparecen en notas_definitivas para ese año
+            $asignaturasActivasIds = \App\Models\NotasDefinitivas::whereIn('id_matricula', $matriculadosMF->pluck('id'))
+                ->distinct()
+                ->pluck('asignatura_id')
+                ->toArray();
 
-        $gradoAcademico->setRelation('asignaturas', $gradoAcademico->asignaturas->whereIn('id', $asignaturasActivasIds));
+            $gradoAcademico->setRelation(
+                'asignaturas',
+                $gradoAcademico->asignaturas->whereIn('id', $asignaturasActivasIds)
+            );
+        }
 
         $estudiantes = \App\Models\Estudiante::whereIn('numero_identificacion_estudiante', $documentosMatriculados)
             ->with('user')
             ->get();
 
-        // 5. Datos para Modales de Gestión
+        // 6. Datos para Modales de Gestión
         $allAsignaturas = \App\Models\Asignatura::orderBy('nombre_asignatura')->get();
         $allUsers = \App\Models\User::whereHas('docente')->orderBy('name')->get();
         
@@ -229,9 +244,11 @@ class GradoAcademicoController extends Controller
 
         return view('GradoAcademico.Show', compact(
             'gradoAcademico', 
-            'estudiantes', 
+            'estudiantes',
+            'matriculadosMF',
             'anhos', 
-            'currentAnhoObj', 
+            'currentAnhoObj',
+            'esAnhoActual',
             'cursosDisponibles',
             'allAsignaturas',
             'allUsers',

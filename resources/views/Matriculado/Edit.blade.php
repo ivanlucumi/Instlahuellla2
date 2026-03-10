@@ -42,6 +42,22 @@
                             <label class="form-label">Dirección Estudiante</label>
                             <input type="text" name="direccion_estudiante" class="form-control @error('direccion_estudiante') is-invalid @enderror" value="{{ old('direccion_estudiante', $matriculado->estudiante->direccion_estudiante ?? '') }}">
                         </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Fecha de Nacimiento <span class="text-danger">*</span></label>
+                            <input type="date" name="fecha_nacimiento_estudiante" class="form-control @error('fecha_nacimiento_estudiante') is-invalid @enderror"
+                                value="{{ old('fecha_nacimiento_estudiante', $matriculado->estudiante->fecha_nacimiento_estudiante ? $matriculado->estudiante->fecha_nacimiento_estudiante->format('Y-m-d') : '') }}" required>
+                            @error('fecha_nacimiento_estudiante') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Género</label>
+                            <select name="genero_estudiante" class="form-select">
+                                <option value="Masculino" @selected(old('genero_estudiante', $matriculado->estudiante->genero_estudiante ?? '') == 'Masculino')>Masculino</option>
+                                <option value="Femenino" @selected(old('genero_estudiante', $matriculado->estudiante->genero_estudiante ?? '') == 'Femenino')>Femenino</option>
+                                <option value="Otro" @selected(old('genero_estudiante', $matriculado->estudiante->genero_estudiante ?? '') == 'Otro')>Otro</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="row">
@@ -73,29 +89,18 @@
                             <input type="hidden" name="parentezco_acudiente" id="parentezco_acudiente" value="{{ old('parentezco_acudiente', $matriculado->parentezco_acudiente ?? 'Acudiente') }}">
                         </div>
 
-                        <!-- Sede -->
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Sede / Institución</label>
-                            <select name="id_sede" id="id_sede" class="form-select @error('id_sede') is-invalid @enderror" required>
-                                <option value="">Seleccione una sede</option>
-                                @foreach($sedes as $sede)
-                                    <option value="{{ $sede->id }}" @selected(old('id_sede', $matriculado->id_sede ?? '') == $sede->id)>
-                                        {{ $sede->nombre_sede }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('id_sede') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
-                        </div>
+                        <!-- Sede Implícita -->
+                        <input type="hidden" name="id_sede" id="id_sede" value="{{ old('id_sede', $matriculado->id_sede ?? '') }}">
 
                         <!-- Grado -->
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Grado Académico</label>
                             <div class="input-group">
-                                <select name="id_grado" id="id_grado" class="form-select select-grado @error('id_grado') is-invalid @enderror" required onchange="matchCurso()">
+                                <select name="id_grado" id="id_grado" class="form-select select-grado @error('id_grado') is-invalid @enderror" required onchange="matchCursoAndSede()">
                                     <option value="">Seleccione grado</option>
                                     @foreach($grados as $grado)
-                                        <option value="{{ $grado->id }}" data-bloque="{{ $grado->bloque }}" @selected(old('id_grado', $matriculado->id_grado ?? '') == $grado->id)>
-                                            {{ $grado->nombre_grado }} - {{ $grado->bloque }}
+                                        <option value="{{ $grado->id }}" data-bloque="{{ $grado->bloque }}" data-sede="{{ $grado->sede_id }}" @selected(old('id_grado', $matriculado->id_grado ?? '') == $grado->id)>
+                                            {{ $grado->nombre_grado }} - {{ $grado->bloque }} ({{ $grado->sede->nombre_sede ?? 'Sin Sede' }})
                                         </option>
                                     @endforeach
                                 </select>
@@ -180,13 +185,21 @@
                             let parentesco = element.options[element.selectedIndex].getAttribute('data-parentesco');
                             document.getElementById('parentezco_acudiente').value = parentesco || 'Acudiente';
                         }
-                        function matchCurso() {
+                        function matchCursoAndSede() {
                             let el = document.getElementById('id_grado');
                             if(el.selectedIndex > 0) {
-                                let bloque = el.options[el.selectedIndex].getAttribute('data-bloque');
+                                let option = el.options[el.selectedIndex];
+                                let bloque = option.getAttribute('data-bloque');
+                                let sedeId = option.getAttribute('data-sede');
+                                
                                 if (bloque) {
                                     document.getElementById('curso').value = bloque;
                                 }
+                                if (sedeId) {
+                                    document.getElementById('id_sede').value = sedeId;
+                                }
+                            } else {
+                                document.getElementById('id_sede').value = '';
                             }
                         }
                         $(document).ready(function() {

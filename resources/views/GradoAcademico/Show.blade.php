@@ -101,7 +101,7 @@
                             'ano_lectivo' => $currentAnhoObj->nombre_anho_escolar,
                             'curso' => ($gradoAcademico->curso->nombre_curso ?? $gradoAcademico->bloque)
                         ]) }}" 
-                           class="btn btn-sm btn-outline-info" target="_blank">
+                           class="btn btn-sm btn-outline-info">
                             <i class="fa fa-file-pdf me-1"></i> Certificado Grupal
                         </a>
                         <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalMatricular">
@@ -140,10 +140,17 @@
                                             <ul class="dropdown-menu dropdown-menu-dark">
                                                 <li><a class="dropdown-item" href="{{ route('admin.estudiante.edit', $est->id) }}"><i class="fa fa-edit me-2"></i>Ver Perfil</a></li>
                                                 <li>
-                                                    <a class="dropdown-item text-info" target="_blank"
-                                                       href="{{ route('admin.certificados.generar', ['identificacion' => $est->numero_identificacion_estudiante, 'grado_aprobado' => ($gradoAcademico->nombre_grado . ' - ' . $gradoAcademico->bloque)]) }}">
+                                                    @php
+                                                        $mfRec = $matriculadosMF->firstWhere('documento_estudiante', $est->numero_identificacion_estudiante);
+                                                    @endphp
+                                                    @if($mfRec)
+                                                    <a class="dropdown-item text-info"
+                                                       href="{{ route('admin.certificados.por-matricula', $mfRec->id) }}">
                                                         <i class="fa fa-file-pdf me-2"></i>Generar Certificado
                                                     </a>
+                                                    @else
+                                                    <span class="dropdown-item text-muted"><i class="fa fa-file-pdf me-2"></i>Sin matrícula</span>
+                                                    @endif
                                                 </li>
                                                 <li><hr class="dropdown-divider"></li>
                                                 <li><a class="dropdown-item text-danger" href="#"><i class="fa fa-trash me-2"></i>Retirar</a></li>
@@ -169,12 +176,25 @@
             <div class="bg-secondary rounded h-100 p-4 shadow-sm">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h5 class="text-white mb-0">
-                        <i class="fa fa-book-open me-2 text-primary"></i> Asignaturas Vinculadas
+                        <i class="fa fa-book-open me-2 text-primary"></i>
+                        @if($esAnhoActual)
+                            Asignaturas del Año Actual
+                        @else
+                            Asignaturas Históricas ({{ $currentAnhoObj->nombre_anho_escolar }})
+                        @endif
                     </h5>
+                    @if($esAnhoActual)
                     <a href="{{ route('admin.gradoacademico.edit', $gradoAcademico->id) }}" class="btn btn-sm btn-outline-primary">
                         <i class="fa fa-cog me-1"></i> Gestionar
                     </a>
+                    @endif
                 </div>
+
+                @if(!$esAnhoActual)
+                <div class="alert alert-info bg-dark border-info text-white small mb-3">
+                    <i class="fa fa-history me-1"></i> Visualizando asignaturas con notas registradas en el año <strong>{{ $currentAnhoObj->nombre_anho_escolar }}</strong>. Para gestionar el plan de estudios actual usa el año en curso.
+                </div>
+                @endif
                 
                 <div class="list-group list-group-flush list-group-dark">
                     @forelse($gradoAcademico->asignaturas as $asig)
@@ -182,31 +202,40 @@
                             <div class="d-flex w-100 justify-content-between align-items-center">
                                 <div>
                                     <h6 class="mb-1 text-info">{{ $asig->nombre_asignatura }}</h6>
+                                    @if($esAnhoActual)
                                     @php
-                                        $docente = $asig->docentes->firstWhere('id', $asig->pivot->docente_id);
+                                        $docenteAsig = $asig->docentes->firstWhere('id', $asig->pivot->docente_id);
                                     @endphp
-                                    <small class="d-block text-white-50">
-                                        <i class="fa fa-calendar-alt me-1"></i> Ciclo: {{ $currentAnhoObj->nombre_anho_escolar }}
-                                    </small>
                                     <small class="text-muted">
                                         <i class="fa fa-chalkboard-teacher me-1"></i>
-                                        {{ $docente ? $docente->name : 'Docente sin asignar' }}
+                                        {{ $docenteAsig ? $docenteAsig->name : 'Docente sin asignar' }}
+                                    </small>
+                                    @endif
+                                    <small class="d-block text-white-50">
+                                        <i class="fa fa-layer-group me-1"></i> {{ $asig->hilo->nombre_hilo ?? 'Sin núcleo' }}
                                     </small>
                                 </div>
+                                @if($esAnhoActual)
                                 <a href="{{ route('docente.asignatura.estudiantes', ['asignatura' => $asig->id, 'grado' => $gradoAcademico->id, 'ano_lectivo' => $currentAnhoObj->nombre_anho_escolar]) }}" 
                                    class="btn btn-xs btn-outline-info rounded-pill px-3" style="font-size: 0.7rem;">
                                    Planilla <i class="fa fa-chevron-right ms-1"></i>
                                 </a>
+                                @endif
                             </div>
                         </div>
                     @empty
                         <div class="text-center py-4 text-muted border border-secondary border-dashed rounded">
-                            No hay materias asignadas a este grado.
+                            @if($esAnhoActual)
+                                <i class="fa fa-info-circle me-1"></i> No hay materias asignadas a este grado.
+                            @else
+                                <i class="fa fa-info-circle me-1"></i> No hay notas registradas para el año {{ $currentAnhoObj->nombre_anho_escolar }}.
+                            @endif
                         </div>
                     @endforelse
                 </div>
 
-                <!-- Quick Associate Section -->
+                @if($esAnhoActual)
+                <!-- Quick Associate Section (solo año actual) -->
                 <div class="mt-4 pt-3 border-top border-secondary">
                     <h6 class="text-white small mb-3">Vincular Materia Rapidamente</h6>
                     <form action="{{ route('admin.gradoacademico.update', $gradoAcademico->id) }}" method="POST">
@@ -241,6 +270,7 @@
                         </div>
                     </form>
                 </div>
+                @endif
             </div>
         </div>
     </div>

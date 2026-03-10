@@ -430,4 +430,30 @@ class EstudianteController extends Controller
         });
         return response()->json($estudiantes);
     }
+
+    public function buscarPorDocumento(Request $request)
+    {
+        $documento = $request->query('documento');
+        
+        if (!$documento) {
+            return response()->json(['encontrado' => false], 400);
+        }
+
+        $estudiante = Estudiante::with('user')->where('numero_identificacion_estudiante', $documento)->first();
+
+        if ($estudiante) {
+            return response()->json([
+                'encontrado'         => true,
+                'name'               => $estudiante->user->name ?? '',
+                'email'              => $estudiante->user->email ?? '',
+                'genero_estudiante'  => $estudiante->genero_estudiante ?? '',
+                'telefono_estudiante' => $estudiante->telefono_estudiante ?? '',
+                'direccion_estudiante' => $estudiante->direccion_estudiante ?? '',
+                'fecha_nacimiento'   => $estudiante->fecha_nacimiento_estudiante ? $estudiante->fecha_nacimiento_estudiante->format('Y-m-d') : '',
+                'tipo_identificacion' => $estudiante->tipo_identificacion_estudiante ?? 'CC',
+            ]);
+        }
+
+        return response()->json(['encontrado' => false]);
+    }
 }

@@ -98,25 +98,82 @@ class CertificadoController extends Controller
         $pdf = Pdf::loadView('Certificado.Pdf', $viewData);
         $pdf->setPaper('legal', 'portrait');
 
-        return $pdf->stream("Certificado_{$request->identificacion}_{$request->grado_aprobado}.pdf");
+        return $pdf->download("Certificado_{$request->identificacion}_{$request->grado_aprobado}.pdf");
+    }
+
+    public function generarPorMatricula($id)
+    {
+        $matricula = \App\Models\MatriculaFinal::with(['grado', 'sede', 'profesor'])->findOrFail($id);
+
+        $estudiante = Estudiante::with(['user', 'gradoAcademico', 'acudiente.user'])
+            ->where('numero_identificacion_estudiante', $matricula->documento_estudiante)
+            ->first();
+
+        if (!$estudiante) {
+            return back()->with('swal', [
+                'icon'  => 'error',
+                'title' => 'No encontrado',
+                'text'  => 'No existe el estudiante asociado a esta matrícula.',
+            ]);
+        }
+
+        // Buscar notas por id_matricula (relación directa, más confiable)
+        $notas = \App\Models\NotasDefinitivas::where('id_matricula', $matricula->id)->get();
+
+        if ($notas->isEmpty()) {
+            return back()->with('swal', [
+                'icon'  => 'warning',
+                'title' => 'Sin notas',
+                'text'  => 'Este estudiante no tiene notas definitivas registradas para esta matrícula.',
+            ]);
+        }
+
+        // Enriquecer notas con Nucleo (Hilo)
+        foreach ($notas as $nota) {
+            $asignatura = \App\Models\Asignatura::with('hilo')
+                ->where('nombre_asignatura', $nota->nombre_asignatura)
+                ->first();
+            $nota->nucleo = $asignatura?->hilo?->nombre_hilo ?? 'N/A';
+        }
+
+        $notas = $notas->sortBy('nucleo');
+
+        $grado = $matricula->grado;
+        $gradoAprobado = trim(($grado->nombre_grado ?? '') . ' - ' . ($grado->bloque ?? ''));
+
+        $viewData = [
+            'estudiante'       => $estudiante,
+            'grado_solicitado' => $gradoAprobado,
+            'notas'            => $notas,
+            'matricula'        => $matricula,
+            'anho_lectivo'     => $matricula->ano_lectivo,
+            'fecha'            => date('d/m/Y'),
+        ];
+
+        $nombreArchivo = "Certificado_{$matricula->documento_estudiante}_{$gradoAprobado}_{$matricula->ano_lectivo}.pdf";
+        $nombreArchivo = str_replace([' ', '/'], '_', $nombreArchivo);
+
+        $pdf = Pdf::loadView('Certificado.Pdf', $viewData);
+        $pdf->setPaper('legal', 'portrait');
+
+        return $pdf->download($nombreArchivo);
     }
 
     public function generarGrupo(Request $request)
     {
         $request->validate([
-            'grado_id' => 'required|exists:grado_academicos,id',
+            'grado_id'    => 'required|exists:grado_academicos,id',
             'ano_lectivo' => 'required|string',
         ]);
 
-        $grado = \App\Models\GradoAcademico::findOrFail($request->grado_id);
-        $gradoAprobado = ($grado->nombre_grado ?? 'N/A') . ' - ' . ($grado->bloque ?? '');
+        $grado = \App\Models\GradoAcademico::with(['sede', 'docente.user', 'curso'])->findOrFail($request->grado_id);
+        $gradoAprobado = trim(($grado->nombre_grado ?? '') . ' - ' . ($grado->bloque ?? ''));
 
-        // 1. Obtener todos los alumnos matriculados en ese grado y año
+        // 1. Obtener TODAS las matrículas del grado y año
         $queryMatriculas = \App\Models\MatriculaFinal::with(['sede', 'profesor'])
             ->where('id_grado', $request->grado_id)
             ->where('ano_lectivo', $request->ano_lectivo);
 
-        // Filtro opcional por Curso/Subgrupo
         if ($request->filled('curso')) {
             $queryMatriculas->where('curso', $request->curso);
         }
@@ -127,35 +184,30 @@ class CertificadoController extends Controller
             return back()->with('swal', [
                 'icon'  => 'warning',
                 'title' => 'Sin alumnos',
-                'text'  => "No se encontraron alumnos matriculados en {$gradoAprobado} para el año {$request->ano_lectivo}."
+                'text'  => "No hay alumnos matriculados en {$gradoAprobado} para el año {$request->ano_lectivo}.",
             ]);
         }
 
         $bulkData = [];
 
-        // 2. Preparar los datos para cada alumno
         foreach ($matriculas as $matricula) {
-            $estudiante = Estudiante::with(['user'])
+            $estudiante = Estudiante::with(['user', 'acudiente.user'])
                 ->where('numero_identificacion_estudiante', $matricula->documento_estudiante)
                 ->first();
 
             if (!$estudiante) continue;
 
-            $notas = \App\Models\NotasDefinitivas::where('documento_estudiante', $matricula->documento_estudiante)
-                ->where('grado_aprobado', $gradoAprobado)
-                ->get();
+            // Buscar notas por id_matricula (relación directa)
+            $notas = \App\Models\NotasDefinitivas::where('id_matricula', $matricula->id)->get();
 
-            if ($notas->isEmpty()) continue;
-
-            // Enriquecer notas con Nucleo
+            // Enriquecer notas con Nucleo (Hilo)
             foreach ($notas as $nota) {
                 $asignatura = \App\Models\Asignatura::with('hilo')
                     ->where('nombre_asignatura', $nota->nombre_asignatura)
                     ->first();
-                $nota->nucleo = $asignatura->hilo->nombre_hilo ?? 'N/A';
+                $nota->nucleo = $asignatura?->hilo?->nombre_hilo ?? 'N/A';
             }
 
-            // Ordenar por nucleo para la agrupación en la vista
             $notas = $notas->sortBy('nucleo');
 
             $bulkData[] = [
@@ -164,20 +216,27 @@ class CertificadoController extends Controller
                 'notas'            => $notas,
                 'matricula'        => $matricula,
                 'anho_lectivo'     => $request->ano_lectivo,
+                'grado'            => $grado,
             ];
         }
 
         if (empty($bulkData)) {
             return back()->with('swal', [
                 'icon'  => 'warning',
-                'title' => 'Sin notas',
-                'text'  => "Los alumnos de este grado no tienen notas definitivas registradas aún."
+                'title' => 'Sin datos',
+                'text'  => "No se pudo construir el certificado grupal para {$gradoAprobado} - {$request->ano_lectivo}.",
             ]);
         }
 
-        $pdf = Pdf::loadView('Certificado.PdfGrupo', ['bulkData' => $bulkData, 'fecha' => date('d/m/Y')]);
+        $nombreArchivo = str_replace([' ', '/'], '_', "Certificados_{$gradoAprobado}_{$request->ano_lectivo}.pdf");
+
+        $pdf = Pdf::loadView('Certificado.PdfGrupo', [
+            'bulkData' => $bulkData,
+            'fecha'    => date('d/m/Y'),
+            'grado'    => $grado,
+        ]);
         $pdf->setPaper('legal', 'portrait');
 
-        return $pdf->stream("Certificados_Grupales_{$gradoAprobado}_{$request->ano_lectivo}.pdf");
+        return $pdf->download($nombreArchivo);
     }
 }

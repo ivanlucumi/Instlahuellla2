@@ -130,6 +130,7 @@ Route::middleware(['auth', 'rol:SUPERADMIN,ADMIN'])
 
         // Rutas para obtener listas (al refrescar los selects tras crear en nueva ventana)
         Route::get('/estudiante/list', [App\Http\Controllers\EstudianteController::class, 'list'])->name('admin.estudiante.list');
+        Route::get('/estudiante/buscar', [App\Http\Controllers\EstudianteController::class, 'buscarPorDocumento'])->name('admin.estudiante.buscar');
         Route::get('/acudiente/list', [App\Http\Controllers\AcudienteController::class, 'list'])->name('admin.acudiente.list');
         Route::get('/acudiente/buscar', [App\Http\Controllers\AcudienteController::class, 'buscarPorDocumento'])->name('admin.acudiente.buscar');
         Route::get('/asignatura/list', [App\Http\Controllers\AsignaturaController::class, 'list'])->name('admin.asignatura.list');
@@ -152,6 +153,7 @@ Route::middleware(['auth', 'rol:SUPERADMIN,ADMIN'])
         Route::get('/certificados', [App\Http\Controllers\CertificadoController::class, 'index'])->name('admin.certificados.index');
         Route::get('/certificados/generar', [App\Http\Controllers\CertificadoController::class, 'generar'])->name('admin.certificados.generar');
         Route::get('/certificados/grupo', [App\Http\Controllers\CertificadoController::class, 'generarGrupo'])->name('admin.certificados.generar-grupo');
+        Route::get('/certificados/matricula/{id}', [App\Http\Controllers\CertificadoController::class, 'generarPorMatricula'])->name('admin.certificados.por-matricula');
 
         // Rutas para Paz y Salvo
         Route::get('/pazysalvo', [App\Http\Controllers\PazYSalvoController::class, 'index'])->name('admin.pazysalvo.index');

@@ -161,20 +161,28 @@
                                             $canCalificar = !$isHistorical || auth()->user()->hasRol('SUPERADMIN');
                                         @endphp
 
-                                        @if(request('asignatura_id') && $estudiante)
-                                            @if($canCalificar)
-                                                <a href="{{ route('docente.asignatura.estudiantes', ['asignatura' => request('asignatura_id'), 'grado' => request('grado_id'), 'ano_lectivo' => $enrollment->ano_lectivo]) }}" 
-                                                   class="btn btn-sm {{ $isHistorical ? 'btn-outline-warning' : 'btn-outline-info' }}" title="Administrar Notas">
-                                                    <i class="fa fa-edit"></i> {{ $isHistorical ? 'Rectificar' : 'Calificar' }}
-                                                </a>
+                                        <div class="d-flex gap-1 justify-content-center flex-wrap">
+                                            @if(request('asignatura_id') && $estudiante)
+                                                @if($canCalificar)
+                                                    <a href="{{ route('docente.asignatura.estudiantes', ['asignatura' => request('asignatura_id'), 'grado' => request('grado_id'), 'ano_lectivo' => $enrollment->ano_lectivo]) }}" 
+                                                       class="btn btn-sm {{ $isHistorical ? 'btn-outline-warning' : 'btn-outline-info' }}" title="Administrar Notas">
+                                                        <i class="fa fa-edit"></i> {{ $isHistorical ? 'Rectificar' : 'Calificar' }}
+                                                    </a>
+                                                @else
+                                                    <span class="badge bg-dark text-muted" title="Solo SuperAdmin puede editar años anteriores">
+                                                        <i class="fa fa-lock me-1"></i> Histórico
+                                                    </span>
+                                                @endif
                                             @else
-                                                <span class="badge bg-dark text-muted" title="Solo SuperAdmin puede editar años anteriores">
-                                                    <i class="fa fa-lock me-1"></i> Histórico
-                                                </span>
+                                                <span class="badge bg-dark text-muted">Ajuste filtros</span>
                                             @endif
-                                        @else
-                                            <span class="badge bg-dark text-muted">Ajuste filtros</span>
-                                        @endif
+
+                                            {{-- Botón Certificado por id_matricula --}}
+                                            <a href="{{ route('admin.certificados.por-matricula', $enrollment->id) }}"
+                                               class="btn btn-sm btn-outline-success" title="Descargar Certificado de Notas">
+                                                <i class="fa fa-file-pdf"></i> Cert.
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
