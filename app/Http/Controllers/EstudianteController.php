@@ -3,18 +3,91 @@
 namespace App\Http\Controllers;
 
 use App\Models\Estudiante;
+use App\Models\Matriculado;
+use App\Models\Notas;
+use App\Models\AnhoEscolar;
+use App\Models\Acudiente;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class EstudianteController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $estudiantes = Estudiante::with(['user', 'acudiente.user', 'gradoAcademico'])->orderBy('id', 'desc')->paginate(15);
+        // 1. Contexto de Filtros
+        $anhos = \App\Models\AnhoEscolar::orderBy('nombre_anho_escolar', 'desc')->get();
+        $grados = \App\Models\GradoAcademico::orderBy('nombre_grado')->get();
+        $cursos = \App\Models\MatriculaFinal::distinct()->pluck('curso');
+        $asignaturas = \App\Models\Asignatura::orderBy('nombre_asignatura')->get();
+
+        // 2. Determinar Año Lectivo Actual/Seleccionado
+        $selectedAnhoId = $request->get('anho_escolar_id');
+        $currentAnho = $selectedAnhoId 
+            ? $anhos->find($selectedAnhoId) 
+            : $anhos->where('estado_anho_escolar', 1)->first() ?? $anhos->first();
         
-        return view('Estudiante.Index', compact('estudiantes'));
+        $anoLectivo = $currentAnho ? $currentAnho->nombre_anho_escolar : date('Y');
+
+        // 3. Consulta de Estudiantes con Filtros
+        $query = Estudiante::query()->with([
+            'user', 
+            'acudiente.user', 
+            'gradoAcademico',
+            'matriculasFinales' => function($q) use ($anoLectivo) {
+                $q->where('ano_lectivo', $anoLectivo)->with('notasDefinitivas');
+            }
+        ]);
+
+        // Filtro por Grado
+        if ($request->filled('grado_id')) {
+            $query->whereHas('matriculasFinales', function($q) use ($request, $anoLectivo) {
+                $q->where('id_grado', $request->grado_id)->where('ano_lectivo', $anoLectivo);
+            });
+        }
+
+        // Filtro por Curso (Bloque)
+        if ($request->filled('curso')) {
+            $query->whereHas('matriculasFinales', function($q) use ($request, $anoLectivo) {
+                $q->where('curso', $request->curso)->where('ano_lectivo', $anoLectivo);
+            });
+        }
+
+        // Filtro por Asignatura
+        if ($request->filled('asignatura_id')) {
+            $query->whereHas('matriculasFinales', function($q) use ($request, $anoLectivo) {
+                $q->where('ano_lectivo', $anoLectivo)
+                  ->whereHas('notasDefinitivas', function($sq) use ($request) {
+                      $sq->where('asignatura_id', $request->asignatura_id);
+                  });
+            });
+        }
+
+        // Búsqueda General (Nombre/ID)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('numero_identificacion_estudiante', 'like', "%{$search}%")
+                  ->orWhere('codigo_estudiante', 'like', "%{$search}%")
+                  ->orWhereHas('user', function($uq) use ($search) {
+                      $uq->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $estudiantes = $query->orderBy('id', 'desc')->paginate(15)->appends($request->all());
+        
+        return view('Estudiante.Index', compact(
+            'estudiantes', 
+            'currentAnho', 
+            'anhos', 
+            'grados', 
+            'cursos', 
+            'asignaturas'
+        ));
     }
 
     /**
@@ -88,14 +161,6 @@ class EstudianteController extends Controller
             'title' => '¡Éxito!',
             'text'  => 'El estudiante y su usuario fueron registrados correctamente.'
         ]);
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Estudiante $estudiante)
-    {
-        //
     }
 
     /**
@@ -186,9 +251,118 @@ class EstudianteController extends Controller
     }
 
 
+    // --- STUDENT ROLE METHODS ---
+
+    public function dashboard()
+    {
+        $user = Auth::user();
+        $estudiante = $user->estudiante;
+
+        if (!$estudiante) {
+            return redirect()->route('home')->with('swal', [
+                'icon' => 'error',
+                'title' => 'Error',
+                'text' => 'No tienes un perfil de estudiante vinculado.'
+            ]);
+        }
+
+        // Obtener última matrícula (año actual)
+        $ultimaMatricula = Matriculado::with(['anhoEscolar', 'grado', 'acudiente.user'])
+            ->where('estudiante_id', $estudiante->id)
+            ->orderBy('id', 'desc')
+            ->first();
+
+        // Obtener notas del año/grado actual
+        $notasActuales = collect();
+        if ($ultimaMatricula) {
+            $notasActuales = Notas::with('asignatura')
+                ->where('estudiante_id', $estudiante->id)
+                ->where('grado_id', $ultimaMatricula->grado_id)
+                ->get();
+        }
+
+        return view('estudiante.dashboard', compact('estudiante', 'ultimaMatricula', 'notasActuales'));
+    }
+
+    public function history()
+    {
+        $user = Auth::user();
+        $estudiante = $user->estudiante;
+
+        if (!$estudiante) return redirect()->route('home');
+
+        $matriculas = Matriculado::with(['anhoEscolar', 'grado', 'acudiente.user'])
+            ->where('estudiante_id', $estudiante->id)
+            ->orderBy('id', 'desc')
+            ->get();
+
+        // Cargar notas para cada matrícula
+        foreach ($matriculas as $matricula) {
+            $matricula->notas = Notas::with('asignatura')
+                ->where('estudiante_id', $estudiante->id)
+                ->where('grado_id', $matricula->grado_id)
+                ->get();
+        }
+
+        return view('estudiante.history', compact('estudiante', 'matriculas'));
+    }
+
+    public function editAcudiente()
+    {
+        $user = Auth::user();
+        $estudiante = $user->estudiante;
+        if (!$estudiante) return redirect()->route('home');
+
+        $acudiente = $estudiante->acudiente;
+
+        if (!$acudiente) {
+            return redirect()->route('estudiante.dashboard')->with('swal', [
+                'icon' => 'warning',
+                'title' => 'Sin Acudiente',
+                'text' => 'No tienes un acudiente asignado en tu perfil. Por favor, contacta a la administración.'
+            ]);
+        }
+
+        return view('estudiante.edit_acudiente', compact('estudiante', 'acudiente'));
+    }
+
+    public function updateAcudiente(Request $request)
+    {
+        $user = Auth::user();
+        $estudiante = $user->estudiante;
+        if (!$estudiante) return redirect()->route('home');
+
+        $acudiente = $estudiante->acudiente;
+
+        if (!$acudiente) {
+            return redirect()->route('estudiante.dashboard')->with('swal', [
+                'icon' => 'error',
+                'title' => 'Error',
+                'text' => 'No se encontró el registro de tu acudiente para actualizar.'
+            ]);
+        }
+
+        $request->validate([
+            'celular_acudiente'   => 'required|string|max:20',
+            'direccion_acudiente' => 'required|string|max:255',
+            'genero_acudiente'    => 'required|string',
+            'parentesco_acudiente'=> 'required|string',
+        ]);
+
+        $acudiente->update($request->all());
+
+        return redirect()->route('estudiante.dashboard')->with('swal', [
+            'icon'  => 'success',
+            'title' => '¡Actualizado!',
+            'text'  => 'La información de tu acudiente ha sido actualizada correctamente.'
+        ]);
+    }
+
     public function notasPeriodo(){
          return view('estudiante.estudiante');
     }
+
+    // --- END STUDENT ROLE METHODS ---
 
     public function storeQuick(Request $request)
     {

@@ -300,6 +300,7 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         $(document).ready(function() {
+            // Configuración Select2
             $('.form-select').select2({
                 theme: 'bootstrap-5',
                 width: '100%',
@@ -309,6 +310,15 @@
                         return "No se encontraron resultados";
                     }
                 }
+            });
+
+            // Buscador Global para Tablas
+            $('.search-table').on('keyup', function() {
+                var value = $(this).val().toLowerCase();
+                var targetTable = $(this).data('table') || 'table';
+                $(targetTable + ' tbody tr').filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
             });
         });
     </script>

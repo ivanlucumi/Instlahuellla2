@@ -21,6 +21,21 @@ class HomeController extends Controller
      */
     public function index()
     {
+        $user = auth()->user();
+
+        if ($user->hasRol('SUPERADMIN') || $user->hasRol('ADMIN')) {
+            return view('admin.Admin');
+        }
+
+        if ($user->hasRol('ESTUDIANTE')) {
+            return redirect()->route('estudiante.dashboard');
+        }
+
+        if ($user->hasRol('DOCENTE')) {
+            return redirect()->route('docente.dashboard');
+        }
+
+        // Default or for roles without specific dashboards yet
         return view('admin.Admin');
     }
 }

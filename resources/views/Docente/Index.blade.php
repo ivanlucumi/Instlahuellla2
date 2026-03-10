@@ -9,9 +9,12 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <h4 class="text-white">Docentes Registrados</h4>
-                <a href="{{ route('admin.docente.create') }}" class="btn btn-primary">
-                    <i class="fa fa-plus me-1"></i> Nuevo Docente
-                </a>
+                <div class="d-flex align-items-center">
+                    <input type="text" class="form-control form-control-sm me-3 search-table" placeholder="Buscar docente..." style="width: 200px;">
+                    <a href="{{ route('admin.docente.create') }}" class="btn btn-primary">
+                        <i class="fa fa-plus me-1"></i> Nuevo Docente
+                    </a>
+                </div>
             </div>
         </div>
     </div>

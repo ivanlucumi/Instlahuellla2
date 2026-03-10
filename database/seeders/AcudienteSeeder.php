@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use App\Models\Acudiente;
 
 class AcudienteSeeder extends Seeder
@@ -14,6 +15,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 1,
     'user_id' => 202,
+    'id_documento' => NULL,
     'celular_acudiente' => '3110000000',
     'direccion_acudiente' => 'sin datos',
     'genero_acudiente' => 'Otro',
@@ -26,6 +28,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 2,
     'user_id' => 1,
+    'id_documento' => '7658',
     'celular_acudiente' => '310',
     'direccion_acudiente' => 'palo',
     'genero_acudiente' => 'otro',
@@ -38,6 +41,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 3,
     'user_id' => 2,
+    'id_documento' => '8596',
     'celular_acudiente' => '3152',
     'direccion_acudiente' => 'EL PALO',
     'genero_acudiente' => 'otro',
@@ -50,6 +54,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 4,
     'user_id' => 277,
+    'id_documento' => '25373774',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -62,6 +67,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 5,
     'user_id' => 278,
+    'id_documento' => '1061436549',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -74,6 +80,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 6,
     'user_id' => 279,
+    'id_documento' => '24373762',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -86,6 +93,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 7,
     'user_id' => 280,
+    'id_documento' => '76140827',
     'celular_acudiente' => '3217541407',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -98,6 +106,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 8,
     'user_id' => 281,
+    'id_documento' => '1061429204',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -110,6 +119,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 9,
     'user_id' => 282,
+    'id_documento' => '25373722',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -122,6 +132,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 10,
     'user_id' => 283,
+    'id_documento' => '34606493',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -134,6 +145,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 11,
     'user_id' => 284,
+    'id_documento' => '25332123',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -146,6 +158,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 12,
     'user_id' => 285,
+    'id_documento' => '34601112',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -158,6 +171,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 13,
     'user_id' => 286,
+    'id_documento' => '25366006',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -170,6 +184,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 14,
     'user_id' => 287,
+    'id_documento' => '1061428234',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -182,6 +197,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 15,
     'user_id' => 288,
+    'id_documento' => '1061428526',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -194,6 +210,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 16,
     'user_id' => 289,
+    'id_documento' => '25363714',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'CHOCHO',
     'genero_acudiente' => 'otro',
@@ -206,6 +223,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 17,
     'user_id' => 290,
+    'id_documento' => '25365925',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -218,6 +236,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 18,
     'user_id' => 291,
+    'id_documento' => '67004356',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -230,6 +249,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 19,
     'user_id' => 292,
+    'id_documento' => '76140669',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -242,6 +262,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 20,
     'user_id' => 293,
+    'id_documento' => '34771430',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'CHOCHO',
     'genero_acudiente' => 'otro',
@@ -254,6 +275,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 21,
     'user_id' => 294,
+    'id_documento' => '25365740',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -266,6 +288,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 22,
     'user_id' => 295,
+    'id_documento' => '25373756',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -278,6 +301,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 23,
     'user_id' => 296,
+    'id_documento' => '4656626',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -290,6 +314,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 24,
     'user_id' => 297,
+    'id_documento' => '25365232',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'GUATABA',
     'genero_acudiente' => 'otro',
@@ -302,6 +327,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 25,
     'user_id' => 298,
+    'id_documento' => '25365794',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -314,6 +340,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 26,
     'user_id' => 299,
+    'id_documento' => '25365994',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -326,6 +353,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 27,
     'user_id' => 300,
+    'id_documento' => '34770533',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'GUADUALITO',
     'genero_acudiente' => 'otro',
@@ -338,6 +366,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 28,
     'user_id' => 301,
+    'id_documento' => '25365868',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -350,6 +379,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 29,
     'user_id' => 302,
+    'id_documento' => '48618606',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -362,6 +392,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 30,
     'user_id' => 303,
+    'id_documento' => '25365991',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -374,6 +405,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 31,
     'user_id' => 304,
+    'id_documento' => '25365545',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -386,6 +418,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 32,
     'user_id' => 305,
+    'id_documento' => '34771334',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'GUATABA',
     'genero_acudiente' => 'otro',
@@ -398,6 +431,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 33,
     'user_id' => 306,
+    'id_documento' => '48680258',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -410,6 +444,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 34,
     'user_id' => 307,
+    'id_documento' => '1061433382',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -422,6 +457,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 35,
     'user_id' => 308,
+    'id_documento' => '34770652',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -434,6 +470,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 36,
     'user_id' => 309,
+    'id_documento' => '76142616',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -446,6 +483,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 37,
     'user_id' => 310,
+    'id_documento' => '4656532',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -458,6 +496,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 38,
     'user_id' => 311,
+    'id_documento' => '25373728',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -470,6 +509,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 39,
     'user_id' => 312,
+    'id_documento' => '25365887',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -482,6 +522,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 40,
     'user_id' => 313,
+    'id_documento' => '25734050',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -494,6 +535,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 41,
     'user_id' => 314,
+    'id_documento' => '25373789',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -506,6 +548,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 42,
     'user_id' => 315,
+    'id_documento' => '4656632',
     'celular_acudiente' => '3202337435',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -518,6 +561,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 43,
     'user_id' => 316,
+    'id_documento' => '34771472',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -530,6 +574,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 44,
     'user_id' => 317,
+    'id_documento' => '34770166',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -542,6 +587,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 45,
     'user_id' => 318,
+    'id_documento' => '25373670',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -554,6 +600,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 46,
     'user_id' => 319,
+    'id_documento' => '1061428984',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -566,6 +613,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 47,
     'user_id' => 320,
+    'id_documento' => '25365807',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -578,6 +626,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 48,
     'user_id' => 321,
+    'id_documento' => '10487602',
     'celular_acudiente' => '3116875275',
     'direccion_acudiente' => 'ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -590,6 +639,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 49,
     'user_id' => 322,
+    'id_documento' => '34595725',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -602,6 +652,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 50,
     'user_id' => 323,
+    'id_documento' => '76142377',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -614,6 +665,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 51,
     'user_id' => 324,
+    'id_documento' => '25365481',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -626,6 +678,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 52,
     'user_id' => 325,
+    'id_documento' => '25365996',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -638,6 +691,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 53,
     'user_id' => 326,
+    'id_documento' => '34606859',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -650,6 +704,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 54,
     'user_id' => 327,
+    'id_documento' => '25373787',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'CHOCHO',
     'genero_acudiente' => 'otro',
@@ -662,6 +717,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 55,
     'user_id' => 328,
+    'id_documento' => '25365543',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -674,6 +730,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 56,
     'user_id' => 329,
+    'id_documento' => '1116912315',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -686,6 +743,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 57,
     'user_id' => 330,
+    'id_documento' => '34771120',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'CHOCHO',
     'genero_acudiente' => 'otro',
@@ -698,6 +756,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 58,
     'user_id' => 331,
+    'id_documento' => '34771155',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -710,6 +769,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 59,
     'user_id' => 332,
+    'id_documento' => '34771263',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -722,6 +782,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 60,
     'user_id' => 333,
+    'id_documento' => '25365896',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -734,6 +795,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 61,
     'user_id' => 334,
+    'id_documento' => '1061433007',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -746,6 +808,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 62,
     'user_id' => 335,
+    'id_documento' => '1061431418',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -758,6 +821,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 63,
     'user_id' => 336,
+    'id_documento' => '34771868',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -770,6 +834,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 64,
     'user_id' => 337,
+    'id_documento' => '25373786',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -782,6 +847,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 65,
     'user_id' => 338,
+    'id_documento' => '1061433091',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -794,6 +860,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 66,
     'user_id' => 339,
+    'id_documento' => '34770158',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -806,6 +873,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 67,
     'user_id' => 340,
+    'id_documento' => '1061432418',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -818,6 +886,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 68,
     'user_id' => 341,
+    'id_documento' => '76141039',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -830,6 +899,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 69,
     'user_id' => 342,
+    'id_documento' => '25365416',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -842,6 +912,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 70,
     'user_id' => 343,
+    'id_documento' => '41171022',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -854,6 +925,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 71,
     'user_id' => 344,
+    'id_documento' => '1061430081',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -866,6 +938,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 72,
     'user_id' => 345,
+    'id_documento' => '25366340',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -878,6 +951,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 73,
     'user_id' => 346,
+    'id_documento' => '1061429822',
     'celular_acudiente' => '3206281869',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -890,6 +964,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 74,
     'user_id' => 347,
+    'id_documento' => '25373792',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -902,6 +977,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 75,
     'user_id' => 348,
+    'id_documento' => '25365278',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -914,6 +990,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 76,
     'user_id' => 349,
+    'id_documento' => '25373761',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -926,6 +1003,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 77,
     'user_id' => 350,
+    'id_documento' => '34771608',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -938,6 +1016,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 78,
     'user_id' => 351,
+    'id_documento' => '1061430330',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -950,6 +1029,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 79,
     'user_id' => 352,
+    'id_documento' => '1061431462',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'GUATABA',
     'genero_acudiente' => 'otro',
@@ -962,6 +1042,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 80,
     'user_id' => 353,
+    'id_documento' => '25363397',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -974,6 +1055,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 81,
     'user_id' => 354,
+    'id_documento' => '25373736',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -986,6 +1068,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 82,
     'user_id' => 355,
+    'id_documento' => '25373776',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -998,6 +1081,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 83,
     'user_id' => 356,
+    'id_documento' => '34771020',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1010,6 +1094,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 84,
     'user_id' => 357,
+    'id_documento' => '25732643',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1022,6 +1107,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 85,
     'user_id' => 358,
+    'id_documento' => '25373793',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1034,6 +1120,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 86,
     'user_id' => 359,
+    'id_documento' => '1061434366',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1046,6 +1133,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 87,
     'user_id' => 360,
+    'id_documento' => '34771978',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1058,6 +1146,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 88,
     'user_id' => 361,
+    'id_documento' => '34772096',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1070,6 +1159,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 89,
     'user_id' => 362,
+    'id_documento' => '25365192',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -1082,6 +1172,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 90,
     'user_id' => 363,
+    'id_documento' => '25373781',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -1094,6 +1185,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 91,
     'user_id' => 364,
+    'id_documento' => '29688887',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -1106,6 +1198,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 92,
     'user_id' => 365,
+    'id_documento' => '34602241',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1118,6 +1211,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 93,
     'user_id' => 366,
+    'id_documento' => '34611755',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1130,6 +1224,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 94,
     'user_id' => 367,
+    'id_documento' => '34601411',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1142,6 +1237,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 95,
     'user_id' => 368,
+    'id_documento' => '76232124',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -1154,6 +1250,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 96,
     'user_id' => 369,
+    'id_documento' => '34771059',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -1166,6 +1263,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 97,
     'user_id' => 370,
+    'id_documento' => '34771058',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1178,6 +1276,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 98,
     'user_id' => 371,
+    'id_documento' => '1061428627',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1190,6 +1289,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 99,
     'user_id' => 372,
+    'id_documento' => '76232130',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -1202,6 +1302,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 100,
     'user_id' => 373,
+    'id_documento' => '34771826',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1214,6 +1315,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 101,
     'user_id' => 374,
+    'id_documento' => '25471269',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'SANTANDER Q',
     'genero_acudiente' => 'otro',
@@ -1226,6 +1328,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 102,
     'user_id' => 375,
+    'id_documento' => '34615008',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1238,6 +1341,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 103,
     'user_id' => 376,
+    'id_documento' => '25470644',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'CHOCHO',
     'genero_acudiente' => 'otro',
@@ -1250,6 +1354,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 104,
     'user_id' => 377,
+    'id_documento' => '34613361',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1262,6 +1367,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 105,
     'user_id' => 378,
+    'id_documento' => '25470956',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1274,6 +1380,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 106,
     'user_id' => 379,
+    'id_documento' => '76140757',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'NAPOLES',
     'genero_acudiente' => 'otro',
@@ -1286,6 +1393,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 107,
     'user_id' => 380,
+    'id_documento' => '25364721',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1298,6 +1406,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 108,
     'user_id' => 381,
+    'id_documento' => '1061499494',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1310,6 +1419,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 109,
     'user_id' => 382,
+    'id_documento' => '25366077',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1322,6 +1432,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 110,
     'user_id' => 383,
+    'id_documento' => '1061429160',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'GUADUALITO',
     'genero_acudiente' => 'otro',
@@ -1334,6 +1445,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 111,
     'user_id' => 384,
+    'id_documento' => '48618611',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1346,6 +1458,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 112,
     'user_id' => 385,
+    'id_documento' => '34770758',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1358,6 +1471,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 113,
     'user_id' => 386,
+    'id_documento' => '1061430834',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1370,6 +1484,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 114,
     'user_id' => 387,
+    'id_documento' => '34771995',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1382,6 +1497,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 115,
     'user_id' => 388,
+    'id_documento' => '25373784',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1394,6 +1510,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 116,
     'user_id' => 389,
+    'id_documento' => '25373636',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1406,6 +1523,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 117,
     'user_id' => 390,
+    'id_documento' => '34771438',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -1418,6 +1536,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 118,
     'user_id' => 391,
+    'id_documento' => '34770598',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -1430,6 +1549,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 119,
     'user_id' => 392,
+    'id_documento' => '34604556',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1442,6 +1562,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 120,
     'user_id' => 393,
+    'id_documento' => '25373766',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -1454,6 +1575,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 121,
     'user_id' => 394,
+    'id_documento' => '25366215',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'EL SOCORRO',
     'genero_acudiente' => 'otro',
@@ -1466,6 +1588,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 122,
     'user_id' => 395,
+    'id_documento' => '25366465',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1478,6 +1601,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 123,
     'user_id' => 396,
+    'id_documento' => '25365873',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1490,6 +1614,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 124,
     'user_id' => 397,
+    'id_documento' => '25373753',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1502,6 +1627,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 125,
     'user_id' => 398,
+    'id_documento' => '34771198',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1514,6 +1640,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 126,
     'user_id' => 399,
+    'id_documento' => '34601194',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1526,6 +1653,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 127,
     'user_id' => 400,
+    'id_documento' => '34771756',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1538,6 +1666,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 128,
     'user_id' => 401,
+    'id_documento' => '34770635',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1550,6 +1679,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 129,
     'user_id' => 402,
+    'id_documento' => '25471069',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1562,6 +1692,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 130,
     'user_id' => 403,
+    'id_documento' => '1067520966',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1574,6 +1705,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 131,
     'user_id' => 404,
+    'id_documento' => '76141471',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1586,6 +1718,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 132,
     'user_id' => 405,
+    'id_documento' => '34771590',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1598,6 +1731,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 133,
     'user_id' => 406,
+    'id_documento' => '25364564',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'GUATABA',
     'genero_acudiente' => 'otro',
@@ -1610,6 +1744,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 134,
     'user_id' => 407,
+    'id_documento' => '1061433740',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1622,6 +1757,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 135,
     'user_id' => 408,
+    'id_documento' => '76140996',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -1634,6 +1770,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 136,
     'user_id' => 409,
+    'id_documento' => '25373725',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1646,6 +1783,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 137,
     'user_id' => 410,
+    'id_documento' => '25373744',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1658,6 +1796,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 138,
     'user_id' => 411,
+    'id_documento' => '34770174',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1670,6 +1809,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 139,
     'user_id' => 412,
+    'id_documento' => '1061430756',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1682,6 +1822,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 140,
     'user_id' => 413,
+    'id_documento' => '1114874279',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -1694,6 +1835,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 141,
     'user_id' => 414,
+    'id_documento' => '34770264',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'GUADUALITO',
     'genero_acudiente' => 'otro',
@@ -1706,6 +1848,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 142,
     'user_id' => 415,
+    'id_documento' => '1061431616',
     'celular_acudiente' => '0',
     'direccion_acudiente' => '',
     'genero_acudiente' => 'otro',
@@ -1718,6 +1861,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 143,
     'user_id' => 416,
+    'id_documento' => '34771232',
     'celular_acudiente' => '0',
     'direccion_acudiente' => '',
     'genero_acudiente' => 'otro',
@@ -1730,6 +1874,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 144,
     'user_id' => 417,
+    'id_documento' => '1061431244',
     'celular_acudiente' => '0',
     'direccion_acudiente' => '',
     'genero_acudiente' => 'otro',
@@ -1742,6 +1887,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 145,
     'user_id' => 418,
+    'id_documento' => '34615473',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -1754,6 +1900,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 146,
     'user_id' => 419,
+    'id_documento' => '1061433468',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -1766,6 +1913,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 147,
     'user_id' => 420,
+    'id_documento' => '25366275',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -1778,6 +1926,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 148,
     'user_id' => 421,
+    'id_documento' => '51966447',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'CALOTO',
     'genero_acudiente' => 'otro',
@@ -1790,6 +1939,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 149,
     'user_id' => 422,
+    'id_documento' => '76141034',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -1802,6 +1952,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 150,
     'user_id' => 423,
+    'id_documento' => '25733436',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -1814,6 +1965,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 151,
     'user_id' => 424,
+    'id_documento' => '76297563',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -1826,6 +1978,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 152,
     'user_id' => 425,
+    'id_documento' => '25373735',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -1838,6 +1991,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 153,
     'user_id' => 426,
+    'id_documento' => '76142479',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -1850,6 +2004,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 154,
     'user_id' => 427,
+    'id_documento' => '4653361',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -1862,6 +2017,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 155,
     'user_id' => 428,
+    'id_documento' => '4652452',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -1874,6 +2030,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 156,
     'user_id' => 429,
+    'id_documento' => '76142802',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -1886,6 +2043,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 157,
     'user_id' => 430,
+    'id_documento' => '1061433982',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -1898,6 +2056,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 158,
     'user_id' => 431,
+    'id_documento' => '34771891',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -1910,6 +2069,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 159,
     'user_id' => 432,
+    'id_documento' => '25373677',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -1922,6 +2082,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 160,
     'user_id' => 433,
+    'id_documento' => '4653437',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -1934,6 +2095,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 161,
     'user_id' => 434,
+    'id_documento' => '34770549',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -1946,6 +2108,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 162,
     'user_id' => 435,
+    'id_documento' => '25366391',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -1958,6 +2121,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 163,
     'user_id' => 436,
+    'id_documento' => '4653350',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -1970,6 +2134,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 164,
     'user_id' => 437,
+    'id_documento' => '1061431969',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -1982,6 +2147,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 165,
     'user_id' => 438,
+    'id_documento' => '1061428499',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -1994,6 +2160,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 166,
     'user_id' => 439,
+    'id_documento' => '25733700',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -2006,6 +2173,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 167,
     'user_id' => 440,
+    'id_documento' => '34613084',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -2018,6 +2186,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 168,
     'user_id' => 441,
+    'id_documento' => '25364471',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -2030,6 +2199,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 169,
     'user_id' => 442,
+    'id_documento' => '25364785',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -2042,6 +2212,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 170,
     'user_id' => 443,
+    'id_documento' => '10482758',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -2054,6 +2225,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 171,
     'user_id' => 444,
+    'id_documento' => '10491849',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -2066,6 +2238,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 172,
     'user_id' => 445,
+    'id_documento' => '25364723',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -2078,6 +2251,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 173,
     'user_id' => 446,
+    'id_documento' => '1061430833',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -2090,6 +2264,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 174,
     'user_id' => 447,
+    'id_documento' => '1061433840',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -2102,6 +2277,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 175,
     'user_id' => 448,
+    'id_documento' => '76140386',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -2114,6 +2290,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 176,
     'user_id' => 449,
+    'id_documento' => '34771466',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -2126,6 +2303,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 177,
     'user_id' => 450,
+    'id_documento' => '34771163',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -2138,6 +2316,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 178,
     'user_id' => 451,
+    'id_documento' => '1061433389',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -2150,6 +2329,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 179,
     'user_id' => 452,
+    'id_documento' => '1107054314',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -2162,6 +2342,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 180,
     'user_id' => 453,
+    'id_documento' => '1061434111',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -2174,6 +2355,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 181,
     'user_id' => 454,
+    'id_documento' => '1062279529',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -2186,6 +2368,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 182,
     'user_id' => 455,
+    'id_documento' => '10483030',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -2198,6 +2381,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 183,
     'user_id' => 456,
+    'id_documento' => '1061430306',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -2210,6 +2394,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 184,
     'user_id' => 457,
+    'id_documento' => '66721090',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -2222,6 +2407,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 185,
     'user_id' => 458,
+    'id_documento' => '25349370',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -2234,6 +2420,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 186,
     'user_id' => 459,
+    'id_documento' => '9999',
     'celular_acudiente' => '0',
     'direccion_acudiente' => '',
     'genero_acudiente' => 'otro',
@@ -2246,6 +2433,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 187,
     'user_id' => 460,
+    'id_documento' => '25366158',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -2258,6 +2446,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 188,
     'user_id' => 461,
+    'id_documento' => '1061428396',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA',
     'genero_acudiente' => 'otro',
@@ -2270,6 +2459,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 189,
     'user_id' => 463,
+    'id_documento' => '4653407',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'CHOCHO',
     'genero_acudiente' => 'otro',
@@ -2282,6 +2472,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 190,
     'user_id' => 464,
+    'id_documento' => '76319004',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -2294,6 +2485,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 191,
     'user_id' => 465,
+    'id_documento' => '94429017',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -2306,6 +2498,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 192,
     'user_id' => 466,
+    'id_documento' => '87303395',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'GUATABA',
     'genero_acudiente' => 'otro',
@@ -2318,6 +2511,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 193,
     'user_id' => 467,
+    'id_documento' => '76141866',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'GUADUALITO',
     'genero_acudiente' => 'otro',
@@ -2330,6 +2524,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 194,
     'user_id' => 468,
+    'id_documento' => '4653121',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'NAPOLES',
     'genero_acudiente' => 'otro',
@@ -2342,6 +2537,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 195,
     'user_id' => 469,
+    'id_documento' => '76140828',
     'celular_acudiente' => '3153823933',
     'direccion_acudiente' => 'CHOCHO',
     'genero_acudiente' => 'otro',
@@ -2354,6 +2550,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 196,
     'user_id' => 470,
+    'id_documento' => '10496551',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -2366,6 +2563,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 197,
     'user_id' => 471,
+    'id_documento' => '76142512',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'GUADALITO',
     'genero_acudiente' => 'otro',
@@ -2378,6 +2576,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 198,
     'user_id' => 472,
+    'id_documento' => '25365618',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'PALOMERA',
     'genero_acudiente' => 'otro',
@@ -2390,6 +2589,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 199,
     'user_id' => 473,
+    'id_documento' => '4768258',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'NAPOLES',
     'genero_acudiente' => 'otro',
@@ -2402,6 +2602,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 200,
     'user_id' => 474,
+    'id_documento' => '1007444058',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -2414,6 +2615,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 201,
     'user_id' => 475,
+    'id_documento' => '34770548',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA',
     'genero_acudiente' => 'otro',
@@ -2426,6 +2628,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 202,
     'user_id' => 476,
+    'id_documento' => '1061432524',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA',
     'genero_acudiente' => 'otro',
@@ -2438,6 +2641,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 203,
     'user_id' => 477,
+    'id_documento' => '1061434599',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA',
     'genero_acudiente' => 'otro',
@@ -2450,6 +2654,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 204,
     'user_id' => 478,
+    'id_documento' => '25365149',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'LOS CHORROS',
     'genero_acudiente' => 'otro',
@@ -2462,6 +2667,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 205,
     'user_id' => 479,
+    'id_documento' => '25365749',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'SELVA',
     'genero_acudiente' => 'otro',
@@ -2474,6 +2680,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 206,
     'user_id' => 480,
+    'id_documento' => '76142993',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'GUATABA',
     'genero_acudiente' => 'otro',
@@ -2486,6 +2693,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 207,
     'user_id' => 481,
+    'id_documento' => '25373746',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -2498,6 +2706,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 208,
     'user_id' => 482,
+    'id_documento' => '76232125',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -2510,6 +2719,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 209,
     'user_id' => 483,
+    'id_documento' => '76141135',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'GUATABA',
     'genero_acudiente' => 'otro',
@@ -2522,6 +2732,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 210,
     'user_id' => 484,
+    'id_documento' => '34604655',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'SOCORRO',
     'genero_acudiente' => 'otro',
@@ -2534,6 +2745,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 211,
     'user_id' => 485,
+    'id_documento' => '25373767',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'EL CHOCHO',
     'genero_acudiente' => 'otro',
@@ -2546,6 +2758,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 212,
     'user_id' => 486,
+    'id_documento' => '25365097',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'LA SELVA',
     'genero_acudiente' => 'otro',
@@ -2558,6 +2771,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 213,
     'user_id' => 487,
+    'id_documento' => '1061435461',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -2570,6 +2784,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 214,
     'user_id' => 488,
+    'id_documento' => '1061434411',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -2582,6 +2797,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 215,
     'user_id' => 489,
+    'id_documento' => '1061434061',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -2594,6 +2810,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 216,
     'user_id' => 490,
+    'id_documento' => '1061436285',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -2606,6 +2823,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 217,
     'user_id' => 491,
+    'id_documento' => '1061433948',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -2618,6 +2836,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 218,
     'user_id' => 492,
+    'id_documento' => '1061430841',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -2630,6 +2849,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 219,
     'user_id' => 493,
+    'id_documento' => '76142262',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'GUATABA',
     'genero_acudiente' => 'otro',
@@ -2642,6 +2862,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 220,
     'user_id' => 494,
+    'id_documento' => '76140401',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'GUADUALITO',
     'genero_acudiente' => 'otro',
@@ -2654,6 +2875,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 221,
     'user_id' => 495,
+    'id_documento' => '34598385',
     'celular_acudiente' => '3114092086',
     'direccion_acudiente' => 'NARIÃ‘O SANTANDER Q',
     'genero_acudiente' => 'otro',
@@ -2666,6 +2888,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 222,
     'user_id' => 496,
+    'id_documento' => '1061429868',
     'celular_acudiente' => '3207453770',
     'direccion_acudiente' => 'GUATABA',
     'genero_acudiente' => 'otro',
@@ -2678,6 +2901,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 223,
     'user_id' => 497,
+    'id_documento' => '1061433741',
     'celular_acudiente' => '3152555587',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -2690,6 +2914,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 224,
     'user_id' => 498,
+    'id_documento' => '34771396',
     'celular_acudiente' => '3117411819',
     'direccion_acudiente' => 'ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -2702,6 +2927,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 225,
     'user_id' => 499,
+    'id_documento' => '1456932',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -2714,6 +2940,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 226,
     'user_id' => 500,
+    'id_documento' => '34770644',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'GUATABA',
     'genero_acudiente' => 'otro',
@@ -2726,6 +2953,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 227,
     'user_id' => 501,
+    'id_documento' => '1059062564',
     'celular_acudiente' => '3128773358',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -2738,6 +2966,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 228,
     'user_id' => 502,
+    'id_documento' => '34771274',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'LA SELVA',
     'genero_acudiente' => 'otro',
@@ -2750,6 +2979,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 229,
     'user_id' => 503,
+    'id_documento' => '1061431845',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'LA SELVA',
     'genero_acudiente' => 'otro',
@@ -2762,6 +2992,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 230,
     'user_id' => 504,
+    'id_documento' => '1061434590',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -2774,6 +3005,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 231,
     'user_id' => 505,
+    'id_documento' => '34770347',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'LA SELVA',
     'genero_acudiente' => 'otro',
@@ -2786,6 +3018,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 232,
     'user_id' => 506,
+    'id_documento' => '1061431336',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'LA TRAMPA',
     'genero_acudiente' => 'otro',
@@ -2798,6 +3031,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 233,
     'user_id' => 507,
+    'id_documento' => '1061428458',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'LA SELVA',
     'genero_acudiente' => 'otro',
@@ -2810,6 +3044,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 234,
     'user_id' => 508,
+    'id_documento' => '1067460626',
     'celular_acudiente' => '3128269386',
     'direccion_acudiente' => 'CALOTO',
     'genero_acudiente' => 'otro',
@@ -2822,6 +3057,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 235,
     'user_id' => 509,
+    'id_documento' => '1064429259',
     'celular_acudiente' => '3177575547',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -2834,6 +3070,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 236,
     'user_id' => 510,
+    'id_documento' => '34613256',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -2846,6 +3083,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 237,
     'user_id' => 511,
+    'id_documento' => '1062300748',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -2858,6 +3096,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 238,
     'user_id' => 512,
+    'id_documento' => '25365614',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'B/LIMONAR CALOTO',
     'genero_acudiente' => 'otro',
@@ -2870,6 +3109,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 239,
     'user_id' => 513,
+    'id_documento' => '34771388',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'SANTA ROSA',
     'genero_acudiente' => 'otro',
@@ -2882,6 +3122,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 240,
     'user_id' => 514,
+    'id_documento' => '1061432553',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -2894,6 +3135,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 241,
     'user_id' => 515,
+    'id_documento' => '9999',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -2906,6 +3148,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 242,
     'user_id' => 516,
+    'id_documento' => '25364992',
     'celular_acudiente' => '3145866181',
     'direccion_acudiente' => 'LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -2918,6 +3161,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 243,
     'user_id' => 517,
+    'id_documento' => '76142998',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'LOS PINOS',
     'genero_acudiente' => 'otro',
@@ -2930,6 +3174,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 244,
     'user_id' => 518,
+    'id_documento' => '76142137',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'CASAS VIEJAS',
     'genero_acudiente' => 'otro',
@@ -2942,6 +3187,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 245,
     'user_id' => 519,
+    'id_documento' => '25373738',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -2954,6 +3200,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 246,
     'user_id' => 520,
+    'id_documento' => '1061429103',
     'celular_acudiente' => '3137252055',
     'direccion_acudiente' => 'GUATABA',
     'genero_acudiente' => 'otro',
@@ -2966,6 +3213,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 247,
     'user_id' => 521,
+    'id_documento' => '76142155',
     'celular_acudiente' => '3506107309',
     'direccion_acudiente' => 'VALLES HONDOS',
     'genero_acudiente' => 'otro',
@@ -2978,6 +3226,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 248,
     'user_id' => 522,
+    'id_documento' => '4653252',
     'celular_acudiente' => '3186919107',
     'direccion_acudiente' => 'ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -2990,6 +3239,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 249,
     'user_id' => 523,
+    'id_documento' => '76232134',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'GUATABA',
     'genero_acudiente' => 'otro',
@@ -3002,6 +3252,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 250,
     'user_id' => 524,
+    'id_documento' => '1061437138',
     'celular_acudiente' => '3225706835',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -3014,6 +3265,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 251,
     'user_id' => 525,
+    'id_documento' => '1112880321',
     'celular_acudiente' => '3172733354',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -3026,6 +3278,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 252,
     'user_id' => 526,
+    'id_documento' => '1061435917',
     'celular_acudiente' => '3104344844',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -3038,6 +3291,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 253,
     'user_id' => 527,
+    'id_documento' => '1061498817',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -3050,6 +3304,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 254,
     'user_id' => 528,
+    'id_documento' => '76142630',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'CASAS VIEJAS',
     'genero_acudiente' => 'otro',
@@ -3062,6 +3317,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 255,
     'user_id' => 529,
+    'id_documento' => '25364962',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'NAPOLES',
     'genero_acudiente' => 'otro',
@@ -3074,6 +3330,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 256,
     'user_id' => 530,
+    'id_documento' => '76142154',
     'celular_acudiente' => '3219310915',
     'direccion_acudiente' => 'LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -3086,6 +3343,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 257,
     'user_id' => 531,
+    'id_documento' => '76142594',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'CASAS VIEJAS',
     'genero_acudiente' => 'otro',
@@ -3098,6 +3356,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 258,
     'user_id' => 532,
+    'id_documento' => '25373741',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'GUATABA',
     'genero_acudiente' => 'otro',
@@ -3110,6 +3369,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 259,
     'user_id' => 533,
+    'id_documento' => '76142665',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'LA SELVA',
     'genero_acudiente' => 'otro',
@@ -3122,6 +3382,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 260,
     'user_id' => 534,
+    'id_documento' => '1061433629',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -3134,6 +3395,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 261,
     'user_id' => 535,
+    'id_documento' => '1061433751',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'LOPEZ ADENTRO',
     'genero_acudiente' => 'otro',
@@ -3146,6 +3408,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 262,
     'user_id' => 536,
+    'id_documento' => '25364925',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'CHORRILLO',
     'genero_acudiente' => 'otro',
@@ -3158,6 +3421,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 263,
     'user_id' => 537,
+    'id_documento' => '25366060',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -3170,6 +3434,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 264,
     'user_id' => 538,
+    'id_documento' => '4784745',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -3182,6 +3447,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 265,
     'user_id' => 539,
+    'id_documento' => '25365678',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -3194,6 +3460,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 266,
     'user_id' => 540,
+    'id_documento' => '1061430438',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -3206,6 +3473,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 267,
     'user_id' => 541,
+    'id_documento' => '4548732',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -3218,6 +3486,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 268,
     'user_id' => 542,
+    'id_documento' => '76141069',
     'celular_acudiente' => '3167703152',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -3230,6 +3499,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 269,
     'user_id' => 543,
+    'id_documento' => '1061433858',
     'celular_acudiente' => '3207739207',
     'direccion_acudiente' => 'HUELLAS',
     'genero_acudiente' => 'otro',
@@ -3242,6 +3512,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 270,
     'user_id' => 544,
+    'id_documento' => '76141361',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LA SELVA',
     'genero_acudiente' => 'otro',
@@ -3254,6 +3525,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 271,
     'user_id' => 545,
+    'id_documento' => '76141143',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -3266,6 +3538,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 272,
     'user_id' => 546,
+    'id_documento' => '0',
     'celular_acudiente' => '0',
     'direccion_acudiente' => '',
     'genero_acudiente' => 'otro',
@@ -3278,6 +3551,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 273,
     'user_id' => 547,
+    'id_documento' => '1061429561',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA EL CHOCHO',
     'genero_acudiente' => 'otro',
@@ -3290,6 +3564,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 274,
     'user_id' => 548,
+    'id_documento' => '1061428136',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -3302,6 +3577,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 275,
     'user_id' => 549,
+    'id_documento' => '1061431501',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -3314,6 +3590,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 276,
     'user_id' => 550,
+    'id_documento' => '1059840758',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA EL CHOCHO',
     'genero_acudiente' => 'otro',
@@ -3326,6 +3603,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 277,
     'user_id' => 551,
+    'id_documento' => '1061431658',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -3338,6 +3616,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 278,
     'user_id' => 552,
+    'id_documento' => '25367156',
     'celular_acudiente' => '0',
     'direccion_acudiente' => '',
     'genero_acudiente' => 'otro',
@@ -3350,6 +3629,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 279,
     'user_id' => 553,
+    'id_documento' => '1061428170',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -3362,6 +3642,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 280,
     'user_id' => 554,
+    'id_documento' => '1061433139',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -3374,6 +3655,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 281,
     'user_id' => 555,
+    'id_documento' => '10495723',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -3386,6 +3668,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 282,
     'user_id' => 556,
+    'id_documento' => '4656560',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATAVA',
     'genero_acudiente' => 'otro',
@@ -3398,6 +3681,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 283,
     'user_id' => 557,
+    'id_documento' => '1061434705',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -3410,6 +3694,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 284,
     'user_id' => 558,
+    'id_documento' => '1061430066',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -3422,6 +3707,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 285,
     'user_id' => 559,
+    'id_documento' => '1061434444',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -3434,6 +3720,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 286,
     'user_id' => 560,
+    'id_documento' => '1061435827',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -3446,6 +3733,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 287,
     'user_id' => 561,
+    'id_documento' => '10489834',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATAVA',
     'genero_acudiente' => 'otro',
@@ -3458,6 +3746,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 288,
     'user_id' => 562,
+    'id_documento' => '56345543',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -3470,6 +3759,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 289,
     'user_id' => 563,
+    'id_documento' => '1061438880',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -3482,6 +3772,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 290,
     'user_id' => 564,
+    'id_documento' => '1061435062',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -3494,6 +3785,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 291,
     'user_id' => 565,
+    'id_documento' => '37004973',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'MUNICIPIO CALOTO',
     'genero_acudiente' => 'otro',
@@ -3506,6 +3798,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 292,
     'user_id' => 566,
+    'id_documento' => '1062282913',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LA SELVA',
     'genero_acudiente' => 'otro',
@@ -3518,6 +3811,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 293,
     'user_id' => 567,
+    'id_documento' => '34771178',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -3530,6 +3824,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 294,
     'user_id' => 568,
+    'id_documento' => '34770636',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -3542,6 +3837,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 295,
     'user_id' => 569,
+    'id_documento' => '1061428392',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -3554,6 +3850,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 296,
     'user_id' => 570,
+    'id_documento' => '1060386291',
     'celular_acudiente' => '0',
     'direccion_acudiente' => '',
     'genero_acudiente' => 'otro',
@@ -3566,6 +3863,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 297,
     'user_id' => 571,
+    'id_documento' => '1061436079',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATAVA',
     'genero_acudiente' => 'otro',
@@ -3578,6 +3876,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 298,
     'user_id' => 572,
+    'id_documento' => '1062296613',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -3590,6 +3889,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 299,
     'user_id' => 573,
+    'id_documento' => '1061432232',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -3602,6 +3902,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 300,
     'user_id' => 574,
+    'id_documento' => '1061434054',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -3614,6 +3915,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 301,
     'user_id' => 575,
+    'id_documento' => '76142486',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA EL CHOCHO',
     'genero_acudiente' => 'otro',
@@ -3626,6 +3928,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 302,
     'user_id' => 576,
+    'id_documento' => '1061429866',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATAVA',
     'genero_acudiente' => 'otro',
@@ -3638,6 +3941,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 303,
     'user_id' => 577,
+    'id_documento' => '1061430856',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -3650,6 +3954,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 304,
     'user_id' => 578,
+    'id_documento' => '4653962',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATAVA',
     'genero_acudiente' => 'otro',
@@ -3662,6 +3967,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 305,
     'user_id' => 579,
+    'id_documento' => '76142505',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUADUALITO',
     'genero_acudiente' => 'otro',
@@ -3674,6 +3980,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 306,
     'user_id' => 580,
+    'id_documento' => '1062289106',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATAVA',
     'genero_acudiente' => 'otro',
@@ -3686,6 +3993,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 307,
     'user_id' => 581,
+    'id_documento' => '76143092',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -3698,6 +4006,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 308,
     'user_id' => 582,
+    'id_documento' => '1002948262',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -3710,6 +4019,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 309,
     'user_id' => 583,
+    'id_documento' => '1061428505',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -3722,6 +4032,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 310,
     'user_id' => 584,
+    'id_documento' => '1061429583',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -3734,6 +4045,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 311,
     'user_id' => 585,
+    'id_documento' => '1062279662',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -3746,6 +4058,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 312,
     'user_id' => 586,
+    'id_documento' => '1061429835',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -3758,6 +4071,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 313,
     'user_id' => 587,
+    'id_documento' => '34615567',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -3770,6 +4084,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 314,
     'user_id' => 588,
+    'id_documento' => '1002946701',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -3782,6 +4097,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 315,
     'user_id' => 589,
+    'id_documento' => '76142786',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATAVA',
     'genero_acudiente' => 'otro',
@@ -3794,6 +4110,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 316,
     'user_id' => 590,
+    'id_documento' => '1061434197',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -3806,6 +4123,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 317,
     'user_id' => 591,
+    'id_documento' => '1061438214',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -3818,6 +4136,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 318,
     'user_id' => 592,
+    'id_documento' => '1061436194',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -3830,6 +4149,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 319,
     'user_id' => 593,
+    'id_documento' => '1061429924',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -3842,6 +4162,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 320,
     'user_id' => 594,
+    'id_documento' => '1061501850',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -3854,6 +4175,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 321,
     'user_id' => 595,
+    'id_documento' => '1061435621',
     'celular_acudiente' => '0',
     'direccion_acudiente' => '',
     'genero_acudiente' => 'otro',
@@ -3866,6 +4188,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 322,
     'user_id' => 596,
+    'id_documento' => '1061433923',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -3878,6 +4201,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 323,
     'user_id' => 597,
+    'id_documento' => '1061433873',
     'celular_acudiente' => '0',
     'direccion_acudiente' => '',
     'genero_acudiente' => 'otro',
@@ -3890,6 +4214,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 324,
     'user_id' => 598,
+    'id_documento' => '1061432852',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -3902,6 +4227,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 325,
     'user_id' => 599,
+    'id_documento' => '34771881',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -3914,6 +4240,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 326,
     'user_id' => 600,
+    'id_documento' => '1061432640',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATAVA',
     'genero_acudiente' => 'otro',
@@ -3926,6 +4253,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 327,
     'user_id' => 601,
+    'id_documento' => '41945827',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -3938,6 +4266,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 328,
     'user_id' => 602,
+    'id_documento' => '1061435042',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -3950,6 +4279,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 329,
     'user_id' => 603,
+    'id_documento' => '1061434430',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -3962,6 +4292,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 330,
     'user_id' => 604,
+    'id_documento' => '1061432004',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA CAMPO ALEGRE',
     'genero_acudiente' => 'otro',
@@ -3974,6 +4305,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 331,
     'user_id' => 605,
+    'id_documento' => '1234',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -3986,6 +4318,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 332,
     'user_id' => 606,
+    'id_documento' => '4786191',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -3998,6 +4331,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 333,
     'user_id' => 607,
+    'id_documento' => '76141766',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA ALTA',
     'genero_acudiente' => 'otro',
@@ -4010,6 +4344,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 334,
     'user_id' => 608,
+    'id_documento' => '1061435854',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -4022,6 +4357,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 335,
     'user_id' => 609,
+    'id_documento' => '76142941',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATABA',
     'genero_acudiente' => 'otro',
@@ -4034,6 +4370,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 336,
     'user_id' => 610,
+    'id_documento' => '76143173',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATABA',
     'genero_acudiente' => 'otro',
@@ -4046,6 +4383,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 337,
     'user_id' => 611,
+    'id_documento' => '1107035577',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -4058,6 +4396,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 338,
     'user_id' => 612,
+    'id_documento' => '4656603',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATABA',
     'genero_acudiente' => 'otro',
@@ -4070,6 +4409,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 339,
     'user_id' => 613,
+    'id_documento' => '1061432571',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATABA',
     'genero_acudiente' => 'otro',
@@ -4082,6 +4422,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 340,
     'user_id' => 614,
+    'id_documento' => '34772048',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LA SELVA',
     'genero_acudiente' => 'otro',
@@ -4094,6 +4435,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 341,
     'user_id' => 615,
+    'id_documento' => '25733185',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -4106,6 +4448,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 342,
     'user_id' => 616,
+    'id_documento' => '4652996',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'CALOTO',
     'genero_acudiente' => 'otro',
@@ -4118,6 +4461,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 343,
     'user_id' => 617,
+    'id_documento' => '76142816',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -4130,6 +4474,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 344,
     'user_id' => 618,
+    'id_documento' => '1061502423',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA EL SOCORRO',
     'genero_acudiente' => 'otro',
@@ -4142,6 +4487,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 345,
     'user_id' => 619,
+    'id_documento' => '1061431339',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA EL ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -4154,6 +4500,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 346,
     'user_id' => 620,
+    'id_documento' => '1002947557',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -4166,6 +4513,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 347,
     'user_id' => 621,
+    'id_documento' => '1061433646',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -4178,6 +4526,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 348,
     'user_id' => 622,
+    'id_documento' => '97041116416',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -4190,6 +4539,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 349,
     'user_id' => 623,
+    'id_documento' => '1061436463',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -4202,6 +4552,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 350,
     'user_id' => 624,
+    'id_documento' => '1061437656',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -4214,6 +4565,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 351,
     'user_id' => 625,
+    'id_documento' => '1061436568',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LA SELVA',
     'genero_acudiente' => 'otro',
@@ -4226,6 +4578,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 352,
     'user_id' => 626,
+    'id_documento' => '1062305765',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -4238,6 +4591,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 353,
     'user_id' => 627,
+    'id_documento' => '1061437015',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -4250,6 +4604,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 354,
     'user_id' => 628,
+    'id_documento' => '1061435500',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA EL NILO',
     'genero_acudiente' => 'otro',
@@ -4262,6 +4617,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 355,
     'user_id' => 629,
+    'id_documento' => '1061502284',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -4274,6 +4630,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 356,
     'user_id' => 630,
+    'id_documento' => '25373723',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -4286,6 +4643,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 357,
     'user_id' => 631,
+    'id_documento' => '1067520673',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -4298,6 +4656,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 358,
     'user_id' => 632,
+    'id_documento' => '1061434397',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -4310,6 +4669,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 359,
     'user_id' => 633,
+    'id_documento' => '1062335620',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA EL ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -4322,6 +4682,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 360,
     'user_id' => 634,
+    'id_documento' => '1002946736',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -4334,6 +4695,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 361,
     'user_id' => 635,
+    'id_documento' => '1062331808',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -4346,6 +4708,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 362,
     'user_id' => 636,
+    'id_documento' => '1061438406',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -4358,6 +4721,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 363,
     'user_id' => 637,
+    'id_documento' => '10498718',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -4370,6 +4734,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 364,
     'user_id' => 638,
+    'id_documento' => '1061438546',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -4382,6 +4747,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 365,
     'user_id' => 639,
+    'id_documento' => '1002948631',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -4394,6 +4760,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 366,
     'user_id' => 640,
+    'id_documento' => '1002948631',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -4406,6 +4773,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 367,
     'user_id' => 641,
+    'id_documento' => '1061435397',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA EL ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -4418,6 +4786,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 368,
     'user_id' => 642,
+    'id_documento' => '1061435679',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -4430,6 +4799,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 369,
     'user_id' => 643,
+    'id_documento' => '76141468',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATABA',
     'genero_acudiente' => 'otro',
@@ -4442,6 +4812,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 370,
     'user_id' => 644,
+    'id_documento' => '1061431474',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA EL CHOCHO',
     'genero_acudiente' => 'otro',
@@ -4454,6 +4825,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 371,
     'user_id' => 645,
+    'id_documento' => '76143053',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA EL CHOCHO',
     'genero_acudiente' => 'otro',
@@ -4466,6 +4838,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 372,
     'user_id' => 646,
+    'id_documento' => '1061428564',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATABA',
     'genero_acudiente' => 'otro',
@@ -4478,6 +4851,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 373,
     'user_id' => 647,
+    'id_documento' => '1062282541',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATABA',
     'genero_acudiente' => 'otro',
@@ -4490,6 +4864,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 374,
     'user_id' => 648,
+    'id_documento' => '1061429948',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'EL PALO',
     'genero_acudiente' => 'otro',
@@ -4502,6 +4877,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 375,
     'user_id' => 649,
+    'id_documento' => '1061428999',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'TOEZ',
     'genero_acudiente' => 'otro',
@@ -4514,6 +4890,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 376,
     'user_id' => 650,
+    'id_documento' => '25732455',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -4526,6 +4903,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 377,
     'user_id' => 651,
+    'id_documento' => '1061431300',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LA SELVA',
     'genero_acudiente' => 'otro',
@@ -4538,6 +4916,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 378,
     'user_id' => 652,
+    'id_documento' => '34615095',
     'celular_acudiente' => '0',
     'direccion_acudiente' => '',
     'genero_acudiente' => 'otro',
@@ -4550,6 +4929,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 379,
     'user_id' => 653,
+    'id_documento' => '98032556019',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -4562,6 +4942,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 380,
     'user_id' => 654,
+    'id_documento' => '76141920',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA EL NILO',
     'genero_acudiente' => 'otro',
@@ -4574,6 +4955,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 381,
     'user_id' => 655,
+    'id_documento' => '96041808672',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LA SELVA',
     'genero_acudiente' => 'otro',
@@ -4586,6 +4968,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 382,
     'user_id' => 656,
+    'id_documento' => '25364787',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -4598,6 +4981,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 383,
     'user_id' => 657,
+    'id_documento' => '1002949272',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LA SELVA',
     'genero_acudiente' => 'otro',
@@ -4610,6 +4994,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 384,
     'user_id' => 658,
+    'id_documento' => '1067527031',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -4622,6 +5007,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 385,
     'user_id' => 659,
+    'id_documento' => '1061429987',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LA DOMINGA',
     'genero_acudiente' => 'otro',
@@ -4634,6 +5020,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 386,
     'user_id' => 660,
+    'id_documento' => '1061430426',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -4646,6 +5033,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 387,
     'user_id' => 661,
+    'id_documento' => '1061433151',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA EL SOCORRO',
     'genero_acudiente' => 'otro',
@@ -4658,6 +5046,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 388,
     'user_id' => 662,
+    'id_documento' => '31539810',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -4670,6 +5059,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 389,
     'user_id' => 663,
+    'id_documento' => '1147952451',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -4682,6 +5072,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 390,
     'user_id' => 664,
+    'id_documento' => '1067523466',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -4694,6 +5085,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 391,
     'user_id' => 665,
+    'id_documento' => '1002948011',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -4706,6 +5098,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 392,
     'user_id' => 666,
+    'id_documento' => '34771470',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -4718,6 +5111,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 393,
     'user_id' => 667,
+    'id_documento' => '34771908',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -4730,6 +5124,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 394,
     'user_id' => 668,
+    'id_documento' => '1061431595',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATAVA',
     'genero_acudiente' => 'otro',
@@ -4742,6 +5137,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 395,
     'user_id' => 669,
+    'id_documento' => '25337547',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -4754,6 +5150,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 396,
     'user_id' => 670,
+    'id_documento' => '1061429077',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -4766,6 +5163,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 397,
     'user_id' => 671,
+    'id_documento' => '1002948564',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -4778,6 +5176,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 398,
     'user_id' => 672,
+    'id_documento' => '1061431311',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -4790,6 +5189,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 399,
     'user_id' => 673,
+    'id_documento' => '315331',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -4802,6 +5202,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 400,
     'user_id' => 674,
+    'id_documento' => '1002947082',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -4814,6 +5215,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 401,
     'user_id' => 675,
+    'id_documento' => '1061434131',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -4826,6 +5228,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 402,
     'user_id' => 676,
+    'id_documento' => '1061438153',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -4838,6 +5241,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 403,
     'user_id' => 677,
+    'id_documento' => '76141956',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -4850,6 +5254,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 404,
     'user_id' => 678,
+    'id_documento' => '76141720',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUADUALITO',
     'genero_acudiente' => 'otro',
@@ -4862,6 +5267,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 405,
     'user_id' => 679,
+    'id_documento' => '25364792',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -4874,6 +5280,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 406,
     'user_id' => 680,
+    'id_documento' => '1061432827',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -4886,6 +5293,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 407,
     'user_id' => 681,
+    'id_documento' => '1061434850',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA NAPOLES',
     'genero_acudiente' => 'otro',
@@ -4898,6 +5306,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 408,
     'user_id' => 682,
+    'id_documento' => '1061429332',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATAVA',
     'genero_acudiente' => 'otro',
@@ -4910,6 +5319,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 409,
     'user_id' => 683,
+    'id_documento' => '1002949362',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -4922,6 +5332,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 410,
     'user_id' => 684,
+    'id_documento' => '1061434586',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA EL CHOCHO',
     'genero_acudiente' => 'otro',
@@ -4934,6 +5345,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 411,
     'user_id' => 685,
+    'id_documento' => '1061432606',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -4946,6 +5358,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 412,
     'user_id' => 686,
+    'id_documento' => '1061432110',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LA SELVA',
     'genero_acudiente' => 'otro',
@@ -4958,6 +5371,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 413,
     'user_id' => 687,
+    'id_documento' => '1114488541',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -4970,6 +5384,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 414,
     'user_id' => 688,
+    'id_documento' => '1082943845',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -4982,6 +5397,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 415,
     'user_id' => 689,
+    'id_documento' => '34770246',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA CHORRILLO',
     'genero_acudiente' => 'otro',
@@ -4994,6 +5410,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 416,
     'user_id' => 690,
+    'id_documento' => '4759609',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5006,6 +5423,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 417,
     'user_id' => 691,
+    'id_documento' => '10491201',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LA DOMINGA',
     'genero_acudiente' => 'otro',
@@ -5018,6 +5436,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 418,
     'user_id' => 692,
+    'id_documento' => '1002920839',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5030,6 +5449,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 419,
     'user_id' => 693,
+    'id_documento' => '1067523866',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5042,6 +5462,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 420,
     'user_id' => 694,
+    'id_documento' => '34771521',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA SANTA ROSA',
     'genero_acudiente' => 'otro',
@@ -5054,6 +5475,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 421,
     'user_id' => 695,
+    'id_documento' => '34772053',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -5066,6 +5488,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 422,
     'user_id' => 696,
+    'id_documento' => '76140961',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'CALOTO',
     'genero_acudiente' => 'otro',
@@ -5078,6 +5501,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 423,
     'user_id' => 697,
+    'id_documento' => '1061432572',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATAVA',
     'genero_acudiente' => 'otro',
@@ -5090,6 +5514,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 424,
     'user_id' => 698,
+    'id_documento' => '1061435878',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA EL CHOCHO',
     'genero_acudiente' => 'otro',
@@ -5102,6 +5527,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 425,
     'user_id' => 699,
+    'id_documento' => '1061434546',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -5114,6 +5540,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 426,
     'user_id' => 700,
+    'id_documento' => '76003349',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5126,6 +5553,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 427,
     'user_id' => 701,
+    'id_documento' => '1067530059',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5138,6 +5566,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 428,
     'user_id' => 702,
+    'id_documento' => '1002946946',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUADUALITO',
     'genero_acudiente' => 'otro',
@@ -5150,6 +5579,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 429,
     'user_id' => 703,
+    'id_documento' => '1061429841',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5162,6 +5592,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 430,
     'user_id' => 704,
+    'id_documento' => '1061432537',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATAVA',
     'genero_acudiente' => 'otro',
@@ -5174,6 +5605,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 431,
     'user_id' => 705,
+    'id_documento' => '48573667',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -5186,6 +5618,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 432,
     'user_id' => 706,
+    'id_documento' => '76142514',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -5198,6 +5631,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 433,
     'user_id' => 707,
+    'id_documento' => '1062333585',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -5210,6 +5644,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 434,
     'user_id' => 708,
+    'id_documento' => '25455213',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -5222,6 +5657,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 435,
     'user_id' => 709,
+    'id_documento' => '1061439005',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'RESGUARDO DE TOEZ',
     'genero_acudiente' => 'otro',
@@ -5234,6 +5670,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 436,
     'user_id' => 710,
+    'id_documento' => '1002946516',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'RESGUARDO DE TOEZ',
     'genero_acudiente' => 'otro',
@@ -5246,6 +5683,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 437,
     'user_id' => 711,
+    'id_documento' => '1061432591',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -5258,6 +5696,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 438,
     'user_id' => 712,
+    'id_documento' => '1061435197',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATAVA',
     'genero_acudiente' => 'otro',
@@ -5270,6 +5709,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 439,
     'user_id' => 713,
+    'id_documento' => '1007147291',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5282,6 +5722,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 440,
     'user_id' => 714,
+    'id_documento' => '1007145992',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5294,6 +5735,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 441,
     'user_id' => 715,
+    'id_documento' => '1061428141',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5306,6 +5748,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 442,
     'user_id' => 716,
+    'id_documento' => '34771601',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA EL TIERRERO',
     'genero_acudiente' => 'otro',
@@ -5318,6 +5761,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 443,
     'user_id' => 717,
+    'id_documento' => '1061432296',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5330,6 +5774,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 444,
     'user_id' => 718,
+    'id_documento' => '1061429480',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5342,6 +5787,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 445,
     'user_id' => 719,
+    'id_documento' => '1062309956',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5354,6 +5800,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 446,
     'user_id' => 720,
+    'id_documento' => '66911640',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LA SELVA',
     'genero_acudiente' => 'otro',
@@ -5366,6 +5813,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 447,
     'user_id' => 721,
+    'id_documento' => '1002885718',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5378,6 +5826,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 448,
     'user_id' => 722,
+    'id_documento' => '1002947482',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LA SELVA',
     'genero_acudiente' => 'otro',
@@ -5390,6 +5839,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 449,
     'user_id' => 723,
+    'id_documento' => '12345',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -5402,6 +5852,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 450,
     'user_id' => 724,
+    'id_documento' => '1002947496',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LA SELVA',
     'genero_acudiente' => 'otro',
@@ -5414,6 +5865,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 451,
     'user_id' => 725,
+    'id_documento' => '1061428786',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LA SELVA',
     'genero_acudiente' => 'otro',
@@ -5426,6 +5878,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 452,
     'user_id' => 726,
+    'id_documento' => '1061436923',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -5438,6 +5891,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 453,
     'user_id' => 727,
+    'id_documento' => '1007525725',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA EL NILO',
     'genero_acudiente' => 'otro',
@@ -5450,6 +5904,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 454,
     'user_id' => 728,
+    'id_documento' => '1061429078',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5462,6 +5917,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 455,
     'user_id' => 729,
+    'id_documento' => '1061428468',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5474,6 +5930,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 456,
     'user_id' => 730,
+    'id_documento' => '1002947493',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5486,6 +5943,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 457,
     'user_id' => 731,
+    'id_documento' => '1061435757',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'EL LIMONAR',
     'genero_acudiente' => 'otro',
@@ -5498,6 +5956,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 458,
     'user_id' => 732,
+    'id_documento' => '1061434836',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATAVA',
     'genero_acudiente' => 'otro',
@@ -5510,6 +5969,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 459,
     'user_id' => 733,
+    'id_documento' => '1061429159',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA ALTAMIRA',
     'genero_acudiente' => 'otro',
@@ -5522,6 +5982,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 460,
     'user_id' => 734,
+    'id_documento' => '76141552',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA NAPOLES',
     'genero_acudiente' => 'otro',
@@ -5534,6 +5995,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 461,
     'user_id' => 735,
+    'id_documento' => '76142790',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA EL CHOCHO',
     'genero_acudiente' => 'otro',
@@ -5546,6 +6008,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 462,
     'user_id' => 736,
+    'id_documento' => '20645512',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5558,6 +6021,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 463,
     'user_id' => 737,
+    'id_documento' => '34605211',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5570,6 +6034,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 464,
     'user_id' => 738,
+    'id_documento' => '1061433049',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -5582,6 +6047,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 465,
     'user_id' => 739,
+    'id_documento' => '1061432739',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUADUALITO',
     'genero_acudiente' => 'otro',
@@ -5594,6 +6060,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 466,
     'user_id' => 740,
+    'id_documento' => '48680159',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA EL CARMELO',
     'genero_acudiente' => 'otro',
@@ -5606,6 +6073,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 467,
     'user_id' => 741,
+    'id_documento' => '313517',
     'celular_acudiente' => '0',
     'direccion_acudiente' => '',
     'genero_acudiente' => 'otro',
@@ -5618,6 +6086,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 468,
     'user_id' => 742,
+    'id_documento' => '1061435466',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATAVA',
     'genero_acudiente' => 'otro',
@@ -5630,6 +6099,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 469,
     'user_id' => 743,
+    'id_documento' => '1061436077',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATAVA',
     'genero_acudiente' => 'otro',
@@ -5642,6 +6112,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 470,
     'user_id' => 744,
+    'id_documento' => '1061436706',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'LAS AGUAS',
     'genero_acudiente' => 'otro',
@@ -5654,6 +6125,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 471,
     'user_id' => 745,
+    'id_documento' => '1133304004',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -5666,6 +6138,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 472,
     'user_id' => 746,
+    'id_documento' => '76140205',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA NAPOLES',
     'genero_acudiente' => 'otro',
@@ -5678,6 +6151,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 473,
     'user_id' => 747,
+    'id_documento' => '1002948824',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5690,6 +6164,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 474,
     'user_id' => 748,
+    'id_documento' => '1061434576',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA EL CHOCHO',
     'genero_acudiente' => 'otro',
@@ -5702,6 +6177,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 475,
     'user_id' => 749,
+    'id_documento' => '1002947710',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5714,6 +6190,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 476,
     'user_id' => 750,
+    'id_documento' => '1061439029',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -5726,6 +6203,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 477,
     'user_id' => 751,
+    'id_documento' => '34771987',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5738,6 +6216,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 478,
     'user_id' => 752,
+    'id_documento' => '1085281847',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -5750,6 +6229,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 479,
     'user_id' => 753,
+    'id_documento' => '1061437688',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -5762,6 +6242,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 480,
     'user_id' => 754,
+    'id_documento' => '1002946968',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5774,6 +6255,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 481,
     'user_id' => 755,
+    'id_documento' => '4656634',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5786,6 +6268,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 482,
     'user_id' => 756,
+    'id_documento' => '1062316342',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'TOEZ',
     'genero_acudiente' => 'otro',
@@ -5798,6 +6281,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 483,
     'user_id' => 757,
+    'id_documento' => '1059062978',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5810,6 +6294,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 484,
     'user_id' => 758,
+    'id_documento' => '1061430786',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATAVA',
     'genero_acudiente' => 'otro',
@@ -5822,6 +6307,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 485,
     'user_id' => 759,
+    'id_documento' => '25365869',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -5834,6 +6320,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 486,
     'user_id' => 760,
+    'id_documento' => '1061430805',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA CHORRILLOS',
     'genero_acudiente' => 'otro',
@@ -5846,6 +6333,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 487,
     'user_id' => 761,
+    'id_documento' => '1002948339',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA CHORRILLOS',
     'genero_acudiente' => 'otro',
@@ -5858,6 +6346,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 488,
     'user_id' => 762,
+    'id_documento' => '1061432899',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VERD LA SELVA',
     'genero_acudiente' => 'otro',
@@ -5870,6 +6359,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 489,
     'user_id' => 763,
+    'id_documento' => '1002946965',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5882,6 +6372,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 490,
     'user_id' => 764,
+    'id_documento' => '1061435425',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5894,6 +6385,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 491,
     'user_id' => 765,
+    'id_documento' => '1002947685',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5906,6 +6398,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 492,
     'user_id' => 766,
+    'id_documento' => '99033011101',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATAVA',
     'genero_acudiente' => 'otro',
@@ -5918,6 +6411,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 493,
     'user_id' => 767,
+    'id_documento' => '1061430828',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -5930,6 +6424,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 494,
     'user_id' => 768,
+    'id_documento' => '1007683889',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5942,6 +6437,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 495,
     'user_id' => 769,
+    'id_documento' => '1007452193',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5954,6 +6450,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 496,
     'user_id' => 770,
+    'id_documento' => '76140417',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATAVA',
     'genero_acudiente' => 'otro',
@@ -5966,6 +6463,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 497,
     'user_id' => 771,
+    'id_documento' => '1061429463',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -5978,6 +6476,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 498,
     'user_id' => 772,
+    'id_documento' => '1061429076',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -5990,6 +6489,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 499,
     'user_id' => 773,
+    'id_documento' => '1061751498',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -6002,6 +6502,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 500,
     'user_id' => 774,
+    'id_documento' => '1061432929',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA VALLES HONDO',
     'genero_acudiente' => 'otro',
@@ -6014,6 +6515,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 501,
     'user_id' => 775,
+    'id_documento' => '1114887739',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -6026,6 +6528,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 502,
     'user_id' => 776,
+    'id_documento' => '1003151211',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -6038,6 +6541,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 503,
     'user_id' => 777,
+    'id_documento' => '1062309685',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -6050,6 +6554,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 504,
     'user_id' => 778,
+    'id_documento' => '1002948899',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -6062,6 +6567,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 505,
     'user_id' => 779,
+    'id_documento' => '1002950037',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LA  EMPERATRIZ',
     'genero_acudiente' => 'otro',
@@ -6074,6 +6580,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 506,
     'user_id' => 780,
+    'id_documento' => '1002946625',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -6086,6 +6593,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 507,
     'user_id' => 781,
+    'id_documento' => '1061432531',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -6098,6 +6606,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 508,
     'user_id' => 782,
+    'id_documento' => '1061430655',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATAVA',
     'genero_acudiente' => 'otro',
@@ -6110,6 +6619,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 509,
     'user_id' => 783,
+    'id_documento' => '1061437272',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA EL CHOCHO',
     'genero_acudiente' => 'otro',
@@ -6122,6 +6632,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 510,
     'user_id' => 784,
+    'id_documento' => '1061501573',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATAVA',
     'genero_acudiente' => 'otro',
@@ -6134,6 +6645,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 511,
     'user_id' => 785,
+    'id_documento' => '1061436545',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATAVA',
     'genero_acudiente' => 'otro',
@@ -6146,6 +6658,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 512,
     'user_id' => 786,
+    'id_documento' => '25367392',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATAVA',
     'genero_acudiente' => 'otro',
@@ -6158,6 +6671,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 513,
     'user_id' => 787,
+    'id_documento' => '1061430849',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA ARRAYAN',
     'genero_acudiente' => 'otro',
@@ -6170,6 +6684,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 514,
     'user_id' => 788,
+    'id_documento' => '1002946936',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -6182,6 +6697,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 515,
     'user_id' => 789,
+    'id_documento' => '1002948593',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LA SELVA',
     'genero_acudiente' => 'otro',
@@ -6194,6 +6710,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 516,
     'user_id' => 790,
+    'id_documento' => '1061428558',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -6206,6 +6723,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 517,
     'user_id' => 791,
+    'id_documento' => '1002919554',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -6218,6 +6736,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 518,
     'user_id' => 792,
+    'id_documento' => '1002947838',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -6230,6 +6749,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 519,
     'user_id' => 793,
+    'id_documento' => '76142644',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LOMA PELADA',
     'genero_acudiente' => 'otro',
@@ -6242,6 +6762,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 520,
     'user_id' => 794,
+    'id_documento' => '1061434846',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -6254,6 +6775,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 521,
     'user_id' => 795,
+    'id_documento' => '1062328525',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'CALOTO',
     'genero_acudiente' => 'otro',
@@ -6266,6 +6788,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 522,
     'user_id' => 796,
+    'id_documento' => '1002948823',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LA SELVA',
     'genero_acudiente' => 'otro',
@@ -6278,6 +6801,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 523,
     'user_id' => 797,
+    'id_documento' => '1061435251',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -6290,6 +6814,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 524,
     'user_id' => 798,
+    'id_documento' => '1061752309',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LA SELVA',
     'genero_acudiente' => 'otro',
@@ -6302,6 +6827,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 525,
     'user_id' => 799,
+    'id_documento' => '1067521768',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'LA EMPERATRIZ',
     'genero_acudiente' => 'otro',
@@ -6314,6 +6840,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 526,
     'user_id' => 800,
+    'id_documento' => '1061428692',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LA SELVA',
     'genero_acudiente' => 'otro',
@@ -6326,6 +6853,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 527,
     'user_id' => 801,
+    'id_documento' => '1002886238',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA BODEGA',
     'genero_acudiente' => 'otro',
@@ -6338,6 +6866,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 528,
     'user_id' => 802,
+    'id_documento' => '25531396',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUATAVA',
     'genero_acudiente' => 'otro',
@@ -6350,6 +6879,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 529,
     'user_id' => 803,
+    'id_documento' => '1112470973',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA LA SELVA',
     'genero_acudiente' => 'otro',
@@ -6362,6 +6892,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 530,
     'user_id' => 804,
+    'id_documento' => '1061434585',
     'celular_acudiente' => '0',
     'direccion_acudiente' => '',
     'genero_acudiente' => 'otro',
@@ -6374,6 +6905,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 531,
     'user_id' => 805,
+    'id_documento' => '1061435596',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA GUADUALITO',
     'genero_acudiente' => 'otro',
@@ -6386,6 +6918,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 532,
     'user_id' => 806,
+    'id_documento' => '1193604243',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -6398,6 +6931,7 @@ class AcudienteSeeder extends Seeder
   array (
     'id' => 533,
     'user_id' => 807,
+    'id_documento' => '25366036',
     'celular_acudiente' => '0',
     'direccion_acudiente' => 'VEREDA HUELLAS',
     'genero_acudiente' => 'otro',
@@ -6409,7 +6943,7 @@ class AcudienteSeeder extends Seeder
 );
 
         foreach ($data as $row) {
-            App\Models\Acudiente::updateOrCreate(['id' => $row['id']], $row);
+            Acudiente::updateOrCreate(['id' => $row['id']], $row);
         }
     }
 }

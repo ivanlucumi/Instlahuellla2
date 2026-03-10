@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use App\Models\Sede;
 
 class SedeSeeder extends Seeder
@@ -25,18 +26,6 @@ class SedeSeeder extends Seeder
   1 => 
   array (
     'id' => 2,
-    'nombre_sede' => '',
-    'descripcion_sede' => '',
-    'codigo_dane_sede' => '',
-    'resolucion_sede' => '',
-    'institucion_id' => 4,
-    'estado_sede' => 1,
-    'created_at' => NULL,
-    'updated_at' => NULL,
-  ),
-  2 => 
-  array (
-    'id' => 4,
     'nombre_sede' => 'ESCUELA RURAL BODEGA ALTA',
     'descripcion_sede' => 'CODIGO DANE CENTRO: 219142000921',
     'codigo_dane_sede' => '21914200050602',
@@ -49,7 +38,7 @@ class SedeSeeder extends Seeder
 );
 
         foreach ($data as $row) {
-            App\Models\Sede::updateOrCreate(['id' => $row['id']], $row);
+            Sede::updateOrCreate(['id' => $row['id']], $row);
         }
     }
 }

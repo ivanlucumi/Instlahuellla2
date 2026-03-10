@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use App\Models\Asignatura;
 
 class AsignaturaSeeder extends Seeder
@@ -433,7 +434,7 @@ class AsignaturaSeeder extends Seeder
 );
 
         foreach ($data as $row) {
-            App\Models\Asignatura::updateOrCreate(['id' => $row['id']], $row);
+            Asignatura::updateOrCreate(['id' => $row['id']], $row);
         }
     }
 }

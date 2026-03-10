@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use App\Models\Hilo;
 
 class HiloSeeder extends Seeder
@@ -103,7 +104,7 @@ class HiloSeeder extends Seeder
 );
 
         foreach ($data as $row) {
-            App\Models\Hilo::updateOrCreate(['id' => $row['id']], $row);
+            Hilo::updateOrCreate(['id' => $row['id']], $row);
         }
     }
 }

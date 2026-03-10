@@ -22,15 +22,12 @@ class Asignatura extends Model
     {
         return $this->belongsTo(Hilo::class);
     }
+
     public function grados()
     {
         return $this->belongsToMany(GradoAcademico::class, 'asignatura_grado_docente', 'asignatura_id', 'grado_academico_id')
                     ->withPivot('docente_id')
                     ->withTimestamps();
-    }
-    public function sede()
-    {
-        return $this->belongsTo(Sede::class, 'sede_id');
     }
 
     public function docentes()

@@ -22,12 +22,14 @@
                     <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4 h-100 border-start border-primary border-4">
                         <i class="fa fa-book fa-3x text-primary opacity-50"></i>
                         <div class="ms-3 text-end">
-                            <h6 class="mb-1 text-white">{{ $asig->nombre_asignatura }}</h6>
-                            <p class="mb-1 text-primary small fw-bold"><i class="fa fa-users me-1"></i>{{ $asig->grado_nombre }}</p>
+                            <h6 class="mb-1 text-white">{{ $asig->nombre_asignatura }} - {{ $asig->grado_nombre }}</h6>
+                            <p class="mb-1 text-primary small fw-bold">
+                                <i class="fa fa-users me-1"></i> Curso: {{ $asig->grado_nombre }}
+                            </p>
                             @if($isSuperAdmin)
                                 <p class="mb-1 text-warning small"><i class="fa fa-user-tie me-1"></i>Docente: {{ $asig->docente_nombre }}</p>
                             @endif
-                            <span class="badge bg-dark-info border border-info mb-3">{{ $asig->hilo_nombre }}</span>
+                            <span class="badge bg-primary mb-3">{{ $asig->hilo_nombre }}</span>
                             <br>
                             <a href="{{ route('docente.asignatura.estudiantes', [$asig->id, $asig->grado_id]) }}" class="btn btn-primary btn-sm">
                                 <i class="fa fa-edit me-1"></i> {{ $isSuperAdmin ? 'Ver/Calificar' : 'Calificar Grupo' }}

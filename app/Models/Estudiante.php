@@ -54,4 +54,9 @@ class Estudiante extends Model
     {
         return $this->hasMany(Notas::class);
     }
+
+    public function matriculasFinales()
+    {
+        return $this->hasMany(MatriculaFinal::class, 'documento_estudiante', 'numero_identificacion_estudiante');
+    }
 }

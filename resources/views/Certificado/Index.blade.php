@@ -15,31 +15,31 @@
                 <form action="{{ route('admin.certificados.generar') }}" method="GET" target="_blank">
                     <div class="row">
                         <div class="col-md-12 mb-3">
-                            <label for="estudiante_id" class="form-label text-white fw-bold">Buscar Estudiante</label>
-                            <select name="estudiante_id" id="estudiante_id" class="form-select @error('estudiante_id') is-invalid @enderror" required>
-                                <option value="">Seleccione un estudiante...</option>
+                            <label for="identificacion" class="form-label text-white fw-bold">Buscar Estudiante (Nombre o Identificación)</label>
+                            <select name="identificacion" id="identificacion" class="form-select select2 @error('identificacion') is-invalid @enderror" required>
+                                <option value="">Seleccione o escriba...</option>
                                 @foreach($estudiantes as $estudiante)
-                                    <option value="{{ $estudiante->id }}">
-                                        {{ $estudiante->user->name ?? 'Sin nombre' }} (Código: {{ $estudiante->codigo_estudiante }})
+                                    <option value="{{ $estudiante['identificacion'] }}">
+                                        {{ $estudiante['nombre'] }}
                                     </option>
                                 @endforeach
                             </select>
-                            @error('estudiante_id')
+                            @error('identificacion')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
 
                         <div class="col-md-12 mb-4">
-                            <label for="anho_escolar_id" class="form-label text-white fw-bold">Año Académico</label>
-                            <select name="anho_escolar_id" id="anho_escolar_id" class="form-select @error('anho_escolar_id') is-invalid @enderror" required>
-                                <option value="">Seleccione el año...</option>
-                                @foreach($anhos as $anho)
-                                    <option value="{{ $anho->id }}">
-                                        {{ $anho->nombre_anho_escolar }}
+                            <label for="grado_aprobado" class="form-label text-white fw-bold">Grado Académico</label>
+                            <select name="grado_aprobado" id="grado_aprobado" class="form-select @error('grado_aprobado') is-invalid @enderror" required>
+                                <option value="">Seleccione el grado...</option>
+                                @foreach($grados as $grado)
+                                    <option value="{{ $grado }}">
+                                        {{ $grado }}
                                     </option>
                                 @endforeach
                             </select>
-                            @error('anho_escolar_id')
+                            @error('grado_aprobado')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>

@@ -19,4 +19,9 @@ class Curso extends Model
     {
         return $this->hasMany(Asignatura::class);
     }
+
+    public function grados()
+    {
+        return $this->hasMany(GradoAcademico::class);
+    }
 }

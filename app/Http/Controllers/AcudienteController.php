@@ -206,4 +206,26 @@ class AcudienteController extends Controller
         });
         return response()->json($acudientes);
     }
+
+    public function buscarPorDocumento(Request $request)
+    {
+        $documento = $request->query('documento');
+        
+        if (!$documento) {
+            return response()->json(['encontrado' => false], 400);
+        }
+
+        $acudiente = Acudiente::with('user')->where('id_documento', $documento)->first();
+
+        if ($acudiente) {
+            return response()->json([
+                'encontrado' => true,
+                'nombre'     => $acudiente->user->name ?? '',
+                'celular'    => $acudiente->celular_acudiente ?? '',
+                'parentesco' => $acudiente->parentesco_acudiente ?? 'Acudiente'
+            ]);
+        }
+
+        return response()->json(['encontrado' => false]);
+    }
 }

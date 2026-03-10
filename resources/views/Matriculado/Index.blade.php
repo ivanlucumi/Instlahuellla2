@@ -9,9 +9,12 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <h4 class="text-white">Matrículas Registradas</h4>
-                <a href="{{ route('admin.matriculado.create') }}" class="btn btn-primary">
-                    <i class="fa fa-plus me-1"></i> Nueva Matrícula
-                </a>
+                <div class="d-flex align-items-center">
+                    <input type="text" class="form-control form-control-sm me-3 search-table" placeholder="Buscar matrícula..." style="width: 250px;">
+                    <a href="{{ route('admin.matriculado.create') }}" class="btn btn-primary">
+                        <i class="fa fa-plus me-1"></i> Nueva Matrícula
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -26,9 +29,10 @@
                                 <th scope="col">#</th>
                                 <th scope="col">Estudiante</th>
                                 <th scope="col">Acudiente</th>
-                                <th scope="col">Asignatura</th>
                                 <th scope="col">Grado</th>
+                                <th scope="col">Curso (Bloque)</th>
                                 <th scope="col">Año Escolar</th>
+                                <th scope="col">Sede</th>
                                 <th scope="col">Estado</th>
                                 <th scope="col">Fecha Matrícula</th>
                                 <th scope="col">Acciones</th>
@@ -43,16 +47,11 @@
                                         <br>
                                         <small class="text-muted">{{ $matriculado->estudiante->codigo_estudiante ?? '' }}</small>
                                     </td>
-                                    <td>{{ $matriculado->acudiente->user->name ?? 'N/A' }}</td>
-                                    <td>
-                                        {{ $matriculado->asignatura->nombre_asignatura ?? 'N/A' }}
-                                        <br>
-                                        <span class="badge {{ $matriculado->asignatura->nivel_educativo == 'primaria' ? 'bg-info' : 'bg-success' }}">
-                                            {{ ucfirst($matriculado->asignatura->nivel_educativo ?? '') }}
-                                        </span>
-                                    </td>
+                                    <td>{{ $matriculado->acudiente->user->name ?? $matriculado->documento_acudiente ?? 'N/A' }}</td>
                                     <td>{{ $matriculado->grado->nombre_grado ?? 'N/A' }}</td>
-                                    <td>{{ $matriculado->anhoEscolar->nombre_anho_escolar ?? 'N/A' }}</td>
+                                    <td>{{ $matriculado->curso ?? 'N/A' }}</td>
+                                    <td>{{ $matriculado->ano_lectivo ?? 'N/A' }}</td>
+                                    <td>{{ $matriculado->sede->nombre_sede ?? 'N/A' }}</td>
                                     <td>
                                         <span class="badge 
                                             @if($matriculado->estado == 'activo') bg-success
@@ -62,7 +61,7 @@
                                             {{ ucfirst($matriculado->estado) }}
                                         </span>
                                     </td>
-                                    <td>{{ $matriculado->fecha_matricula?->format('d/m/Y') ?? 'N/A' }}</td>
+                                    <td>{{ $matriculado->fecha ? date('d/m/Y', strtotime($matriculado->fecha)) : 'N/A' }}</td>
                                     <td>
                                         <a href="{{ route('admin.matriculado.edit', $matriculado) }}" 
                                            class="btn btn-warning btn-sm">

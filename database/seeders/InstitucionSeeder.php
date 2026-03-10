@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Institucion;
 
 class InstitucionSeeder extends Seeder
 {
@@ -28,7 +27,7 @@ class InstitucionSeeder extends Seeder
 );
 
         foreach ($data as $row) {
-            App\Models\Institucion::updateOrCreate(['id' => $row['id']], $row);
+            \App\Models\Institucion::updateOrCreate(['id' => $row['id']], $row);
         }
     }
 }

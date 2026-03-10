@@ -8,13 +8,16 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h4 class="text-white">{{ $asignatura->nombre_asignatura }}</h4>
+                    <h4 class="text-white">{{ $asignatura->nombre_asignatura }} - Curso {{ $grado->bloque }}</h4>
                     <p class="text-primary mb-0 fw-bold">
-                        <i class="fa fa-users me-1"></i> Grado: {{ $grado->nombre_grado }} - {{ $grado->bloque }}
+                        <i class="fa fa-calendar-alt me-1"></i> Año Lectivo: <span class="text-white">{{ $anoLectivo }}</span>
+                        @if(!$esAnoActual)
+                            <span class="badge bg-warning text-dark ms-2"><i class="fa fa-lock me-1"></i> MODO LECTURA - HISTÓRICO</span>
+                        @endif
                     </p>
                     <p class="text-muted mb-0 small">
-                        <span class="badge bg-info">{{ $asignatura->hilo->nombre_hilo ?? 'N/A' }}</span> | 
-                        Sede: {{ $asignatura->sede->nombre_sede ?? 'N/A' }}
+                        <i class="fa fa-graduation-cap me-1"></i> Grado: {{ $grado->nombre_grado }} - {{ $grado->bloque }} | 
+                        <span class="badge bg-info">{{ $asignatura->hilo->nombre_hilo ?? 'N/A' }}</span>
                     </p>
                 </div>
                 <a href="{{ route('docente.dashboard') }}" class="btn btn-warning">
@@ -31,6 +34,14 @@
                     @csrf
                     <input type="hidden" name="asignatura_id" value="{{ $asignatura->id }}">
                     <input type="hidden" name="grado_id" value="{{ $grado->id }}">
+
+                    @if(!$esAnoActual)
+                        <div class="alert alert-warning border-warning bg-dark-warning mb-4" style="border-left: 5px solid;">
+                            <i class="fa fa-exclamation-triangle me-2"></i>
+                            <strong>Atención:</strong> Está visualizando registros del año <strong>{{ $anoLectivo }}</strong>. 
+                            La edición de calificaciones y la promoción de estudiantes para ciclos cerrados no está permitida.
+                        </div>
+                    @endif
                     
                     <div class="table-responsive">
                         <table class="table table-hover text-white">
@@ -97,9 +108,13 @@
                                             <input type="text" name="notas[{{ $estudiante->id }}][observaciones]" id="obs-{{ $estudiante->id }}" class="form-control form-control-sm bg-dark text-white border-0 obs-input" value="{{ $notaObj->observaciones ?? '' }}" placeholder="Nota o comentario..." readonly>
                                         </td>
                                         <td class="text-center">
-                                            <button type="button" class="btn btn-sm btn-outline-info edit-btn" onclick="enableEdit('{{ $estudiante->id }}')">
-                                                <i class="fa fa-edit"></i> Editar
-                                            </button>
+                                            @if($esAnoActual)
+                                                <button type="button" class="btn btn-sm btn-outline-info edit-btn" onclick="enableEdit('{{ $estudiante->id }}')">
+                                                    <i class="fa fa-edit"></i> Editar
+                                                </button>
+                                            @else
+                                                <span class="badge bg-secondary"><i class="fa fa-lock"></i> Bloqueado</span>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
@@ -107,17 +122,19 @@
                         </table>
                     </div>
 
-                    <div class="mt-4 d-flex align-items-center">
-                        <button type="submit" class="btn btn-primary" id="save-btn" disabled>
-                            <i class="bi bi-save me-1"></i> Guardar Calificaciones
-                        </button>
-                        <span class="ms-3 text-warning small" id="edit-warning" style="display: none;">
-                            <i class="bi bi-exclamation-triangle me-1"></i> Recuerde que las observaciones son obligatorias al ingresar notas.
-                        </span>
-                    </div>
+                    @if($esAnoActual)
+                        <div class="mt-4 d-flex align-items-center">
+                            <button type="submit" class="btn btn-primary" id="save-btn" disabled>
+                                <i class="bi bi-save me-1"></i> Guardar Calificaciones
+                            </button>
+                            <span class="ms-3 text-warning small" id="edit-warning" style="display: none;">
+                                <i class="bi bi-exclamation-triangle me-1"></i> Recuerde que las observaciones son obligatorias al ingresar notas.
+                            </span>
+                        </div>
+                    @endif
                 </form>
 
-                @if($all_graded)
+                @if($all_graded && $esAnoActual)
                 <hr class="my-5 border-light">
 
                 <div class="card bg-dark border-secondary shadow">
@@ -160,7 +177,7 @@
                         </form>
                     </div>
                 </div>
-                @else
+                @elseif($esAnoActual)
                 <div class="alert alert-info mt-5 border-info bg-dark-info" style="border-left: 5px solid;">
                     <i class="bi bi-info-circle-fill me-2"></i>
                     <strong>Sección de Promoción:</strong> Para habilitar la promoción de estudiantes, primero debe calificar a <strong>todos</strong> los estudiantes con su nota definitiva.

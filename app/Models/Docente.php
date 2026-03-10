@@ -31,13 +31,10 @@ class Docente extends Model
     }
 
     public function asignaturas()
-{
-    return $this->belongsToMany(
-        Asignatura::class,
-        'docente_asignatura',
-        'docente_id',
-        'asignatura_id'
-    );
-}
+    {
+        return $this->belongsToMany(Asignatura::class, 'asignatura_grado_docente', 'docente_id', 'asignatura_id', 'user_id', 'id')
+                    ->withPivot('grado_academico_id')
+                    ->withTimestamps();
+    }
     
 }

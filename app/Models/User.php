@@ -96,12 +96,14 @@ class User extends Authenticatable
 
     public function asignaturas()
     {
-        return $this->hasMany(Asignatura::class, 'docente_id');
+        return $this->belongsToMany(Asignatura::class, 'asignatura_grado_docente', 'docente_id', 'asignatura_id')
+                    ->withPivot('grado_academico_id')
+                    ->withTimestamps();
     }
 
     public function grados()
     {
-        return $this->hasMany(GradoAcademico::class, 'docente_id');
+        return $this->hasManyThrough(GradoAcademico::class, Docente::class, 'user_id', 'docente_id');
     }
 
 }

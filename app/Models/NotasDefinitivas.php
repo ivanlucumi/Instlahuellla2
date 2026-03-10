@@ -8,9 +8,9 @@ use App\Traits\Auditable;
 
 class NotasDefinitivas extends Model
 {
-    use Auditable;
-
     protected $fillable = [
+        'id_matricula',
+        'asignatura_id',
         'documento_estudiante',
         'nombre_estudiante',
         'grado_aprobado',
@@ -22,4 +22,14 @@ class NotasDefinitivas extends Model
         'nombre_asignatura',
         'curso',
     ];
+
+    public function asignatura()
+    {
+        return $this->belongsTo(Asignatura::class, 'asignatura_id');
+    }
+
+    public function matriculaFinal()
+    {
+        return $this->belongsTo(MatriculaFinal::class, 'id_matricula');
+    }
 }

@@ -9,9 +9,12 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <h4 class="text-white">Acudientes Registrados</h4>
-                <a href="{{ route('admin.acudiente.create') }}" class="btn btn-primary">
-                    <i class="fa fa-plus me-1"></i> Nuevo Acudiente
-                </a>
+                <div class="d-flex align-items-center">
+                    <input type="text" class="form-control form-control-sm me-3 search-table" placeholder="Buscar acudiente..." style="width: 250px;">
+                    <a href="{{ route('admin.acudiente.create') }}" class="btn btn-primary">
+                        <i class="fa fa-plus me-1"></i> Nuevo Acudiente
+                    </a>
+                </div>
             </div>
         </div>
     </div>

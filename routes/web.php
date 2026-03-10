@@ -15,14 +15,22 @@ Route::get('/logout', function () {
     return redirect('/login');
 })->name('logout.get');
 
-// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-// ruta principal agrupacion de rutas y middleware
+Route::middleware(['auth'])
+    ->group(function () {
+        Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    });
+
+// ruta principal agrupacion de rutas y middleware para ADMIN
 Route::middleware(['auth', 'rol:SUPERADMIN,ADMIN'])
     ->prefix('home')
     ->group(function () {
-        Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-        Route::get('/usuarios/crear', [App\Http\Controllers\UsuarioController::class, 'crear'])->name('admin.usuarios.crear');
-        Route::get('/usuarios/asignar-rol', [App\Http\Controllers\UsuarioController::class, 'asignarRol'])->name('admin.usuarios.asignarRol');
+        // Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+        Route::get('/usuarios', [App\Http\Controllers\UsuarioController::class, 'index'])->name('admin.usuarios.index');
+        Route::get('/usuarios/crear', [App\Http\Controllers\UsuarioController::class, 'create'])->name('admin.usuarios.create');
+        Route::post('/usuarios', [App\Http\Controllers\UsuarioController::class, 'store'])->name('admin.usuarios.store');
+        Route::get('/usuarios/{user}/editar', [App\Http\Controllers\UsuarioController::class, 'edit'])->name('admin.usuarios.edit');
+        Route::put('/usuarios/{user}', [App\Http\Controllers\UsuarioController::class, 'update'])->name('admin.usuarios.update');
+        Route::delete('/usuarios/{user}', [App\Http\Controllers\UsuarioController::class, 'destroy'])->name('admin.usuarios.destroy');
 
         Route::get('/institucion', [App\Http\Controllers\InstitucionController::class, 'Index'])->name('admin.institucion.index');
         Route::get('/institucion/crear', [App\Http\Controllers\InstitucionController::class, 'Create'])->name('admin.institucion.create');
@@ -123,6 +131,7 @@ Route::middleware(['auth', 'rol:SUPERADMIN,ADMIN'])
         // Rutas para obtener listas (al refrescar los selects tras crear en nueva ventana)
         Route::get('/estudiante/list', [App\Http\Controllers\EstudianteController::class, 'list'])->name('admin.estudiante.list');
         Route::get('/acudiente/list', [App\Http\Controllers\AcudienteController::class, 'list'])->name('admin.acudiente.list');
+        Route::get('/acudiente/buscar', [App\Http\Controllers\AcudienteController::class, 'buscarPorDocumento'])->name('admin.acudiente.buscar');
         Route::get('/asignatura/list', [App\Http\Controllers\AsignaturaController::class, 'list'])->name('admin.asignatura.list');
         Route::get('/gradoacademico/list', [App\Http\Controllers\GradoAcademicoController::class, 'list'])->name('admin.gradoacademico.list');
         Route::get('/anho-escolar/list', [App\Http\Controllers\AnhoEscolarController::class, 'list'])->name('admin.anhoescolar.list');
@@ -142,6 +151,7 @@ Route::middleware(['auth', 'rol:SUPERADMIN,ADMIN'])
         // Rutas para Certificados de Notas
         Route::get('/certificados', [App\Http\Controllers\CertificadoController::class, 'index'])->name('admin.certificados.index');
         Route::get('/certificados/generar', [App\Http\Controllers\CertificadoController::class, 'generar'])->name('admin.certificados.generar');
+        Route::get('/certificados/grupo', [App\Http\Controllers\CertificadoController::class, 'generarGrupo'])->name('admin.certificados.generar-grupo');
 
         // Rutas para Paz y Salvo
         Route::get('/pazysalvo', [App\Http\Controllers\PazYSalvoController::class, 'index'])->name('admin.pazysalvo.index');
@@ -151,6 +161,18 @@ Route::middleware(['auth', 'rol:SUPERADMIN,ADMIN'])
 Route::middleware(['auth', 'rol:ESTUDIANTE'])
     ->prefix('estudiante')
     ->group(function () {
+
+        Route::get('/dashboard', [App\Http\Controllers\EstudianteController::class, 'dashboard'])
+            ->name('estudiante.dashboard');
+        
+        Route::get('/historial', [App\Http\Controllers\EstudianteController::class, 'history'])
+            ->name('estudiante.history');
+
+        Route::get('/acudiente/editar', [App\Http\Controllers\EstudianteController::class, 'editAcudiente'])
+            ->name('estudiante.acudiente.edit');
+        
+        Route::put('/acudiente/actualizar', [App\Http\Controllers\EstudianteController::class, 'updateAcudiente'])
+            ->name('estudiante.acudiente.update');
 
         Route::get('/notasperiodo', [App\Http\Controllers\EstudianteController::class, 'notasPeriodo'])
             ->name('estudiante.notasPeriodo');
