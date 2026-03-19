@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->string('id_documento')->unique()->after('user_id');
             $table->string('celular_acudiente');
             $table->string('direccion_acudiente');
             $table->string('genero_acudiente');

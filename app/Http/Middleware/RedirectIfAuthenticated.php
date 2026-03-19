@@ -21,7 +21,7 @@ class RedirectIfAuthenticated
         if (Auth::guard($guard)->check()) {
             $user = Auth::user();
             
-            if($user->hasRol('SUPERADMIN') || $user->hasRol('ADMIN')){
+            if($user->hasRol('SUPERADMIN') || $user->hasRol('ADMIN') || $user->hasRol('DIRECTOR')){
                 return redirect()->route('home');
             }
 

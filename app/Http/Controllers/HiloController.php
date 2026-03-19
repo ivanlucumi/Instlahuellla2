@@ -10,9 +10,17 @@ class HiloController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $hilos = Hilo::orderBy('id')->get();
+        $query = \App\Models\Hilo::query();
+
+        if ($request->filled('search')) {
+            $query->where('nombre_hilo', 'LIKE', '%' . $request->search . '%');
+        }
+
+        $perPage = $request->get('per_page', 10);
+        $hilos = $query->orderBy('id', 'desc')->paginate($perPage)->appends($request->all());
+
         return view('Hilo.Index', compact('hilos'));
     }
 
@@ -85,6 +93,8 @@ class HiloController extends Controller
      */
     public function destroy(Hilo $hilo)
     {
+        abort_unless(auth()->user()->hasRol('SUPERADMIN'), 403, 'Solo el Súper Administrador puede eliminar registros.');
+
         $hilo->delete();
 
         return redirect()->route('admin.hilo.index')->with('swal', [

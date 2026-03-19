@@ -17,7 +17,8 @@ class UsuarioController extends Controller
     {
         $query = User::with('roles')->orderBy('id', 'desc');
 
-        if ($request->has('search')) {
+        // Búsqueda por nombre o email
+        if ($request->filled('search')) {
             $search = $request->get('search');
             $query->where(function($q) use ($search) {
                 $q->where('name', 'LIKE', "%$search%")
@@ -25,8 +26,23 @@ class UsuarioController extends Controller
             });
         }
 
-        $usuarios = $query->paginate(10);
-        return view('admin.usuarios.index', compact('usuarios'));
+        // Filtro por Rol
+        if ($request->filled('rol_id')) {
+            $query->whereHas('roles', function($q) use ($request) {
+                $q->where('rol.id', $request->rol_id);
+            });
+        }
+
+        // Filtro por Género
+        if ($request->filled('genero')) {
+            $query->where('genero', $request->genero);
+        }
+
+        $perPage = $request->get('per_page', 10);
+        $usuarios = $query->paginate($perPage)->appends($request->all());
+        
+        $roles = Rol::orderBy('nombre')->get();
+        return view('admin.usuarios.index', compact('usuarios', 'roles'));
     }
 
     /**
@@ -61,6 +77,37 @@ class UsuarioController extends Controller
             ]);
 
             $user->roles()->attach($request->roles);
+
+            // Automatización: crear perfil de docente o estudiante según el rol asignado
+            $roleNames = Rol::whereIn('id', $request->roles)->pluck('nombre')->toArray();
+
+            if (in_array('DOCENTE', $roleNames)) {
+                \App\Models\Docente::firstOrCreate(
+                    ['user_id' => $user->id],
+                    [
+                        'codigo_docente' => 'DOC-' . strtoupper(substr(uniqid(), -6)),
+                        'genero_docente' => $request->genero ?? 'Masculino',
+                        'foto_docente'   => 'default.png',
+                        'estado_docente' => true,
+                    ]
+                );
+            }
+
+            if (in_array('ESTUDIANTE', $roleNames)) {
+                \App\Models\Estudiante::firstOrCreate(
+                    ['user_id' => $user->id],
+                    [
+                        'codigo_estudiante' => 'EST-' . strtoupper(substr(uniqid(), -6)),
+                        'genero_estudiante' => $request->genero ?? 'Masculino',
+                        'foto_estudiante'   => 'images/default_user.png',
+                        'email_estudiante'  => $request->email,
+                        'estado_estudiante' => true,
+                        'anho_curso_estudiante' => date('Y'),
+                        'tipo_identificacion_estudiante' => 'TI',
+                        'numero_identificacion_estudiante' => 'ID-' . strtoupper(substr(uniqid(), -6)),
+                    ]
+                );
+            }
         });
 
         return redirect()->route('admin.usuarios.index')->with('swal', [
@@ -120,6 +167,8 @@ class UsuarioController extends Controller
      */
     public function destroy(User $user)
     {
+        abort_unless(auth()->user()->hasRol('SUPERADMIN'), 403, 'Solo el Súper Administrador puede eliminar registros.');
+
         // Evitar que el usuario se elimine a sí mismo
         if (auth()->id() === $user->id) {
             return back()->with('swal', [

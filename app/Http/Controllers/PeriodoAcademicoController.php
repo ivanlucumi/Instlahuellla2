@@ -10,10 +10,18 @@ class PeriodoAcademicoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $periodos = PeriodoAcademico::with('anhoEscolar')->orderBy('id', 'desc')->paginate(15);
-        return view('PeriodoAcademico.Index', compact('periodos'));
+        $query = PeriodoAcademico::query();
+
+        if ($request->filled('search')) {
+            $query->where('nombre_periodo', 'LIKE', '%' . $request->search . '%');
+        }
+
+        $perPage = $request->get('per_page', 10);
+        $periodoAcademicos = $query->orderBy('id', 'desc')->paginate($perPage)->appends($request->all());
+
+        return view('PeriodoAcademico.Index', compact('periodoAcademicos'));
     }
 
     /**
@@ -93,6 +101,8 @@ class PeriodoAcademicoController extends Controller
      */
     public function destroy(PeriodoAcademico $periodoAcademico)
     {
+        abort_unless(auth()->user()->hasRol('SUPERADMIN'), 403, 'Solo el Súper Administrador puede eliminar registros.');
+
         $periodoAcademico->delete();
         return redirect()->route('admin.periodoacademico.index')->with('swal', [
             'icon'  => 'success',

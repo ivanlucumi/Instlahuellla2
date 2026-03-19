@@ -10,10 +10,18 @@ class AnhoEscolarController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $anhos = AnhoEscolar::orderBy('id', 'desc')->paginate(15);
-        return view('AnhoEscolar.Index', compact('anhos'));
+        $query = AnhoEscolar::query();
+
+        if ($request->filled('search')) {
+            $query->where('nombre_anho_escolar', 'LIKE', '%' . $request->search . '%');
+        }
+
+        $perPage = $request->get('per_page', 10);
+        $anhoEscolars = $query->orderBy('nombre_anho_escolar', 'desc')->paginate($perPage)->appends($request->all());
+
+        return view('AnhoEscolar.Index', compact('anhoEscolars'));
     }
 
     /**
@@ -101,6 +109,8 @@ class AnhoEscolarController extends Controller
      */
     public function destroy(AnhoEscolar $anhoEscolar)
     {
+        abort_unless(auth()->user()->hasRol('SUPERADMIN'), 403, 'Solo el Súper Administrador puede eliminar registros.');
+
         $anhoEscolar->delete();
         return redirect()->route('admin.anhoescolar.index')->with('swal', [
             'icon'  => 'success',

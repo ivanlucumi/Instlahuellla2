@@ -25,6 +25,13 @@
             background-color: #fff !important;
             color: #000 !important;
         }
+
+        /* Active Menu Icon Color */
+        .sidebar .navbar-nav .nav-link.active i,
+        .sidebar .navbar-nav .nav-link.active.show i,
+        .sidebar .navbar-nav .dropdown-item.active i {
+            color: #4dc3ff !important;
+        }
     </style>
 
     <title>@yield('title')</title>
@@ -98,28 +105,60 @@
                         <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
                     </div>
                     <div class="ms-3">
-                        <h6 class="mb-0">Jhon Doe</h6>
-                        <span>Admin</span>
+                        <h6 class="mb-0">{{ auth()->user()->name }}</h6>
+                        <span>
+                            @if(auth()->user()->hasRol('SUPERADMIN')) Súper Admin
+                            @elseif(auth()->user()->hasRol('ADMIN')) Admin
+                            @elseif(auth()->user()->hasRol('DIRECTOR')) Director
+                            @elseif(auth()->user()->hasRol('DOCENTE')) Docente
+                            @elseif(auth()->user()->hasRol('ESTUDIANTE')) Estudiante
+                            @endif
+                        </span>
                     </div>
                 </div>
                 <div class="navbar-nav w-100">
-                    <a href="{{ route('home') }}" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
+                    <a href="{{ route('home') }}" class="nav-item nav-link {{ request()->routeIs('*.dashboard') || request()->routeIs('home') ? 'active' : '' }}">
+                        <i class="fa fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
                     @auth
                         @foreach(auth()->user()->menus() as $nombreMenu => $items)
                             {{-- DROPDOWN --}}
                             @if($items->first()->tipo === 'dropdown')
+                                @php
+                                    $isActive = $items->contains(function($item) {
+                                        if (!$item->url) return false;
+                                        // Si la URL termina en .index, checkeamos todo el prefijo del recurso
+                                        if (str_ends_with($item->url, '.index')) {
+                                            $baseRoute = str_replace('.index', '', $item->url);
+                                            return request()->routeIs($baseRoute . '.*');
+                                        }
+                                        return request()->routeIs($item->url);
+                                    });
+                                @endphp
                                 <div class="nav-item dropdown">
                                     <a href="{{ $items->first()->url ? route($items->first()->url) : 'javascript:void(0)' }}" 
-                                       class="nav-link dropdown-toggle {{ $items->contains(fn($item) => request()->routeIs($item->url)) ? 'active' : '' }}" 
-                                       data-bs-toggle="dropdown">
+                                       class="nav-link dropdown-toggle {{ $isActive ? 'active show' : '' }}" 
+                                       data-bs-toggle="dropdown"
+                                       aria-expanded="{{ $isActive ? 'true' : 'false' }}">
                                         <i class="{{ $items->first()->icono }} me-2"></i>
                                         {{ $nombreMenu }}
                                     </a>
 
-                                    <div class="dropdown-menu bg-transparent border-0">
+                                    <div class="dropdown-menu bg-transparent border-0 {{ $isActive ? 'show' : '' }}">
                                         @foreach($items->whereNotNull('nombre_submenu') as $submenu)
+                                            @php
+                                                $submenuActive = false;
+                                                if ($submenu->url) {
+                                                    if (str_ends_with($submenu->url, '.index')) {
+                                                        $baseSub = str_replace('.index', '', $submenu->url);
+                                                        $submenuActive = request()->routeIs($baseSub . '.*');
+                                                    } else {
+                                                        $submenuActive = request()->routeIs($submenu->url);
+                                                    }
+                                                }
+                                            @endphp
                                             <a href="{{ route($submenu->url) }}" 
-                                               class="dropdown-item {{ request()->routeIs($submenu->url) ? 'active' : '' }}">
+                                               class="dropdown-item {{ $submenuActive ? 'active' : '' }}">
                                                 <i class="{{ $submenu->icono }} me-2"></i>
                                                 {{ $submenu->nombre_submenu }}
                                             </a>
@@ -320,6 +359,11 @@
                     $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
                 });
             });
+
+            // Fail-safe para el Spinner
+            setTimeout(function() {
+                $('#spinner').removeClass('show');
+            }, 3000);
         });
     </script>
 </body>

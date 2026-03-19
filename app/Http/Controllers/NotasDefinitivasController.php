@@ -10,15 +10,47 @@ class NotasDefinitivasController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $notasDefinitivas = NotasDefinitivas::orderBy('id')->paginate(15);
-        return view('NotasDefinitivas.Index', compact('notasDefinitivas'));
+        $query = NotasDefinitivas::query();
+
+        // Filtros multi-parámetro
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('documento_estudiante', 'LIKE', "%$search%")
+                  ->orWhere('nombre_estudiante', 'LIKE', "%$search%");
+            });
+        }
+
+        if ($request->filled('grado_aprobado')) {
+            $query->where('grado_aprobado', $request->grado_aprobado);
+        }
+
+        if ($request->filled('curso')) {
+            $query->where('curso', $request->curso);
+        }
+
+        if ($request->filled('nombre_asignatura')) {
+            $query->where('nombre_asignatura', $request->nombre_asignatura);
+        }
+
+        // Cantidad por página (defecto 80)
+        $perPage = $request->get('per_page', 80);
+        $notasDefinitivas = $query->orderBy('id', 'desc')->paginate($perPage)->appends($request->all());
+
+        // Datos para los filtros
+        $grados = NotasDefinitivas::distinct()->pluck('grado_aprobado');
+        $cursos = NotasDefinitivas::distinct()->pluck('curso');
+        $asignaturas = NotasDefinitivas::distinct()->pluck('nombre_asignatura');
+
+        return view('NotasDefinitivas.Index', compact('notasDefinitivas', 'grados', 'cursos', 'asignaturas'));
     }
 
     public function create()
     {
-        // Aunque guardamos texto, necesitamos los datos para que el usuario seleccione
+        abort_unless(auth()->user()->hasRol('SUPERADMIN'), 403, 'Solo el Súper Administrador puede gestionar estos registros.');
+
         $grados = \App\Models\GradoAcademico::orderBy('nombre_grado')->get();
         $cursos = \App\Models\Curso::orderBy('nombre_curso')->get();
         $asignaturas = \App\Models\Asignatura::orderBy('nombre_asignatura')->get();
@@ -29,6 +61,8 @@ class NotasDefinitivasController extends Controller
 
     public function store(Request $request)
     {
+        abort_unless(auth()->user()->hasRol('SUPERADMIN'), 403, 'Solo el Súper Administrador puede gestionar estos registros.');
+
         $request->validate([
             'documento_estudiante' => 'required|string|max:20',
             'nombre_estudiante'    => 'required|string|max:255',
@@ -71,20 +105,28 @@ class NotasDefinitivasController extends Controller
         //
     }
 
-    public function edit(NotasDefinitivas $notasDefinitivas)
+    public function edit(NotasDefinitivas $notasDefinitiva)
     {
-        // Para editar, pasamos los valores actuales. 
-        // Si se requiere que siga siendo texto libre o seleccionable, podemos pasar las listas también.
+        abort_unless(auth()->user()->hasRol('SUPERADMIN'), 403, 'Solo el Súper Administrador puede editar registros.');
+
         $grados = \App\Models\GradoAcademico::orderBy('nombre_grado')->get();
         $cursos = \App\Models\Curso::orderBy('nombre_curso')->get();
         $asignaturas = \App\Models\Asignatura::orderBy('nombre_asignatura')->get();
         $estudiantes = \App\Models\Estudiante::with('user')->get()->sortBy('user.name');
 
-        return view('NotasDefinitivas.Edit', compact('notasDefinitivas', 'grados', 'cursos', 'asignaturas', 'estudiantes'));
+        return view('NotasDefinitivas.Edit', [
+            'notasDefinitivas' => $notasDefinitiva, 
+            'grados'          => $grados, 
+            'cursos'          => $cursos, 
+            'asignaturas'      => $asignaturas, 
+            'estudiantes'     => $estudiantes
+        ]);
     }
 
-    public function update(Request $request, NotasDefinitivas $notasDefinitivas)
+    public function update(Request $request, NotasDefinitivas $notasDefinitiva)
     {
+        abort_unless(auth()->user()->hasRol('SUPERADMIN'), 403, 'Solo el Súper Administrador puede actualizar registros.');
+
         $request->validate([
             'documento_estudiante' => 'required|string|max:20',
             'nombre_estudiante'    => 'required|string|max:255',
@@ -113,7 +155,7 @@ class NotasDefinitivasController extends Controller
         $data['nota_per4'] = $n4;
         $data['nota_definitiva'] = number_format($definitiva, 2, '.', '');
 
-        $notasDefinitivas->update($data);
+        $notasDefinitiva->update($data);
 
         return redirect()->route('admin.notas-definitivas.index')->with('swal', [
             'icon'  => 'success',
@@ -122,9 +164,11 @@ class NotasDefinitivasController extends Controller
         ]);
     }
 
-    public function destroy(NotasDefinitivas $notasDefinitivas)
+    public function destroy(NotasDefinitivas $notasDefinitiva)
     {
-        $notasDefinitivas->delete();
+        abort_unless(auth()->user()->hasRol('SUPERADMIN'), 403, 'Solo el Súper Administrador puede eliminar registros.');
+
+        $notasDefinitiva->delete();
 
         return redirect()->route('admin.notas-definitivas.index')->with('swal', [
             'icon'  => 'success',

@@ -56,7 +56,7 @@
                         </select>
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <select name="asignatura_id" class="form-select bg-dark text-white border-secondary" onchange="this.form.submit()">
                             <option value="">Asignatura...</option>
                             @foreach($asignaturas as $asig)
@@ -64,6 +64,15 @@
                                     {{ $asig->nombre_asignatura }}
                                 </option>
                             @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-md-1">
+                        <select name="per_page" class="form-select bg-dark text-white border-secondary" onchange="this.form.submit()">
+                            <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10</option>
+                            <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15</option>
+                            <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                            <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
                         </select>
                     </div>
 
@@ -244,6 +253,7 @@
                                             <i class="fa fa-edit"></i>
                                         </a>
                                         
+                                        @if(auth()->user()->hasRol('SUPERADMIN'))
                                         <form action="{{ route('admin.gradoacademico.destroy', $grado) }}" 
                                               method="POST" 
                                               class="d-inline"
@@ -254,6 +264,7 @@
                                                 <i class="fa fa-trash"></i>
                                             </button>
                                         </form>
+                                        @endif
                                     </td>
                                 </tr>
                             @empty
@@ -274,7 +285,7 @@
                 {{-- Paginación --}}
                 @if($grados->hasPages())
                     <div class="d-flex justify-content-center mt-4">
-                        {{ $grados->links() }}
+                        {{ $grados->appends(request()->all())->links() }}
                     </div>
                 @endif
             </div>

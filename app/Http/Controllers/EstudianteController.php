@@ -18,11 +18,32 @@ class EstudianteController extends Controller
      */
     public function index(Request $request)
     {
+        $user = auth()->user();
+        $isDirector = $user->hasRol('DIRECTOR') && !$user->hasRol('SUPERADMIN') && !$user->hasRol('ADMIN');
+        $misGradosIds = $isDirector ? $user->grados->pluck('id')->toArray() : [];
+
         // 1. Contexto de Filtros
         $anhos = \App\Models\AnhoEscolar::orderBy('nombre_anho_escolar', 'desc')->get();
-        $grados = \App\Models\GradoAcademico::orderBy('nombre_grado')->get();
-        $cursos = \App\Models\MatriculaFinal::distinct()->pluck('curso');
-        $asignaturas = \App\Models\Asignatura::orderBy('nombre_asignatura')->get();
+        
+        $gradosQuery = \App\Models\GradoAcademico::orderBy('nombre_grado');
+        if ($isDirector) {
+            $gradosQuery->whereIn('id', $misGradosIds);
+        }
+        $grados = $gradosQuery->get();
+
+        $cursosQuery = \App\Models\MatriculaFinal::distinct();
+        if ($isDirector) {
+            $cursosQuery->whereIn('id_grado', $misGradosIds);
+        }
+        $cursos = $cursosQuery->pluck('curso');
+
+        $asignaturasQuery = \App\Models\Asignatura::orderBy('nombre_asignatura');
+        if ($isDirector) {
+            $asignaturasQuery->whereHas('grados', function($q) use ($misGradosIds) {
+                $q->whereIn('grado_academicos.id', $misGradosIds);
+            });
+        }
+        $asignaturas = $asignaturasQuery->get();
 
         // 2. Determinar Año Lectivo Actual/Seleccionado
         $selectedAnhoId = $request->get('anho_escolar_id');
@@ -41,6 +62,13 @@ class EstudianteController extends Controller
                 $q->where('ano_lectivo', $anoLectivo)->with('notasDefinitivas');
             }
         ]);
+
+        // Si es DIRECTOR, solo ve los estudiantes de sus grados asignados (Director de Grupo)
+        if ($isDirector) {
+            $query->whereHas('matriculasFinales', function($q) use ($misGradosIds, $anoLectivo) {
+                $q->whereIn('id_grado', $misGradosIds)->where('ano_lectivo', $anoLectivo);
+            });
+        }
 
         // Filtro por Grado
         if ($request->filled('grado_id')) {
@@ -78,7 +106,8 @@ class EstudianteController extends Controller
             });
         }
 
-        $estudiantes = $query->orderBy('id', 'desc')->paginate(15)->appends($request->all());
+        $perPage = $request->get('per_page', 10);
+        $estudiantes = $query->orderBy('id', 'desc')->paginate($perPage)->appends($request->all());
         
         return view('Estudiante.Index', compact(
             'estudiantes', 
@@ -86,7 +115,8 @@ class EstudianteController extends Controller
             'anhos', 
             'grados', 
             'cursos', 
-            'asignaturas'
+            'asignaturas',
+            'selectedAnhoId'
         ));
     }
 
@@ -239,6 +269,8 @@ class EstudianteController extends Controller
      */
     public function destroy(Estudiante $estudiante)
     {
+        abort_unless(auth()->user()->hasRol('SUPERADMIN'), 403, 'Solo el Súper Administrador puede eliminar registros.');
+
         if ($estudiante->foto_estudiante != 'images/default_user.png' && file_exists(public_path($estudiante->foto_estudiante))) {
             unlink(public_path($estudiante->foto_estudiante));
         }
@@ -281,7 +313,9 @@ class EstudianteController extends Controller
                 ->get();
         }
 
-        return view('estudiante.dashboard', compact('estudiante', 'ultimaMatricula', 'notasActuales'));
+        $institucion = \App\Models\Institucion::first();
+
+        return view('estudiante.dashboard', compact('estudiante', 'ultimaMatricula', 'notasActuales', 'institucion'));
     }
 
     public function history()

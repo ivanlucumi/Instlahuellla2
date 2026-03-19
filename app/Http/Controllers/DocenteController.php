@@ -17,9 +17,28 @@ class DocenteController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $docentes = Docente::with('user')->orderBy('id')->get();
+        $query = Docente::with('user')->orderBy('id', 'desc');
+
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->where(function($q) use ($search) {
+                $q->where('codigo_docente', 'LIKE', "%$search%")
+                  ->orWhereHas('user', function($uq) use ($search) {
+                      $uq->where('name', 'LIKE', "%$search%")
+                        ->orWhere('email', 'LIKE', "%$search%");
+                  });
+            });
+        }
+
+        if ($request->filled('genero')) {
+            $query->where('genero_docente', $request->genero);
+        }
+
+        $perPage = $request->get('per_page', 10);
+        $docentes = $query->paginate($perPage)->appends($request->all());
+
         return view('Docente.Index', compact('docentes'));
     }
 
@@ -164,6 +183,8 @@ class DocenteController extends Controller
      */
     public function destroy(Docente $docente)
     {
+        abort_unless(auth()->user()->hasRol('SUPERADMIN'), 403, 'Solo el Súper Administrador puede eliminar registros.');
+
         // Eliminar foto si existe y no es la default
         if ($docente->foto_docente && $docente->foto_docente !== 'default.png') {
             \Storage::disk('public')->delete($docente->foto_docente);
@@ -182,57 +203,93 @@ class DocenteController extends Controller
     public function asignaturaDocente()
     {
         $user = auth()->user();
-        $isSuperAdmin = $user->roles()->whereIn('nombre', ['SUPERADMIN', 'ADMIN'])->exists();
-        
+        $isSuperAdmin = $user->hasRol('SUPERADMIN') || $user->hasRol('ADMIN');
+        $isDirector = $user->hasRol('DIRECTOR');
+        $docenteId = $user->docente->id ?? null;
+
         if ($isSuperAdmin) {
             // SuperAdmin/Admin ve todas las asignaciones de todos los docentes
             $gradosConMaterias = GradoAcademico::with(['asignaturas' => function($q) {
                 $q->with(['hilo', 'docentes']);
             }])->get();
         } else {
-            // El docente solo ve sus propias materias
-            $gradosConMaterias = GradoAcademico::whereHas('asignaturas', function($q) use ($user) {
-                $q->where('asignatura_grado_docente.docente_id', $user->id);
-            })->with(['asignaturas' => function($q) use ($user) {
-                $q->where('asignatura_grado_docente.docente_id', $user->id)->with('hilo');
+            // El docente ve:
+            // 1. Sus propias materias (en cualquier grado)
+            // 2. Si es director, TODAS las materias de los grados que dirige
+            $gradosDirigidosIds = $isDirector ? GradoAcademico::where('docente_id', $docenteId)->pluck('id')->toArray() : [];
+            
+            $gradosConMaterias = GradoAcademico::where(function($query) use ($user, $gradosDirigidosIds) {
+                $query->whereIn('id', $gradosDirigidosIds)
+                      ->orWhereHas('asignaturas', function($q) use ($user) {
+                          $q->where('asignatura_grado_docente.docente_id', $user->id);
+                      });
+            })->with(['asignaturas' => function($q) use ($user, $gradosDirigidosIds) {
+                $q->with('hilo');
             }])->get();
         }
 
         // Aplanamos para la vista
         $assignments = collect();
         foreach ($gradosConMaterias as $grado) {
+            $esDirigido = $isDirector && $grado->docente_id == $docenteId;
+            
             foreach ($grado->asignaturas as $asig) {
-                // Para SuperAdmin, buscamos quién es el docente de esta materia en este grado
-                $docenteNombre = 'N/A';
-                if ($isSuperAdmin) {
-                    // Obtenemos el docente desde la tabla pivote manualmente o via relación corregida
-                    $pivot = \DB::table('asignatura_grado_docente')
-                        ->where('grado_academico_id', $grado->id)
-                        ->where('asignatura_id', $asig->id)
-                        ->first();
-                    
-                    if ($pivot && $pivot->docente_id) {
-                        $u = \App\Models\User::find($pivot->docente_id);
+                // Buscamos quién es el docente de esta materia en este grado
+                $pivot = \DB::table('asignatura_grado_docente')
+                    ->where('grado_academico_id', $grado->id)
+                    ->where('asignatura_id', $asig->id)
+                    ->first();
+                
+                $docenteDeLaMateriaId = $pivot->docente_id ?? null;
+                $puedeVer = $isSuperAdmin || $esDirigido || ($docenteDeLaMateriaId == $user->id);
+
+                if ($puedeVer) {
+                    $docenteNombre = 'N/A';
+                    if ($docenteDeLaMateriaId) {
+                        $u = \App\Models\User::find($docenteDeLaMateriaId);
                         $docenteNombre = $u ? $u->name : 'N/A';
                     }
-                }
 
-                $assignments->push((object)[
-                    'id'                => $asig->id,
-                    'nombre_asignatura' => $asig->nombre_asignatura,
-                    'hilo_nombre'       => $asig->hilo->nombre_hilo ?? 'N/A',
-                    'grado_id'          => $grado->id,
-                    'grado_nombre'      => $grado->nombre_grado . ' - ' . $grado->bloque,
-                    'docente_nombre'    => $isSuperAdmin ? $docenteNombre : null,
-                ]);
+                    $assignments->push((object)[
+                        'id'                => $asig->id,
+                        'nombre_asignatura' => $asig->nombre_asignatura,
+                        'hilo_nombre'       => $asig->hilo->nombre_hilo ?? 'N/A',
+                        'grado_id'          => $grado->id,
+                        'grado_nombre'      => $grado->nombre_grado . ' - ' . $grado->bloque,
+                        'docente_nombre'    => $docenteNombre,
+                    ]);
+                }
             }
         }
 
-        return view('Docente.asignatura.asignatura_docente', compact('assignments', 'isSuperAdmin'));
+        $institucion = \App\Models\Institucion::first();
+
+        return view('Docente.asignatura.asignatura_docente', compact('assignments', 'isSuperAdmin', 'isDirector', 'institucion'));
     }
 
     public function estudiantesAsignatura($asignaturaId, $gradoId)
     {
+        $user = auth()->user();
+        $isSuperAdmin = $user->hasRol('SUPERADMIN') || $user->hasRol('ADMIN');
+        
+        // Permisos: SuperAdmin, Director del Grado o Docente asignado a la materia
+        $isDirectorOfThisGrade = GradoAcademico::where('id', $gradoId)
+            ->where('docente_id', $user->docente->id ?? null)
+            ->exists();
+        
+        $isAssignedTeacher = \DB::table('asignatura_grado_docente')
+            ->where('grado_academico_id', $gradoId)
+            ->where('asignatura_id', $asignaturaId)
+            ->where('docente_id', $user->id)
+            ->exists();
+
+        if (!$isSuperAdmin && !$isDirectorOfThisGrade && !$isAssignedTeacher) {
+            abort(403, 'No tiene permisos para ver los estudiantes o notas de esta asignatura.');
+        }
+
+        // ¿Puede editar? Solo si es SuperAdmin o el Docente Asignado
+        $canEdit = $isSuperAdmin || $isAssignedTeacher;
+
         $asignatura = Asignatura::with(['hilo'])->findOrFail($asignaturaId);
         $grado = GradoAcademico::findOrFail($gradoId);
         
@@ -294,7 +351,8 @@ class DocenteController extends Controller
             'todosLosGrados', 
             'all_graded',
             'esAnoActual',
-            'anoLectivo'
+            'anoLectivo',
+            'canEdit'
         ));
     }
 
@@ -305,6 +363,19 @@ class DocenteController extends Controller
             'grado_id'      => 'required|exists:grado_academicos,id',
             'notas'         => 'required|array',
         ]);
+
+        $user = auth()->user();
+        $isSuperAdmin = $user->hasRol('SUPERADMIN') || $user->hasRol('ADMIN');
+        
+        $isAssignedTeacher = \DB::table('asignatura_grado_docente')
+            ->where('grado_academico_id', $request->grado_id)
+            ->where('asignatura_id', $request->asignatura_id)
+            ->where('docente_id', $user->id)
+            ->exists();
+
+        if (!$isSuperAdmin && !$isAssignedTeacher) {
+            abort(403, 'No tiene permisos para modificar las calificaciones de esta asignatura.');
+        }
 
         $anhoEscolarId = AnhoEscolar::where('estado_anho_escolar', 1)
             ->orderBy('nombre_anho_escolar', 'desc')
@@ -348,14 +419,20 @@ class DocenteController extends Controller
                 ]
             );
 
-            // Calcular definitiva: solo si hay más de 2 periodos con nota > 0
-            // Filtrar solo notas válidas (> 0). Si P4 es 0 o vacío, no se cuenta.
-            $rawNotes = [$nota1, $nota2, $nota3, $nota4];
-            $validNotes = array_filter($rawNotes, fn($n) => is_numeric($n) && (float)$n > 0);
-            
-            $definitiva = count($validNotes) >= 3 
-                ? array_sum($validNotes) / count($validNotes) 
-                : 0; 
+            // Calcular definitiva: solo promedia cuando se califique el 3er periodo
+            $n1 = is_numeric($nota1) && $nota1 > 0 ? (float)$nota1 : 0;
+            $n2 = is_numeric($nota2) && $nota2 > 0 ? (float)$nota2 : 0;
+            $n3 = is_numeric($nota3) && $nota3 > 0 ? (float)$nota3 : 0;
+            $n4 = is_numeric($nota4) && $nota4 > 0 ? (float)$nota4 : 0;
+
+            $definitiva = 0;
+            if ($n3 > 0) {
+                if ($n4 > 0) {
+                    $definitiva = ($n1 + $n2 + $n3 + $n4) / 4;
+                } else {
+                    $definitiva = ($n1 + $n2 + $n3) / 3;
+                }
+            }
 
             $newNota = Notas::updateOrCreate(
                 [
@@ -408,8 +485,25 @@ class DocenteController extends Controller
         $request->validate([
             'estudiantes' => 'required|array',
             'grado_destino_id' => 'required|exists:grado_academicos,id',
+            'grado_origen_id' => 'required|exists:grado_academicos,id',
             'asignatura_id' => 'required|exists:asignaturas,id',
         ]);
+
+        $user = auth()->user();
+        $isSuperAdmin = $user->hasRol('SUPERADMIN') || $user->hasRol('ADMIN');
+        $isDirectorOfThisGrade = GradoAcademico::where('id', $request->grado_origen_id)
+            ->where('docente_id', $user->docente->id ?? null)
+            ->exists();
+        
+        $isAssignedTeacher = \DB::table('asignatura_grado_docente')
+            ->where('grado_academico_id', $request->grado_origen_id)
+            ->where('asignatura_id', $request->asignatura_id)
+            ->where('docente_id', $user->id)
+            ->exists();
+
+        if (!$isSuperAdmin && !$isDirectorOfThisGrade && !$isAssignedTeacher) {
+            abort(403, 'No tiene permisos para realizar promociones en este grado/asignatura.');
+        }
 
         $errors = [];
         $promotedCount = 0;
@@ -437,7 +531,7 @@ class DocenteController extends Controller
             // 0. Buscar la matrícula final actual para vincular las notas
             $currentMatriculaFinal = \App\Models\MatriculaFinal::where([
                 'documento_estudiante' => $estudiante->numero_identificacion_estudiante,
-                'id_grado'             => $request->grado_id,
+                'id_grado'             => $request->grado_origen_id,
             ])->orderBy('id', 'desc')->first();
 
             // 1. Almacenar en NotasDefinitivas (Histórico)
@@ -494,7 +588,7 @@ class DocenteController extends Controller
                 ],
                 [
                     'id_sede'              => $gradoDestino->sede_id ?? 1,
-                    'curso'                => $gradoDestino->bloque ?? '1',
+                    'curso'                => $gradoDestino->curso->nombre_curso ?? $gradoDestino->bloque ?? '1',
                     'fecha'                => now(),
                     'estado'               => 'activo',
                     'id_profesor'          => $gradoDestino->docente_id ?? auth()->id(),

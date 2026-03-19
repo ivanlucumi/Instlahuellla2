@@ -4,185 +4,185 @@
 
 @section('content')
 <div class="container-fluid pt-4 px-4">
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h4 class="text-white">{{ $asignatura->nombre_asignatura }} - Curso {{ $grado->bloque }}</h4>
-                    <p class="text-primary mb-0 fw-bold">
-                        <i class="fa fa-calendar-alt me-1"></i> Año Lectivo: <span class="text-white">{{ $anoLectivo }}</span>
-                        @if(!$esAnoActual)
-                            <span class="badge bg-warning text-dark ms-2"><i class="fa fa-lock me-1"></i> MODO LECTURA - HISTÓRICO</span>
-                        @endif
-                    </p>
-                    <p class="text-muted mb-0 small">
-                        <i class="fa fa-graduation-cap me-1"></i> Grado: {{ $grado->nombre_grado }} - {{ $grado->bloque }} | 
-                        <span class="badge bg-info">{{ $asignatura->hilo->nombre_hilo ?? 'N/A' }}</span>
-                    </p>
-                </div>
-                <a href="{{ route('docente.dashboard') }}" class="btn btn-warning">
-                    <i class="fa fa-arrow-left me-1"></i> Volver
-                </a>
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-8">
+            <h4 class="text-dark fw-bold mb-1">{{ $asignatura->nombre_asignatura }} <span class="text-muted fw-normal">| Curso {{ $grado->bloque }}</span></h4>
+            <div class="d-flex align-items-center flex-wrap gap-2 mt-2">
+                <span class="badge bg-light text-primary border"><i class="fa fa-calendar-alt me-1"></i> {{ $anoLectivo }}</span>
+                <span class="badge bg-light text-info border"><i class="fa fa-graduation-cap me-1"></i> {{ $grado->nombre_grado }}</span>
+                <span class="badge bg-light text-secondary border">{{ $asignatura->hilo->nombre_hilo ?? 'N/A' }}</span>
+                @if(!$esAnoActual)
+                    <span class="badge bg-warning text-dark"><i class="fa fa-lock me-1"></i> HISTÓRICO</span>
+                @endif
+                @if($esAnoActual && !$canEdit)
+                    <span class="badge bg-info text-white"><i class="fa fa-eye me-1"></i> MODO SUPERVISIÓN</span>
+                @endif
             </div>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <a href="{{ route('docente.dashboard') }}" class="btn btn-outline-secondary rounded-pill px-4">
+                <i class="fa fa-arrow-left me-1"></i> Volver al Panel
+            </a>
         </div>
     </div>
 
     <div class="row">
         <div class="col-12">
-            <div class="bg-secondary rounded h-100 p-4">
-                <form action="{{ route('docente.notas.update') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="asignatura_id" value="{{ $asignatura->id }}">
-                    <input type="hidden" name="grado_id" value="{{ $grado->id }}">
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-body p-4">
+                    <form action="{{ route('docente.notas.update') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="asignatura_id" value="{{ $asignatura->id }}">
+                        <input type="hidden" name="grado_id" value="{{ $grado->id }}">
 
-                    @if(!$esAnoActual)
-                        <div class="alert alert-warning border-warning bg-dark-warning mb-4" style="border-left: 5px solid;">
-                            <i class="fa fa-exclamation-triangle me-2"></i>
-                            <strong>Atención:</strong> Está visualizando registros del año <strong>{{ $anoLectivo }}</strong>. 
-                            La edición de calificaciones y la promoción de estudiantes para ciclos cerrados no está permitida.
-                        </div>
-                    @endif
-                    
-                    <div class="table-responsive">
-                        <table class="table table-hover text-white">
-                            <thead>
-                                <tr>
-                                    <th style="width: 40px;">
-                                        <input type="checkbox" id="select-all" class="form-check-input">
-                                    </th>
-                                    <th>Estudiante</th>
-                                    <th class="text-center">P1</th>
-                                    <th class="text-center">P2</th>
-                                    <th class="text-center">P3</th>
-                                    <th class="text-center">P4</th>
-                                    <th class="text-center">Definitiva</th>
-                                    <th>Observaciones</th>
-                                    <th class="text-center">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($estudiantes as $estudiante)
-                                    @php
-                                        $notaObj = $estudiante->notas->first(); 
-                                    @endphp
-                                    <tr id="row-{{ $estudiante->id }}">
-                                        <td>
-                                            @php
-                                                $definitiva = $notaObj->nota_definitiva ?? 0;
-                                                $isApto = ($notaObj && $definitiva >= 3);
-                                            @endphp
-                                            <input type="checkbox" name="estudiantes[]" value="{{ $estudiante->id }}" 
-                                                class="form-check-input student-checkbox" 
-                                                data-apto="{{ $isApto ? '1' : '0' }}"
-                                                data-nombre="{{ $estudiante->user->name }}">
-                                        </td>
-                                        <td>
-                                            <div class="fw-bold text-white">
-                                                {{ $estudiante->user->name }}
-                                                @if(!$isApto)
-                                                    <i class="bi bi-exclamation-circle-fill text-danger ms-1" title="No apto para promoción (Nota < 3.0 o sin notas)"></i>
-                                                @else
-                                                    <i class="bi bi-check-circle-fill text-success ms-1" title="Apto para promoción"></i>
-                                                @endif
-                                            </div>
-                                            <small class="text-muted">{{ $estudiante->numero_identificacion_estudiante }}</small>
-                                        </td>
-                                        <td style="width: 80px;">
-                                            <input type="number" name="notas[{{ $estudiante->id }}][nota1]" class="form-control form-control-sm text-center nota-input bg-dark text-white border-0" data-student="{{ $estudiante->id }}" value="{{ $notaObj->nota1 ?? '' }}" min="0" max="5" step="0.1" readonly>
-                                        </td>
-                                        <td style="width: 80px;">
-                                            <input type="number" name="notas[{{ $estudiante->id }}][nota2]" class="form-control form-control-sm text-center nota-input bg-dark text-white border-0" data-student="{{ $estudiante->id }}" value="{{ $notaObj->nota2 ?? '' }}" min="0" max="5" step="0.1" readonly>
-                                        </td>
-                                        <td style="width: 80px;">
-                                            <input type="number" name="notas[{{ $estudiante->id }}][nota3]" class="form-control form-control-sm text-center nota-input bg-dark text-white border-0" data-student="{{ $estudiante->id }}" value="{{ $notaObj->nota3 ?? '' }}" min="0" max="5" step="0.1" readonly>
-                                        </td>
-                                        <td style="width: 80px;">
-                                            <input type="number" name="notas[{{ $estudiante->id }}][nota4]" class="form-control form-control-sm text-center nota-input bg-dark text-white border-0" data-student="{{ $estudiante->id }}" value="{{ $notaObj->nota4 ?? '' }}" min="0" max="5" step="0.1" readonly>
-                                        </td>
-                                        <td class="text-center fw-bold">
-                                            <span id="def-{{ $estudiante->id }}" class="badge def-badge {{ $definitiva >= 3 ? 'bg-success' : 'bg-danger' }}">
-                                                {{ number_format($definitiva, 2) }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <input type="text" name="notas[{{ $estudiante->id }}][observaciones]" id="obs-{{ $estudiante->id }}" class="form-control form-control-sm bg-dark text-white border-0 obs-input" value="{{ $notaObj->observaciones ?? '' }}" placeholder="Nota o comentario..." readonly>
-                                        </td>
-                                        <td class="text-center">
-                                            @if($esAnoActual)
-                                                <button type="button" class="btn btn-sm btn-outline-info edit-btn" onclick="enableEdit('{{ $estudiante->id }}')">
-                                                    <i class="fa fa-edit"></i> Editar
-                                                </button>
-                                            @else
-                                                <span class="badge bg-secondary"><i class="fa fa-lock"></i> Bloqueado</span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-
-                    @if($esAnoActual)
-                        <div class="mt-4 d-flex align-items-center">
-                            <button type="submit" class="btn btn-primary" id="save-btn" disabled>
-                                <i class="bi bi-save me-1"></i> Guardar Calificaciones
-                            </button>
-                            <span class="ms-3 text-warning small" id="edit-warning" style="display: none;">
-                                <i class="bi bi-exclamation-triangle me-1"></i> Recuerde que las observaciones son obligatorias al ingresar notas.
-                            </span>
-                        </div>
-                    @endif
-                </form>
-
-                @if($all_graded && $esAnoActual)
-                <hr class="my-5 border-light">
-
-                <div class="card bg-dark border-secondary shadow">
-                    <div class="card-header border-secondary bg-primary bg-gradient text-white">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-mortarboard-fill me-2"></i> Promover Estudiantes a Grado Superior
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <p class="small text-muted mb-4">
-                            <i class="bi bi-info-circle me-1 text-info"></i> 
-                            Todos los estudiantes han sido calificados. Ahora puede proceder con la promoción de aquellos que aprobaron (nota >= 3.0).
-                        </p>
-                        
-                        <form action="{{ route('docente.estudiantes.promover') }}" method="POST" id="promote-form">
-                            @csrf
-                            <input type="hidden" name="asignatura_id" value="{{ $asignatura->id }}">
-                            <input type="hidden" name="grado_origen_id" value="{{ $grado->id }}">
-                            <div id="selected-students-container"></div>
-                            
-                            <div class="row g-3 align-items-end">
-                                <div class="col-md-5">
-                                    <label class="form-label text-white small">Seleccione el Grado de Destino (Año Superior)</label>
-                                    <select name="grado_destino_id" class="form-select bg-dark text-white border-secondary" required>
-                                        <option value="">Seleccione el grado...</option>
-                                        @foreach($todosLosGrados as $g)
-                                            <option value="{{ $g->id }}">{{ $g->nombre_grado }} - {{ $g->bloque }} ({{ $g->sede->nombre_sede ?? 'N/A' }})</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-md-7">
-                                    <button type="button" onclick="submitPromotion('manual')" class="btn btn-warning">
-                                        <i class="bi bi-person-check me-1"></i> Promover Seleccionados
-                                    </button>
-                                    <button type="button" onclick="submitPromotion('total')" class="btn btn-danger ms-2">
-                                        <i class="bi bi-people-fill me-1"></i> Promover Grupo Apto
-                                    </button>
-                                </div>
+                        @if(!$esAnoActual)
+                            <div class="alert alert-light border shadow-sm mb-4 border-start border-4 border-warning">
+                                <i class="fa fa-exclamation-triangle me-2 text-warning"></i>
+                                <strong>Modo Lectura:</strong> Está visualizando registros históricos. No se permiten modificaciones.
                             </div>
-                        </form>
+                        @endif
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="bg-light">
+                                    <tr class="text-muted small text-uppercase fw-bold">
+                                        <th style="width: 40px;">
+                                            <input type="checkbox" id="select-all" class="form-check-input">
+                                        </th>
+                                        <th>Estudiante</th>
+                                        <th class="text-center">P1</th>
+                                        <th class="text-center">P2</th>
+                                        <th class="text-center">P3</th>
+                                        <th class="text-center">P4</th>
+                                        <th class="text-center">Definitiva</th>
+                                        <th>Observaciones</th>
+                                        <th class="text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($estudiantes as $estudiante)
+                                        @php
+                                            $notaObj = $estudiante->notas->first(); 
+                                            $definitiva = $notaObj->nota_definitiva ?? 0;
+                                            $isApto = ($notaObj && $definitiva >= 3);
+                                        @endphp
+                                        <tr id="row-{{ $estudiante->id }}" class="border-bottom-0">
+                                            <td>
+                                                <input type="checkbox" name="estudiantes[]" value="{{ $estudiante->id }}" 
+                                                    class="form-check-input student-checkbox" 
+                                                    data-apto="{{ $isApto ? '1' : '0' }}"
+                                                    data-nombre="{{ $estudiante->user->name }}">
+                                            </td>
+                                            <td>
+                                                <div class="fw-bold text-dark">
+                                                    {{ $estudiante->user->name }}
+                                                    @if(!$isApto)
+                                                        <i class="bi bi-exclamation-circle-fill text-muted ms-1" title="Bajo rendimiento"></i>
+                                                    @else
+                                                        <i class="bi bi-check-circle-fill text-success ms-1" title="Aprobado"></i>
+                                                    @endif
+                                                </div>
+                                                <small class="text-muted">{{ $estudiante->numero_identificacion_estudiante }}</small>
+                                            </td>
+                                            <td style="width: 80px;">
+                                                <input type="number" name="notas[{{ $estudiante->id }}][nota1]" class="form-control form-control-sm text-center nota-input border-0 bg-light" data-student="{{ $estudiante->id }}" value="{{ $notaObj->nota1 ?? '' }}" min="0" max="5" step="0.1" readonly>
+                                            </td>
+                                            <td style="width: 80px;">
+                                                <input type="number" name="notas[{{ $estudiante->id }}][nota2]" class="form-control form-control-sm text-center nota-input border-0 bg-light" data-student="{{ $estudiante->id }}" value="{{ $notaObj->nota2 ?? '' }}" min="0" max="5" step="0.1" readonly>
+                                            </td>
+                                            <td style="width: 80px;">
+                                                <input type="number" name="notas[{{ $estudiante->id }}][nota3]" class="form-control form-control-sm text-center nota-input border-0 bg-light" data-student="{{ $estudiante->id }}" value="{{ $notaObj->nota3 ?? '' }}" min="0" max="5" step="0.1" readonly>
+                                            </td>
+                                            <td style="width: 80px;">
+                                                <input type="number" name="notas[{{ $estudiante->id }}][nota4]" class="form-control form-control-sm text-center nota-input border-0 bg-light" data-student="{{ $estudiante->id }}" value="{{ $notaObj->nota4 ?? '' }}" min="0" max="5" step="0.1" readonly>
+                                            </td>
+                                            <td class="text-center fw-bold">
+                                                <span id="def-{{ $estudiante->id }}" class="badge rounded-pill {{ $definitiva >= 3 ? 'bg-success' : ($definitiva > 0 ? 'bg-danger' : 'bg-light text-muted border') }}">
+                                                    {{ number_format($definitiva, 2) }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <input type="text" name="notas[{{ $estudiante->id }}][observaciones]" id="obs-{{ $estudiante->id }}" class="form-control form-control-sm border-0 bg-light obs-input" value="{{ $notaObj->observaciones ?? '' }}" placeholder="..." readonly>
+                                            </td>
+                                            <td class="text-center">
+                                                @if($esAnoActual)
+                                                    @if($canEdit)
+                                                        <button type="button" class="btn btn-sm btn-link text-primary text-decoration-none edit-btn shadow-none" onclick="enableEdit('{{ $estudiante->id }}')">
+                                                            <i class="fa fa-edit me-1"></i> Editar
+                                                        </button>
+                                                    @else
+                                                        <span class="badge bg-light text-muted border"><i class="fa fa-eye me-1"></i> Solo Lectura</span>
+                                                    @endif
+                                                @else
+                                                    <span class="text-muted small"><i class="fa fa-lock"></i> Bloqueado</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+
+                        @if($esAnoActual && $canEdit)
+                            <div class="mt-4 p-3 bg-light rounded d-flex align-items-center">
+                                <button type="submit" class="btn btn-dark px-4 rounded-pill shadow-sm" id="save-btn" disabled>
+                                    <i class="bi bi-save me-1"></i> Guardar Cambios
+                                </button>
+                                <span class="ms-3 text-muted small" id="edit-warning" style="display: none;">
+                                    <i class="bi bi-info-circle me-1 text-warning"></i> Complete las observaciones para guardar.
+                                </span>
+                            </div>
+                        @elseif($esAnoActual && !$canEdit)
+                            <div class="mt-4 p-3 bg-light rounded text-muted small">
+                                <i class="fa fa-info-circle me-1"></i> Está visualizando este registro como **Director de Grado**. Solo el docente asignado puede modificar las calificaciones.
+                            </div>
+                        @endif
+                    </form>
+
+                    @if($all_graded && $esAnoActual)
+                    <div class="mt-5 pt-4 border-top">
+                        <div class="card border-0 bg-light shadow-none">
+                            <div class="card-body p-4">
+                                <h5 class="fw-bold text-dark mb-4">
+                                    <i class="bi bi-mortarboard-fill me-2 text-secondary"></i> Promover Estudiantes
+                                </h5>
+                                
+                                <form action="{{ route('docente.estudiantes.promover') }}" method="POST" id="promote-form">
+                                    @csrf
+                                    <input type="hidden" name="asignatura_id" value="{{ $asignatura->id }}">
+                                    <input type="hidden" name="grado_origen_id" value="{{ $grado->id }}">
+                                    <div id="selected-students-container"></div>
+                                    
+                                    <div class="row g-3">
+                                        <div class="col-md-5">
+                                            <label class="form-label text-dark small fw-bold">Grado de Destino</label>
+                                            <select name="grado_destino_id" class="form-select border-0 shadow-sm" required>
+                                                <option value="">Seleccione el curso...</option>
+                                                @foreach($todosLosGrados as $g)
+                                                    <option value="{{ $g->id }}">{{ $g->nombre_grado }} - {{ $g->bloque }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-7 d-flex align-items-end gap-2">
+                                            <button type="button" onclick="submitPromotion('manual')" class="btn btn-dark rounded-pill px-4">
+                                                <i class="bi bi-person-check me-1"></i> Promover Seleccionados
+                                            </button>
+                                            <button type="button" onclick="submitPromotion('total')" class="btn btn-outline-dark rounded-pill px-4">
+                                                <i class="bi bi-people-fill me-1"></i> Promover Grupo Apto
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                     </div>
+                    @elseif($esAnoActual)
+                    <div class="alert alert-light border shadow-sm mt-5 mb-0">
+                        <i class="bi bi-info-circle me-2 text-info"></i>
+                        La sección de promoción se habilitará cuando **todos** los estudiantes tengan calificación definitiva.
+                    </div>
+                    @endif
                 </div>
-                @elseif($esAnoActual)
-                <div class="alert alert-info mt-5 border-info bg-dark-info" style="border-left: 5px solid;">
-                    <i class="bi bi-info-circle-fill me-2"></i>
-                    <strong>Sección de Promoción:</strong> Para habilitar la promoción de estudiantes, primero debe calificar a <strong>todos</strong> los estudiantes con su nota definitiva.
-                </div>
-                @endif
             </div>
         </div>
     </div>
@@ -210,21 +210,27 @@ document.addEventListener('DOMContentLoaded', function() {
         const checkbox = document.querySelector(`.student-checkbox[value="${studentId}"]`);
         const row = document.getElementById(`row-${studentId}`);
         
-        let sum = 0;
-        let count = 0;
-        let hasValue = false;
+        const n1 = parseFloat(document.querySelector(`input[name="notas[${studentId}][nota1]"]`).value) || 0;
+        const n2 = parseFloat(document.querySelector(`input[name="notas[${studentId}][nota2]"]`).value) || 0;
+        const n3 = parseFloat(document.querySelector(`input[name="notas[${studentId}][nota3]"]`).value) || 0;
+        const n4 = parseFloat(document.querySelector(`input[name="notas[${studentId}][nota4]"]`).value) || 0;
         
+        // Verifica si hay algun campo llenado (para las observaciones)
+        let hasValues = false;
         studentInputs.forEach(input => {
-            const val = parseFloat(input.value);
-            if (!isNaN(val) && input.value !== '') {
-                sum += val;
-                count++;
-                hasValue = true;
-            }
+            if (input.value !== '') hasValues = true;
         });
 
-        if (count > 0) {
-            const avg = sum / count;
+        let avg = 0;
+        if (n3 > 0) {
+            if (n4 > 0) {
+                avg = (n1 + n2 + n3 + n4) / 4;
+            } else {
+                avg = (n1 + n2 + n3) / 3;
+            }
+        }
+
+        if (n3 > 0) {
             const isApto = avg >= 3;
             badge.textContent = avg.toFixed(2);
             badge.classList.remove('bg-danger', 'bg-success');
@@ -237,8 +243,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 icon.className = isApto ? 'bi bi-check-circle-fill text-success ms-1' : 'bi bi-exclamation-circle-fill text-danger ms-1';
                 icon.title = isApto ? 'Apto para promoción' : 'No apto para promoción (Nota < 3.0)';
             }
+        } else {
+            // Si P3 no se ha llenado (n3 <= 0), no hay definitiva real aún (0)
+            badge.textContent = '0.00';
+            badge.classList.remove('bg-success');
+            badge.classList.add('bg-secondary');
+            
+            checkbox.dataset.apto = '0';
+            const icon = row.querySelector('.bi-exclamation-circle-fill, .bi-check-circle-fill');
+            if (icon) {
+                icon.className = 'bi bi-dash-circle text-muted ms-1';
+                icon.title = 'Requiere al menos 3 periodos para promoción';
+            }
+        }
 
-            // Requerir observaciones visualmente
+        // Requerir observaciones visualmente si hay calificacion
+        if (hasValues) {
             if (obsInput.value.trim() === '') {
                 obsInput.classList.add('border', 'border-warning');
                 obsInput.classList.remove('border-0');
@@ -247,15 +267,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 obsInput.classList.add('border-0');
             }
         } else {
-            badge.textContent = '0.00';
-            badge.classList.remove('bg-success');
-            badge.classList.add('bg-danger');
-            checkbox.dataset.apto = '0';
-            const icon = row.querySelector('.bi-exclamation-circle-fill, .bi-check-circle-fill');
-            if (icon) {
-                icon.className = 'bi bi-exclamation-circle-fill text-danger ms-1';
-                icon.title = 'No apto para promoción (Sin notas)';
-            }
             obsInput.classList.remove('border', 'border-warning');
             obsInput.classList.add('border-0');
         }

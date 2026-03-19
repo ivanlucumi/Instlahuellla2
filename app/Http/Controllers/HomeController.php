@@ -24,7 +24,11 @@ class HomeController extends Controller
         $user = auth()->user();
 
         if ($user->hasRol('SUPERADMIN') || $user->hasRol('ADMIN')) {
-            return view('admin.Admin');
+            return redirect()->route('admin.dashboard');
+        }
+
+        if ($user->hasRol('DIRECTOR')) {
+            return redirect()->route('director.dashboard');
         }
 
         if ($user->hasRol('ESTUDIANTE')) {
@@ -35,7 +39,21 @@ class HomeController extends Controller
             return redirect()->route('docente.dashboard');
         }
 
-        // Default or for roles without specific dashboards yet
-        return view('admin.Admin');
+        // Si llega aquí y tiene acceso, mostrar un dashboard genérico o el de admin
+        $institucion = \App\Models\Institucion::first();
+        return view('admin.Admin', compact('institucion'));
+    }
+
+    public function adminDashboard()
+    {
+        $institucion = \App\Models\Institucion::first();
+        return view('admin.Admin', compact('institucion'));
+    }
+
+    public function directorDashboard()
+    {
+        $institucion = \App\Models\Institucion::first();
+        // Podríamos pasar más datos específicos para directores aquí
+        return view('admin.Admin', compact('institucion')); // Por ahora usan la misma vista base
     }
 }

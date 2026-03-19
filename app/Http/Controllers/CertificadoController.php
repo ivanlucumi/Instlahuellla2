@@ -40,7 +40,7 @@ class CertificadoController extends Controller
             'grado_aprobado' => 'required|string',
         ]);
 
-        // Buscar al estudiante por número de identificación
+        // 1. Buscar al estudiante
         $estudiante = Estudiante::with(['user', 'gradoAcademico', 'acudiente.user'])
             ->where('numero_identificacion_estudiante', $request->identificacion)
             ->first();
@@ -53,29 +53,70 @@ class CertificadoController extends Controller
             ]);
         }
 
-        // Obtener las notas definitivas para el estudiante y grado seleccionado
-        $notasDefinitivas = \App\Models\NotasDefinitivas::where('documento_estudiante', $request->identificacion)
-            ->where('grado_aprobado', $request->grado_aprobado)
+        // 2. Buscar todas las matrículas para ese grado que NO estén en estado 'Retirado'
+        // Esto maneja a los repitentes
+        $matriculasOptions = \App\Models\MatriculaFinal::with(['grado', 'sede', 'profesor'])
+            ->where('documento_estudiante', $request->identificacion)
+            ->where('estado', '!=', 'Retirado')
+            ->whereHas('grado', function($q) use ($request) {
+                $q->where('nombre_grado', $request->grado_aprobado);
+            })
             ->get();
+
+        if ($matriculasOptions->isEmpty()) {
+            return back()->with('swal', [
+                'icon'  => 'warning',
+                'title' => 'Sin registros válidos',
+                'text'  => "El estudiante no cuenta con matrículas activas o aprobadas para el grado {$request->grado_aprobado} (Solo se certifican matrículas que no estén en estado Retirado)."
+            ]);
+        }
+
+        // 3. Si hay más de una matrícula (repitente), mostramos listado para elegir
+        if ($matriculasOptions->count() > 1 && !$request->has('matricula_id')) {
+            return view('Certificado.Listado', [
+                'estudiante' => $estudiante,
+                'grado_nombre' => $request->grado_aprobado,
+                'matriculas' => $matriculasOptions
+            ]);
+        }
+
+        // 4. Seleccionar la matrícula a procesar
+        $matricula = $request->has('matricula_id') 
+            ? $matriculasOptions->find($request->matricula_id) 
+            : $matriculasOptions->first();
+
+        if (!$matricula) {
+            return redirect()->route('admin.certificados.index')->with('swal', [
+                'icon' => 'error',
+                'title' => 'Error',
+                'text' => 'La matrícula seleccionada no es válida.'
+            ]);
+        }
+
+        // 5. Buscar las notas definitivas para ESTA matrícula específica
+        $notasDefinitivas = \App\Models\NotasDefinitivas::where('id_matricula', $matricula->id)
+            ->get();
+
+        // Fallback por si id_matricula no está vinculado correctamente (pero filtramos por año y curso de la matrícula elegida)
+        if ($notasDefinitivas->isEmpty()) {
+            $notasDefinitivas = \App\Models\NotasDefinitivas::where('documento_estudiante', $request->identificacion)
+                ->where('grado_aprobado', 'LIKE', '%' . ($matricula->grado->nombre_grado ?? $request->grado_aprobado) . '%')
+                ->where('curso', (string)$matricula->curso)
+                ->whereHas('matriculaFinal', function($q) use ($matricula) {
+                    $q->where('ano_lectivo', $matricula->ano_lectivo);
+                })
+                ->get();
+        }
 
         if ($notasDefinitivas->isEmpty()) {
             return back()->with('swal', [
                 'icon'  => 'warning',
-                'title' => 'Sin registros',
-                'text'  => "No se encontraron notas definitivas para el estudiante en el grado {$request->grado_aprobado}."
+                'title' => 'Sin notas',
+                'text'  => "No se encontraron notas definitivas registradas para el año {$matricula->ano_lectivo} en este grado."
             ]);
         }
 
-        // Intentar obtener información de matrícula final para el contexto (sede, profesor)
-        // Usamos el primer año que aparezca en las notas definitivas si es posible, o el año actual
-        $matricula = \App\Models\MatriculaFinal::with(['grado', 'sede', 'profesor'])
-            ->where('documento_estudiante', $request->identificacion)
-            ->whereHas('grado', function($q) use ($request) {
-                $q->where('nombre_grado', $request->grado_aprobado);
-            })
-            ->first();
-
-        // Enriquecer las notas con el "Nucleo" (Hilo) de la asignatura
+        // 6. Enriquecer las notas con el "Nucleo" (Hilo) de la asignatura
         foreach ($notasDefinitivas as $nota) {
             $asignatura = \App\Models\Asignatura::with('hilo')
                 ->where('nombre_asignatura', $nota->nombre_asignatura)
@@ -83,7 +124,6 @@ class CertificadoController extends Controller
             $nota->nucleo = $asignatura->hilo->nombre_hilo ?? 'N/A';
         }
 
-        // Ordenar por nucleo para que la agrupación en la vista funcione
         $notasDefinitivas = $notasDefinitivas->sortBy('nucleo');
 
         $viewData = [
@@ -91,21 +131,29 @@ class CertificadoController extends Controller
             'grado_solicitado' => $request->grado_aprobado,
             'notas'            => $notasDefinitivas,
             'matricula'        => $matricula,
-            'anho_lectivo'     => $matricula->ano_lectivo ?? ($notasDefinitivas->first()->ano_lectivo ?? date('Y')),
+            'anho_lectivo'     => $matricula->ano_lectivo,
             'fecha'            => date('d/m/Y'),
         ];
 
         $pdf = Pdf::loadView('Certificado.Pdf', $viewData);
         $pdf->setPaper('legal', 'portrait');
 
-        return $pdf->download("Certificado_{$request->identificacion}_{$request->grado_aprobado}.pdf");
+        return $pdf->download("Certificado_{$request->identificacion}_{$matricula->ano_lectivo}.pdf");
     }
 
     public function generarPorMatricula($id)
     {
         $matricula = \App\Models\MatriculaFinal::with(['grado', 'sede', 'profesor'])->findOrFail($id);
 
-        $estudiante = Estudiante::with(['user', 'gradoAcademico', 'acudiente.user'])
+        if ($matricula->estado === 'Retirado') {
+            return back()->with('swal', [
+                'icon'  => 'error',
+                'title' => 'Estudiante Retirado',
+                'text'  => 'No se puede generar certificado para una matrícula con estado Retirado (no cuenta con calificaciones definitivas).',
+            ]);
+        }
+
+        $estudiante = \App\Models\Estudiante::with(['user', 'gradoAcademico', 'acudiente.user'])
             ->where('numero_identificacion_estudiante', $matricula->documento_estudiante)
             ->first();
 
@@ -117,14 +165,28 @@ class CertificadoController extends Controller
             ]);
         }
 
-        // Buscar notas por id_matricula (relación directa, más confiable)
-        $notas = \App\Models\NotasDefinitivas::where('id_matricula', $matricula->id)->get();
+        // 2. Buscar notas por id_matricula (relación directa)
+        // Agregamos filtro por curso para mayor precisión en casos de múltiples registros
+        $notas = \App\Models\NotasDefinitivas::where('id_matricula', $matricula->id)
+            ->where('curso', (string)$matricula->curso)
+            ->get();
+
+        // 3. Fallback: Si no hay notas vinculadas por ID, buscamos por documento, nombre de grado (parcial), año y CURSO
+        if ($notas->isEmpty()) {
+            $notas = \App\Models\NotasDefinitivas::where('documento_estudiante', $matricula->documento_estudiante)
+                ->where('grado_aprobado', 'LIKE', '%' . ($matricula->grado->nombre_grado ?? '') . '%')
+                ->where('curso', (string)$matricula->curso)
+                ->whereHas('matriculaFinal', function($q) use ($matricula) {
+                    $q->where('ano_lectivo', $matricula->ano_lectivo);
+                })
+                ->get();
+        }
 
         if ($notas->isEmpty()) {
             return back()->with('swal', [
                 'icon'  => 'warning',
                 'title' => 'Sin notas',
-                'text'  => 'Este estudiante no tiene notas definitivas registradas para esta matrícula.',
+                'text'  => 'Este estudiante no tiene notas definitivas registradas para este curso y año.',
             ]);
         }
 
@@ -169,10 +231,11 @@ class CertificadoController extends Controller
         $grado = \App\Models\GradoAcademico::with(['sede', 'docente.user', 'curso'])->findOrFail($request->grado_id);
         $gradoAprobado = trim(($grado->nombre_grado ?? '') . ' - ' . ($grado->bloque ?? ''));
 
-        // 1. Obtener TODAS las matrículas del grado y año
+        // 1. Obtener TODAS las matrículas del grado y año (excepto retirados)
         $queryMatriculas = \App\Models\MatriculaFinal::with(['sede', 'profesor'])
             ->where('id_grado', $request->grado_id)
-            ->where('ano_lectivo', $request->ano_lectivo);
+            ->where('ano_lectivo', $request->ano_lectivo)
+            ->where('estado', '!=', 'Retirado');
 
         if ($request->filled('curso')) {
             $queryMatriculas->where('curso', $request->curso);
@@ -197,8 +260,30 @@ class CertificadoController extends Controller
 
             if (!$estudiante) continue;
 
-            // Buscar notas por id_matricula (relación directa)
+            // 2. Buscar notas por id_matricula (relación directa)
             $notas = \App\Models\NotasDefinitivas::where('id_matricula', $matricula->id)->get();
+
+            // 3. Fallback: Si no hay notas por id_matricula, intentamos por documento, grado, año y CURSO
+            if ($notas->isEmpty()) {
+                $notas = \App\Models\NotasDefinitivas::where('documento_estudiante', $matricula->documento_estudiante)
+                    ->where('grado_aprobado', 'LIKE', '%' . ($grado->nombre_grado ?? '') . '%')
+                    ->where(function($q) use ($matricula) {
+                        $q->where('id_matricula', $matricula->id)
+                          ->orWhere(function($sq) use ($matricula) {
+                              $sq->where('curso', $matricula->curso)
+                                 ->whereHas('matriculaFinal', function($ssq) use ($matricula) {
+                                     $ssq->where('ano_lectivo', $matricula->ano_lectivo);
+                                 });
+                          });
+                    })
+                    ->get();
+            }
+
+            // 4. Si después del fallback sigue vacío (por ejemplo el estudiante fue retirado o no tiene notas en este curso/año)
+            // lo omitimos para evitar reportes en blanco.
+            if ($notas->isEmpty()) {
+                continue;
+            }
 
             // Enriquecer notas con Nucleo (Hilo)
             foreach ($notas as $nota) {

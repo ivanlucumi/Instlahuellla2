@@ -16,12 +16,24 @@ class MatriculadoController extends Controller
 {
     public function index()
     {
-        $matriculados = MatriculaFinal::with([
+        $query = MatriculaFinal::with([
             'estudiante.user',
             'sede',
             'grado',
             'profesor'
-        ])->orderBy('id', 'desc')->paginate(15);
+        ]);
+
+        // Si es DIRECTOR y no SUPERADMIN/ADMIN, solo ve matrículas de sus grados asignados
+        if (auth()->user()->hasRol('DIRECTOR') && !auth()->user()->hasRol('SUPERADMIN') && !auth()->user()->hasRol('ADMIN')) {
+            $directorId = auth()->id();
+            $query->whereHas('grado', function($q) use ($directorId) {
+                $q->whereHas('docente', function($sq) use ($directorId) {
+                    $sq->where('user_id', $directorId);
+                });
+            });
+        }
+
+        $matriculados = $query->orderBy('id', 'desc')->paginate(15);
         
         return view('Matriculado.Index', compact('matriculados'));
     }
@@ -352,6 +364,8 @@ class MatriculadoController extends Controller
 
     public function destroy($id)
     {
+        abort_unless(auth()->user()->hasRol('SUPERADMIN'), 403, 'Solo el Súper Administrador puede eliminar registros.');
+
         $matricula = MatriculaFinal::findOrFail($id);
         $matricula->delete();
 

@@ -41,7 +41,11 @@ class InstitucionController extends Controller
             'departamento_institucion'  => 'required|string|max:100',
             'resolucion_institucion'    => 'nullable|string|max:255',
             'rector_id'                 => 'required|exists:users,id',
-            //'favicon_institucion'       => 'nullable|image|mimes:png,jpg,jpeg,ico|max:2048',
+            'jerarquia'                 => 'nullable|string',
+            'calendario'                => 'nullable|string',
+            'sector'                    => 'nullable|string',
+            'modelo'                    => 'nullable|string',
+            'jornada'                   => 'nullable|string',
         ]);
         
     
@@ -55,15 +59,7 @@ class InstitucionController extends Controller
         }
 
         // 💾 Guardar
-        Institucion::create([
-            'nombre_institucion'       => $request->nombre_institucion,
-            'descripcion_institucion'  => $request->descripcion_institucion,
-            'codigo_dane'              => $request->codigo_dane,
-            'ciudad_institucion'       => $request->ciudad_institucion,
-            'departamento_institucion' => $request->departamento_institucion,
-            'resolucion_institucion'   => $request->resolucion_institucion,
-            'rector_id'                => $request->rector_id,
-        ]);
+        Institucion::create($request->all());
 
         // ✅ Éxito
         return redirect()->route('admin.institucion.index')->with('swal', [
@@ -110,6 +106,11 @@ class InstitucionController extends Controller
             'departamento_institucion' => 'required',
             'rector_id'                => 'required|exists:users,id',
             'resolucion_institucion'   => 'nullable|string',
+            'jerarquia'                => 'nullable|string',
+            'calendario'               => 'nullable|string',
+            'sector'                   => 'nullable|string',
+            'modelo'                   => 'nullable|string',
+            'jornada'                  => 'nullable|string',
         ]);
 
         $institucion->update($request->all());
@@ -125,6 +126,8 @@ class InstitucionController extends Controller
 
     public function destroy(Institucion $institucion)
     {
+        abort_unless(auth()->user()->hasRol('SUPERADMIN'), 403, 'Solo el Súper Administrador puede eliminar registros.');
+
         $institucion->delete();
 
         return redirect()->route('admin.institucion.index')

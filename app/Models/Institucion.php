@@ -16,6 +16,11 @@ class Institucion extends Model
         'departamento_institucion',
         'resolucion_institucion',
         'rector_id',
+        'jerarquia',
+        'calendario',
+        'sector',
+        'modelo',
+        'jornada',
     ];
 
     public function rector()

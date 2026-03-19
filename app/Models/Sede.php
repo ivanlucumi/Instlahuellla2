@@ -14,7 +14,9 @@ class Sede extends Model
         'codigo_dane_sede',
         'resolucion_sede',
         'institucion_id',
-        'estado_sede'
+        'estado_sede',
+        'zona_sede',
+        'jornada'
     ];
 
     protected $casts = [

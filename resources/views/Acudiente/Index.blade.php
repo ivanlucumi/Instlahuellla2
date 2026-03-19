@@ -7,14 +7,47 @@
 <div class="container-fluid pt-4 px-4">
     <div class="row mb-3">
         <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <h4 class="text-white">Acudientes Registrados</h4>
-                <div class="d-flex align-items-center">
-                    <input type="text" class="form-control form-control-sm me-3 search-table" placeholder="Buscar acudiente..." style="width: 250px;">
-                    <a href="{{ route('admin.acudiente.create') }}" class="btn btn-primary">
-                        <i class="fa fa-plus me-1"></i> Nuevo Acudiente
-                    </a>
-                </div>
+            <div class="bg-secondary rounded p-4 shadow-sm border-start border-4 border-warning">
+                <form action="{{ route('admin.acudiente.index') }}" method="GET" class="row g-3 align-items-end">
+                    <div class="col-md-2">
+                        <label class="text-white-50 small mb-1">Mostrar</label>
+                        <select name="per_page" class="form-select border-0 bg-dark text-white" onchange="this.form.submit()">
+                            <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10 registros</option>
+                            <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15 registros</option>
+                            <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25 registros</option>
+                            <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50 registros</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-2">
+                        <label class="text-white-50 small mb-1">Género</label>
+                        <select name="genero" class="form-select border-0 bg-dark text-white" onchange="this.form.submit()">
+                            <option value="">Cualquiera</option>
+                            <option value="Masculino" {{ request('genero') == 'Masculino' ? 'selected' : '' }}>Masculino</option>
+                            <option value="Femenino" {{ request('genero') == 'Femenino' ? 'selected' : '' }}>Femenino</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-5">
+                        <label class="text-white-50 small mb-1">Búsqueda rápida</label>
+                        <div class="input-group">
+                            <input type="text" name="search" class="form-control border-0 bg-dark text-white" 
+                                   placeholder="Nombre, email o celular..." value="{{ request('search') }}">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 d-flex gap-2 justify-content-end">
+                        <a href="{{ route('admin.acudiente.index') }}" class="btn btn-outline-light" title="Limpiar Filtros">
+                            <i class="fa fa-sync-alt"></i>
+                        </a>
+                        <a href="{{ route('admin.acudiente.create') }}" class="btn btn-primary">
+                            <i class="fa fa-plus me-1"></i> Nuevo Acudiente
+                        </a>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -56,6 +89,7 @@
                                             <i class="fa fa-edit"></i>
                                         </a>
                                         
+                                        @if(auth()->user()->hasRol('SUPERADMIN'))
                                         <form action="{{ route('admin.acudiente.destroy', $acudiente) }}" 
                                               method="POST" 
                                               class="d-inline"
@@ -66,6 +100,7 @@
                                                 <i class="fa fa-trash"></i>
                                             </button>
                                         </form>
+                                        @endif
                                     </td>
                                 </tr>
                             @empty
@@ -86,7 +121,7 @@
                 {{-- Paginación --}}
                 @if($acudientes->hasPages())
                     <div class="d-flex justify-content-center mt-4">
-                        {{ $acudientes->links() }}
+                        {{ $acudientes->appends(request()->all())->links() }}
                     </div>
                 @endif
             </div>

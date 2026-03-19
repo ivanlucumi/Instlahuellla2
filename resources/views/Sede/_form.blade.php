@@ -65,6 +65,26 @@
     @enderror
 </div>
 
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Zona</label>
+        <select name="zona_sede" class="form-select">
+            <option value="RURAL" @selected(old('zona_sede', $sede->zona_sede ?? 'RURAL') == 'RURAL')>RURAL</option>
+            <option value="URBANA" @selected(old('zona_sede', $sede->zona_sede ?? '') == 'URBANA')>URBANA</option>
+        </select>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Jornada</label>
+        <select name="jornada" class="form-select">
+            <option value="MAÑANA" @selected(old('jornada', $sede->jornada ?? 'MAÑANA') == 'MAÑANA')>MAÑANA</option>
+            <option value="TARDE" @selected(old('jornada', $sede->jornada ?? '') == 'TARDE')>TARDE</option>
+            <option value="NOCTURNA" @selected(old('jornada', $sede->jornada ?? '') == 'NOCTURNA')>NOCTURNA</option>
+            <option value="UNICA" @selected(old('jornada', $sede->jornada ?? '') == 'UNICA')>UNICA</option>
+        </select>
+    </div>
+</div>
+
 <div class="mb-3">
     <div class="form-check form-switch">
         <input class="form-check-input" 

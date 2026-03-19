@@ -119,6 +119,8 @@ class NotasController extends Controller
 
     public function destroy(Notas $nota)
     {
+        abort_unless(auth()->user()->hasRol('SUPERADMIN'), 403, 'Solo el Súper Administrador puede eliminar registros.');
+
         $nota->delete();
 
         return redirect()->route('admin.notas.index')->with('swal', [

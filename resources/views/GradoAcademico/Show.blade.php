@@ -73,6 +73,7 @@
     </div>
 
     <div class="row g-4">
+        @if($cursosDisponibles->count() > 1)
         <!-- Dashboard Content: Sidebar with Courses -->
         <div class="col-lg-12 mb-2">
             <div class="bg-secondary rounded p-3">
@@ -87,6 +88,7 @@
                 </div>
             </div>
         </div>
+        @endif
 
         <!-- Left Column: Students -->
         <div class="col-sm-12 col-xl-7">
@@ -141,10 +143,12 @@
                                                 <li><a class="dropdown-item" href="{{ route('admin.estudiante.edit', $est->id) }}"><i class="fa fa-edit me-2"></i>Ver Perfil</a></li>
                                                 <li>
                                                     @php
+                                                        // $matriculadosMF ya viene filtrado por Grado, Año y Curso desde el controlador
                                                         $mfRec = $matriculadosMF->firstWhere('documento_estudiante', $est->numero_identificacion_estudiante);
                                                     @endphp
+                                                    
                                                     @if($mfRec)
-                                                    <a class="dropdown-item text-info"
+                                                    <a class="dropdown-item text-info cert-link"
                                                        href="{{ route('admin.certificados.por-matricula', $mfRec->id) }}">
                                                         <i class="fa fa-file-pdf me-2"></i>Generar Certificado
                                                     </a>
@@ -152,8 +156,10 @@
                                                     <span class="dropdown-item text-muted"><i class="fa fa-file-pdf me-2"></i>Sin matrícula</span>
                                                     @endif
                                                 </li>
+                                                @if(auth()->user()->hasRol('SUPERADMIN'))
                                                 <li><hr class="dropdown-divider"></li>
                                                 <li><a class="dropdown-item text-danger" href="#"><i class="fa fa-trash me-2"></i>Retirar</a></li>
+                                                @endif
                                             </ul>
                                         </div>
                                     </td>
@@ -361,4 +367,28 @@
     .border-dashed { border-style: dashed !important; }
 </style>
 
+@section('scripts')
+<script>
+    $(document).ready(function() {
+        // Alerta de carga para certificados individuales y grupales
+        $('.cert-link, .btn-outline-info').on('click', function(e) {
+            // Solo si no es un botón de modal o similar
+            if($(this).attr('href') && $(this).attr('href') !== '#') {
+                Swal.fire({
+                    title: 'Generando Certificado',
+                    text: 'Estamos procesando el reporte PDF, por favor espere...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    },
+                    customClass: {
+                        popup: 'bg-light text-dark border-secondary shadow-lg',
+                        title: 'text-primary'
+                    }
+                });
+            }
+        });
+    });
+</script>
+@endsection
 @endsection

@@ -7,12 +7,27 @@ use Illuminate\Http\Request;
 
 class AcudienteController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request)
     {
-        $acudientes = Acudiente::with('user')->orderBy('id')->paginate(15);
+        $query = Acudiente::with('user')->orderBy('id', 'desc');
+
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->where(function($q) use ($search) {
+                $q->whereHas('user', function($uq) use ($search) {
+                    $uq->where('name', 'LIKE', "%$search%")
+                      ->orWhere('email', 'LIKE', "%$search%");
+                })->orWhere('celular_acudiente', 'LIKE', "%$search%");
+            });
+        }
+
+        if ($request->filled('genero')) {
+            $query->where('genero_acudiente', $request->genero);
+        }
+
+        $perPage = $request->get('per_page', 15);
+        $acudientes = $query->paginate($perPage)->appends($request->all());
+
         return view('Acudiente.Index', compact('acudientes'));
     }
 
@@ -141,6 +156,8 @@ class AcudienteController extends Controller
      */
     public function destroy(Acudiente $acudiente)
     {
+        abort_unless(auth()->user()->hasRol('SUPERADMIN'), 403, 'Solo el Súper Administrador puede eliminar registros.');
+
         $acudiente->delete();
 
         return redirect()->route('admin.acudiente.index')->with('swal', [

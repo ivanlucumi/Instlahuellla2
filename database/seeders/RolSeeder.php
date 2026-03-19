@@ -56,6 +56,15 @@ class RolSeeder extends Seeder
     'created_at' => '2026-02-28 03:47:59',
     'updated_at' => '2026-02-28 03:47:59',
   ),
+  5 => 
+  array (
+    'id' => 6,
+    'nombre' => 'DIRECTOR',
+    'descripcion' => 'Director de Grado Académico',
+    'estado' => 1,
+    'created_at' => '2026-03-09 23:40:00',
+    'updated_at' => '2026-03-09 23:40:00',
+  ),
 );
 
         foreach ($data as $row) {

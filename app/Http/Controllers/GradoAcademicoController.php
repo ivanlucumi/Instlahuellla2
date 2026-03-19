@@ -18,6 +18,14 @@ class GradoAcademicoController extends Controller
         $asignaturas = \App\Models\Asignatura::orderBy('nombre_asignatura')->get();
 
         $query = GradoAcademico::with(['sede', 'docente.user', 'asignaturas', 'curso']);
+
+        // Si es DIRECTOR y no SUPERADMIN/ADMIN, solo ve sus propios grados
+        if (auth()->user()->hasRol('DIRECTOR') && !auth()->user()->hasRol('SUPERADMIN') && !auth()->user()->hasRol('ADMIN')) {
+            $query->whereHas('docente', function ($q) {
+                $q->where('user_id', auth()->id());
+            });
+        }
+
         $enrollmentsResults = null;
         $searchSummary = '';
         $currentAnho = $anhos->where('estado_anho_escolar', 1)->first()?->nombre_anho_escolar;
@@ -82,7 +90,8 @@ class GradoAcademicoController extends Controller
             }
         }
 
-        $grados = $query->orderBy('id')->paginate(15);
+        $perPage = $request->get('per_page', 15);
+        $grados = $query->orderBy('id', 'desc')->paginate($perPage)->appends($request->all());
         
         return view('GradoAcademico.Index', compact('grados', 'cursos', 'anhos', 'allGrados', 'asignaturas', 'enrollmentsResults', 'searchSummary', 'currentAnho'));
     }
@@ -149,6 +158,9 @@ class GradoAcademicoController extends Controller
                 $gradoAcademico->asignaturas()->sync($syncData);
             }
 
+            // Manage DIRECTOR role
+            $this->syncDirectorRole($request->docente_id);
+
             \Illuminate\Support\Facades\DB::commit();
 
             return redirect()->route('admin.gradoacademico.index')->with('swal', [
@@ -172,6 +184,14 @@ class GradoAcademicoController extends Controller
      */
     public function show(Request $request, GradoAcademico $gradoAcademico)
     {
+        // Autorización: un director solo puede ver su propio grado
+        if (auth()->user()->hasRol('DIRECTOR') && !auth()->user()->hasRol('SUPERADMIN') && !auth()->user()->hasRol('ADMIN')) {
+            $esSuGrado = $gradoAcademico->docente && $gradoAcademico->docente->user_id === auth()->id();
+            if (!$esSuGrado) {
+                abort(403, 'No tienes permiso para ver este grado académico.');
+            }
+        }
+
         // 1. Contexto Académico
         $anhos = \App\Models\AnhoEscolar::orderBy('nombre_anho_escolar', 'desc')->get();
         $anhoId = $request->get('anho_escolar_id');
@@ -185,10 +205,13 @@ class GradoAcademicoController extends Controller
         $anhoActual = date('Y');
         $esAnhoActual = ((string)$anoLectivo === (string)$anhoActual);
 
-        // 2. Otros cursos (bloques) del mismo nivel
+        // 2. Otros cursos (bloques) del mismo nivel Y MISMA SEDE
         $cursosDisponibles = GradoAcademico::where('nombre_grado', $gradoAcademico->nombre_grado)
+            ->where('sede_id', $gradoAcademico->sede_id)
             ->with('curso')
             ->get();
+
+
 
         // 3. Cargar relaciones base del grado
         $gradoAcademico->load([
@@ -198,14 +221,19 @@ class GradoAcademicoController extends Controller
             'asignaturas.docentes',
         ]);
 
-        // Preferimos el nombre_curso de la relación si existe, sino bloque
+        // Preferimos el nombre_curso de la relación si existe, sino el bloque como fallback
         $cursoTarget = $gradoAcademico->curso->nombre_curso ?? $gradoAcademico->bloque;
 
-        // 4. Estudiantes matriculados según Año Lectivo
+        // 4. Estudiantes matriculados según Año Lectivo, CURSO ESPECÍFICO y SEDE
+        // Filtramos estrictamente por id_grado, año, curso, sede y omitimos a los "Retirados"
         $matriculadosMF = \App\Models\MatriculaFinal::where('id_grado', $gradoAcademico->id)
             ->where('ano_lectivo', $anoLectivo)
-            ->where('curso', $cursoTarget)
+            ->where('curso', (string)$cursoTarget)
+            ->where('id_sede', $gradoAcademico->sede_id) // Filter by the grade's sede
+            ->where('estado', '!=', 'Retirado')
             ->get();
+
+           // DD($cursoTarget, $gradoAcademico->sede_id, $anoLectivo, $gradoAcademico);
         
         $documentosMatriculados = $matriculadosMF->pluck('documento_estudiante');
 
@@ -296,6 +324,7 @@ class GradoAcademicoController extends Controller
         }
 
         try {
+            $oldDocenteId = $gradoAcademico->docente_id;
             \Illuminate\Support\Facades\DB::beginTransaction();
 
             $gradoAcademico->update([
@@ -320,6 +349,12 @@ class GradoAcademicoController extends Controller
                 $gradoAcademico->asignaturas()->sync([]);
             }
 
+            // Manage DIRECTOR roles for old and new director
+            if ($oldDocenteId != $request->docente_id) {
+                $this->syncDirectorRole($oldDocenteId);
+            }
+            $this->syncDirectorRole($request->docente_id);
+
             \Illuminate\Support\Facades\DB::commit();
 
             return redirect()->route('admin.gradoacademico.index')->with('swal', [
@@ -343,7 +378,13 @@ class GradoAcademicoController extends Controller
      */
     public function destroy(GradoAcademico $gradoAcademico)
     {
+        abort_unless(auth()->user()->hasRol('SUPERADMIN'), 403, 'Solo el Súper Administrador puede eliminar registros.');
+
+        $directorId = $gradoAcademico->docente_id;
         $gradoAcademico->delete();
+
+        // Refresh role for the teacher who was the director
+        $this->syncDirectorRole($directorId);
 
         return redirect()->route('admin.gradoacademico.index')->with('swal', [
             'icon'  => 'success',
@@ -390,5 +431,32 @@ class GradoAcademicoController extends Controller
             ];
         });
         return response()->json($grados);
+    }
+
+    /**
+     * Sincroniza el rol de DIRECTOR para un docente según sus grados asignados.
+     */
+    private function syncDirectorRole($docenteId)
+    {
+        if (!$docenteId) return;
+
+        $docente = \App\Models\Docente::with('user')->find($docenteId);
+        if (!$docente || !$docente->user) return;
+
+        $directorRole = \App\Models\Rol::where('nombre', 'DIRECTOR')->first();
+        if (!$directorRole) return;
+
+        $isStillDirector = GradoAcademico::where('docente_id', $docenteId)->exists();
+
+        if ($isStillDirector) {
+            if (!$docente->user->hasRol('DIRECTOR')) {
+                $docente->user->roles()->attach($directorRole->id);
+            }
+        } else {
+            // Se quita el rol de DIRECTOR si ya no dirige ningún grado
+            if ($docente->user->hasRol('DIRECTOR')) {
+                $docente->user->roles()->detach($directorRole->id);
+            }
+        }
     }
 }

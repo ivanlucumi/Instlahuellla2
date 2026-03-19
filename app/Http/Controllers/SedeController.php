@@ -10,9 +10,18 @@ class SedeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $sedes = Sede::with('institucion')->orderBy('id')->get();
+        $query = Sede::query();
+
+        if ($request->filled('search')) {
+            $query->where('nombre_sede', 'LIKE', '%' . $request->search . '%')
+                  ->orWhere('direccion_sede', 'LIKE', '%' . $request->search . '%');
+        }
+
+        $perPage = $request->get('per_page', 10);
+        $sedes = $query->orderBy('id', 'desc')->paginate($perPage)->appends($request->all());
+
         return view('Sede.Index', compact('sedes'));
     }
 
@@ -38,17 +47,14 @@ class SedeController extends Controller
             'resolucion_sede'    => 'required|string|max:255',
             'institucion_id'     => 'required|exists:institucions,id',
             'estado_sede'        => 'nullable|boolean',
+            'zona_sede'          => 'nullable|string',
+            'jornada'            => 'nullable|string',
         ]);
 
         // 💾 Guardar
-        Sede::create([
-            'nombre_sede'       => $request->nombre_sede,
-            'descripcion_sede'  => $request->descripcion_sede,
-            'codigo_dane_sede'  => $request->codigo_dane_sede,
-            'resolucion_sede'   => $request->resolucion_sede,
-            'institucion_id'    => $request->institucion_id,
-            'estado_sede'       => $request->has('estado_sede') ? true : false,
-        ]);
+        $data = $request->all();
+        $data['estado_sede'] = $request->has('estado_sede') ? true : false;
+        Sede::create($data);
 
         // ✅ Éxito
         return redirect()->route('admin.sede.index')->with('swal', [
@@ -88,17 +94,14 @@ class SedeController extends Controller
             'resolucion_sede'    => 'required|string|max:255',
             'institucion_id'     => 'required|exists:institucions,id',
             'estado_sede'        => 'nullable|boolean',
+            'zona_sede'          => 'nullable|string',
+            'jornada'            => 'nullable|string',
         ]);
 
         // 💾 Actualizar
-        $sede->update([
-            'nombre_sede'       => $request->nombre_sede,
-            'descripcion_sede'  => $request->descripcion_sede,
-            'codigo_dane_sede'  => $request->codigo_dane_sede,
-            'resolucion_sede'   => $request->resolucion_sede,
-            'institucion_id'    => $request->institucion_id,
-            'estado_sede'       => $request->has('estado_sede') ? true : false,
-        ]);
+        $data = $request->all();
+        $data['estado_sede'] = $request->has('estado_sede') ? true : false;
+        $sede->update($data);
 
         // ✅ Éxito
         return redirect()->route('admin.sede.index')->with('swal', [
@@ -113,6 +116,8 @@ class SedeController extends Controller
      */
     public function destroy(Sede $sede)
     {
+        abort_unless(auth()->user()->hasRol('SUPERADMIN'), 403, 'Solo el Súper Administrador puede eliminar registros.');
+
         $sede->delete();
 
         return redirect()->route('admin.sede.index')->with('swal', [

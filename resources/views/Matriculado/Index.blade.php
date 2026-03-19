@@ -68,6 +68,7 @@
                                             <i class="fa fa-edit"></i>
                                         </a>
                                         
+                                        @if(auth()->user()->hasRol('SUPERADMIN'))
                                         <form action="{{ route('admin.matriculado.destroy', $matriculado) }}" 
                                               method="POST" 
                                               class="d-inline"
@@ -78,6 +79,7 @@
                                                 <i class="fa fa-trash"></i>
                                             </button>
                                         </form>
+                                        @endif
                                     </td>
                                 </tr>
                             @empty

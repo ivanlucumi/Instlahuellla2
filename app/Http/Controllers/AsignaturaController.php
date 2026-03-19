@@ -7,13 +7,38 @@ use Illuminate\Http\Request;
 
 class AsignaturaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request)
     {
-        $asignaturas = Asignatura::with(['hilo', 'grados'])->orderBy('id')->paginate(15);
-        return view('Asignatura.Index', compact('asignaturas'));
+        $query = Asignatura::with(['hilo', 'grados']);
+        
+        // Si es DIRECTOR y no SUPERADMIN/ADMIN, solo ve asignaturas de sus grados asignados
+        if (auth()->user()->hasRol('DIRECTOR') && !auth()->user()->hasRol('SUPERADMIN') && !auth()->user()->hasRol('ADMIN')) {
+            $directorId = auth()->id();
+            $query->whereHas('grados', function($q) use ($directorId) {
+                $q->whereHas('docente', function($sq) use ($directorId) {
+                    $sq->where('user_id', $directorId);
+                });
+            });
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->where('nombre_asignatura', 'LIKE', "%$search%");
+        }
+
+        if ($request->filled('hilo_id')) {
+            $query->where('hilo_id', $request->hilo_id);
+        }
+
+        if ($request->filled('nivel_educativo')) {
+            $query->where('nivel_educativo', $request->nivel_educativo);
+        }
+
+        $perPage = $request->get('per_page', 15);
+        $asignaturas = $query->orderBy('id', 'desc')->paginate($perPage)->appends($request->all());
+        
+        $hilos = \App\Models\Hilo::orderBy('nombre_hilo')->get();
+        return view('Asignatura.Index', compact('asignaturas', 'hilos'));
     }
 
     /**
@@ -92,6 +117,8 @@ class AsignaturaController extends Controller
      */
     public function destroy(Asignatura $asignatura)
     {
+        abort_unless(auth()->user()->hasRol('SUPERADMIN'), 403, 'Solo el Súper Administrador puede eliminar registros.');
+
         $asignatura->delete();
 
         return redirect()->route('admin.asignatura.index')->with('swal', [

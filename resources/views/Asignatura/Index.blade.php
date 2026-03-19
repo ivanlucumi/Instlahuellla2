@@ -7,14 +7,57 @@
 <div class="container-fluid pt-4 px-4">
     <div class="row mb-3">
         <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <h4 class="text-white">Asignaturas Registradas</h4>
-                <div class="d-flex align-items-center">
-                    <input type="text" class="form-control form-control-sm me-3 search-table" placeholder="Filtrar asignaturas..." style="width: 250px;">
-                    <a href="{{ route('admin.asignatura.create') }}" class="btn btn-primary">
-                        <i class="fa fa-plus me-1"></i> Nueva Asignatura
-                    </a>
-                </div>
+            <div class="bg-secondary rounded p-4 shadow-sm border-start border-4 border-info">
+                <form action="{{ route('admin.asignatura.index') }}" method="GET" class="row g-3 align-items-end">
+                    <div class="col-md-2">
+                        <label class="text-white-50 small mb-1">Mostrar</label>
+                        <select name="per_page" class="form-select border-0 bg-dark text-white" onchange="this.form.submit()">
+                            <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10 registros</option>
+                            <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15 registros</option>
+                            <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25 registros</option>
+                            <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50 registros</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="text-white-50 small mb-1">Hilo</label>
+                        <select name="hilo_id" class="form-select border-0 bg-dark text-white" onchange="this.form.submit()">
+                            <option value="">Todos los Hilos</option>
+                            @foreach($hilos as $hilo)
+                                <option value="{{ $hilo->id }}" {{ request('hilo_id') == $hilo->id ? 'selected' : '' }}>{{ $hilo->nombre_hilo }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-2">
+                        <label class="text-white-50 small mb-1">Nivel</label>
+                        <select name="nivel_educativo" class="form-select border-0 bg-dark text-white" onchange="this.form.submit()">
+                            <option value="">Todos</option>
+                            <option value="primaria" {{ request('nivel_educativo') == 'primaria' ? 'selected' : '' }}>Primaria</option>
+                            <option value="secundaria" {{ request('nivel_educativo') == 'secundaria' ? 'selected' : '' }}>Secundaria</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="text-white-50 small mb-1">Búsqueda rápida</label>
+                        <div class="input-group">
+                            <input type="text" name="search" class="form-control border-0 bg-dark text-white" 
+                                   placeholder="Nombre de asignatura..." value="{{ request('search') }}">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 d-flex gap-2 justify-content-end">
+                        <a href="{{ route('admin.asignatura.index') }}" class="btn btn-outline-light" title="Limpiar Filtros">
+                            <i class="fa fa-sync-alt"></i>
+                        </a>
+                        <a href="{{ route('admin.asignatura.create') }}" class="btn btn-primary">
+                            <i class="fa fa-plus me-1"></i> Nueva
+                        </a>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -66,6 +109,7 @@
                                             <i class="fa fa-edit"></i>
                                         </a>
                                         
+                                        @if(auth()->user()->hasRol('SUPERADMIN'))
                                         <form action="{{ route('admin.asignatura.destroy', $asignatura) }}" 
                                               method="POST" 
                                               class="d-inline"
@@ -76,6 +120,7 @@
                                                 <i class="fa fa-trash"></i>
                                             </button>
                                         </form>
+                                        @endif
                                     </td>
                                 </tr>
                             @empty
@@ -96,7 +141,7 @@
                 {{-- Paginación --}}
                 @if($asignaturas->hasPages())
                     <div class="d-flex justify-content-center mt-4">
-                        {{ $asignaturas->links() }}
+                        {{ $asignaturas->appends(request()->all())->links() }}
                     </div>
                 @endif
             </div>

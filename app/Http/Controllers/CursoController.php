@@ -10,9 +10,17 @@ class CursoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $cursos = Curso::orderBy('id')->get();
+        $query = Curso::query();
+
+        if ($request->filled('search')) {
+            $query->where('nombre_curso', 'LIKE', '%' . $request->search . '%');
+        }
+
+        $perPage = $request->get('per_page', 10);
+        $cursos = $query->orderBy('id', 'desc')->paginate($perPage)->appends($request->all());
+
         return view('Curso.Index', compact('cursos'));
     }
 
@@ -85,6 +93,8 @@ class CursoController extends Controller
      */
     public function destroy(Curso $curso)
     {
+        abort_unless(auth()->user()->hasRol('SUPERADMIN'), 403, 'Solo el Súper Administrador puede eliminar registros.');
+
         $curso->delete();
 
         return redirect()->route('admin.curso.index')->with('swal', [

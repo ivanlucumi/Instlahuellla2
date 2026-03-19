@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('telefono_estudiante');
             $table->string('email_estudiante');
             $table->string('tipo_identificacion_estudiante');
-            $table->string('numero_identificacion_estudiante');
+            $table->string('numero_identificacion_estudiante')->unique();
             $table->boolean('estado_estudiante')->default(true);            
             $table->unsignedBigInteger('acudiente_id');
             $table->foreign('acudiente_id')->references('id')->on('acudientes')->onDelete('cascade');

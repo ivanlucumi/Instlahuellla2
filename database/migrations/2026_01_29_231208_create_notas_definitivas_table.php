@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('notas_definitivas', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('id_matricula')->nullable()->after('id');
             $table->string('documento_estudiante');
             $table->string('nombre_estudiante');
             $table->string('grado_aprobado');
@@ -23,6 +24,10 @@ return new class extends Migration
             $table->decimal('nota_definitiva', 5, 2);
             $table->string('nombre_asignatura');
             $table->string('curso');
+            
+            $table->foreign('id_matricula')->references('id')->on('matricula_finals')->onDelete('set null');
+            $table->foreign('documento_estudiante')->references('numero_identificacion_estudiante')->on('estudiantes')->onDelete('cascade');
+            
             $table->timestamps();
         });
     }

@@ -50,6 +50,7 @@
                                                 <i class="fa fa-pen"></i>
                                             </a>
                                             
+                                            @if(auth()->user()->hasRol('SUPERADMIN'))
                                             <form action="{{ route('admin.notas.destroy', $nota->id) }}" 
                                                   method="POST" 
                                                   class="d-inline delete-form">
@@ -62,6 +63,7 @@
                                                     <i class="fa fa-trash"></i>
                                                 </button>
                                             </form>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>

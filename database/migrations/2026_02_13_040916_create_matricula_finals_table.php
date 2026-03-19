@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_sede');
             $table->unsignedBigInteger('id_grado');
             $table->string('curso');
-            $table->string('año_lectivo');
+            $table->string('ano_lectivo');
             $table->date('fecha');
             $table->string('estado');
             $table->unsignedBigInteger('id_profesor');
@@ -27,6 +27,8 @@ return new class extends Migration
             $table->foreign('id_sede')->references('id')->on('sedes')->onDelete('cascade');
             $table->foreign('id_grado')->references('id')->on('grado_academicos')->onDelete('cascade');
             $table->foreign('id_profesor')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('documento_estudiante')->references('numero_identificacion_estudiante')->on('estudiantes')->onDelete('cascade');
+            $table->foreign('documento_acudiente')->references('id_documento')->on('acudientes')->onDelete('cascade');
             
             $table->timestamps();
         });

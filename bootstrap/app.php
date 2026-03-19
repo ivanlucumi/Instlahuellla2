@@ -36,6 +36,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'administrador' => \App\Http\Middleware\AdministradorMiddleware::class,
             'chechasession' => \App\Http\Middleware\ChecarSesion::class,
             'rol' => \App\Http\Middleware\CheckRol::class,
+            'role_secure' => \App\Http\Middleware\RoleProtectionMiddleware::class,
         ]);
         //
     })
