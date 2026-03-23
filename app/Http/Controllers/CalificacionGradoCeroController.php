@@ -267,4 +267,80 @@ class CalificacionGradoCeroController extends Controller
 
         return $pdf->stream("Boletines_Grupo_{$grado->nombre_grado}_{$periodo->nombre_periodo}.pdf");
     }
+
+    public function promocion(GradoAcademico $grado)
+    {
+        $user = auth()->user();
+        if ($user->hasRol('DIRECTOR')) {
+            $docente = Docente::where('user_id', $user->id)->first();
+            if (!$docente || $grado->docente_id != $docente->id) {
+                abort(403);
+            }
+        } elseif (!$user->hasRol('SUPERADMIN')) {
+            abort(403);
+        }
+
+        $estudiantes = Estudiante::with('user')
+            ->where('grado_academico_id', $grado->id)
+            ->get()
+            ->sortBy('user.name');
+
+        $gradosDestino = GradoAcademico::with(['sede', 'curso'])->get();
+        $anhosDestino = AnhoEscolar::all();
+        
+        return view('GradoCero.Calificaciones.promocion', compact('grado', 'estudiantes', 'gradosDestino', 'anhosDestino'));
+    }
+
+    public function procesarPromocion(Request $request)
+    {
+        $request->validate([
+            'estudiantes' => 'required|array|min:1',
+            'grado_destino_id' => 'required|exists:grado_academicos,id',
+            'anho_destino_id' => 'required|exists:anho_escolar,id',
+        ]);
+
+        $gradoDestino = GradoAcademico::findOrFail($request->grado_destino_id);
+        $anhoDestino = AnhoEscolar::findOrFail($request->anho_destino_id);
+
+        \DB::transaction(function() use ($request, $gradoDestino, $anhoDestino) {
+            foreach ($request->estudiantes as $estudianteId) {
+                $estudiante = Estudiante::findOrFail($estudianteId);
+                
+                // 1. Actualizar el grado en el perfil del estudiante
+                $estudiante->update([
+                    'grado_academico_id' => $gradoDestino->id
+                ]);
+
+                // 2. Crear registro de matriculado para el nuevo ciclo
+                Matriculado::updateOrCreate([
+                    'estudiante_id' => $estudiante->id,
+                    'grado_id' => $gradoDestino->id,
+                    'anho_escolar_id' => $anhoDestino->id,
+                ], [
+                    'acudiente_id' => $estudiante->acudiente_id ?? 1,
+                    'fecha_matricula' => now(),
+                    'estado' => 'activo'
+                ]);
+
+                // 3. Sincronizar con MatriculaFinal
+                \App\Models\MatriculaFinal::updateOrCreate([
+                    'documento_estudiante' => $estudiante->numero_identificacion_estudiante,
+                    'id_grado' => $gradoDestino->id,
+                    'ano_lectivo' => $anhoDestino->nombre_anho_escolar,
+                ], [
+                    'id_sede' => $gradoDestino->sede_id,
+                    'curso' => $gradoDestino->curso->nombre_curso ?? $gradoDestino->bloque,
+                    'fecha' => now(),
+                    'estado' => 'activo',
+                    'id_profesor' => $gradoDestino->docente_id ?? auth()->id(),
+                ]);
+            }
+        });
+
+        return redirect()->route('admin.grado-cero.calificaciones.index')->with('swal', [
+            'icon' => 'success',
+            'title' => '¡Promoción Exitosa!',
+            'text' => 'Los estudiantes seleccionados han sido promovidos.'
+        ]);
+    }
 }

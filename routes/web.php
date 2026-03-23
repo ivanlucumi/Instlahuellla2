@@ -165,6 +165,10 @@ Route::middleware(['auth', 'role_secure:SUPERADMIN,ADMIN,DIRECTOR'])
             // Descargas de Boletines
             Route::get('/boletin/estudiante/{estudiante}/{periodo}/{anho}', [App\Http\Controllers\CalificacionGradoCeroController::class, 'descargarBoletin'])->name('admin.grado-cero.boletin.descargar');
             Route::get('/boletin/grupo/{grado}/{periodo}/{anho}', [App\Http\Controllers\CalificacionGradoCeroController::class, 'descargarGrupo'])->name('admin.grado-cero.boletin.grupo');
+
+            // Promoción (Graduación de Transición)
+            Route::get('/promocion/{grado}', [App\Http\Controllers\CalificacionGradoCeroController::class, 'promocion'])->name('admin.grado-cero.calificaciones.promocion');
+            Route::post('/promover', [App\Http\Controllers\CalificacionGradoCeroController::class, 'procesarPromocion'])->name('admin.grado-cero.calificaciones.procesar-promocion');
         });
     });
 
