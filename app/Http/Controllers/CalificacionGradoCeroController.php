@@ -24,7 +24,7 @@ class CalificacionGradoCeroController extends Controller
         // Query base para grados de transición
         $query = GradoAcademico::where(function($q) {
             $q->where('nombre_grado', 'LIKE', '%TRANSICION%')
-              ->orWhere('nombre_grado', 'LIKE', '%CERO%');
+              ->orWhere('nombre_grado', 'LIKE', 'CERO%');
         });
 
         // Si es DIRECTOR, filtrar solo los que tiene a cargo
@@ -127,6 +127,18 @@ class CalificacionGradoCeroController extends Controller
             if ($request->has('calificaciones')) {
                 foreach ($request->calificaciones as $estudiante_id => $valor) {
                     if ($valor) {
+                        $exists = CalificacionGradoCero::where([
+                            'estudiante_id' => $estudiante_id,
+                            'criterio_id' => $criterio_id,
+                            'grado_academico_id' => $grado_id,
+                            'periodo_id' => $periodo_id,
+                            'anho_escolar_id' => $anho_id,
+                        ])->exists();
+
+                        if ($exists && !auth()->user()->hasRol('SUPERADMIN') && !auth()->user()->hasRol('RECTOR')) {
+                            continue; // No puede editar lo que ya existe
+                        }
+
                         CalificacionGradoCero::updateOrCreate([
                             'estudiante_id' => $estudiante_id,
                             'criterio_id' => $criterio_id,
@@ -145,6 +157,18 @@ class CalificacionGradoCeroController extends Controller
             foreach ($request->calificaciones as $estudiante_id => $criterios) {
                 foreach ($criterios as $criterio_id => $valor) {
                     if ($valor) {
+                        $exists = CalificacionGradoCero::where([
+                            'estudiante_id' => $estudiante_id,
+                            'criterio_id' => $criterio_id,
+                            'grado_academico_id' => $grado_id,
+                            'periodo_id' => $periodo_id,
+                            'anho_escolar_id' => $anho_id,
+                        ])->exists();
+
+                        if ($exists && !auth()->user()->hasRol('SUPERADMIN') && !auth()->user()->hasRol('RECTOR')) {
+                            continue;
+                        }
+
                         CalificacionGradoCero::updateOrCreate([
                             'estudiante_id' => $estudiante_id,
                             'criterio_id' => $criterio_id,
@@ -163,6 +187,17 @@ class CalificacionGradoCeroController extends Controller
         if ($request->has('observaciones')) {
             foreach ($request->observaciones as $estudiante_id => $texto) {
                 if ($texto) {
+                    $exists = ObservacionGradoCero::where([
+                        'estudiante_id' => $estudiante_id,
+                        'grado_academico_id' => $grado_id,
+                        'periodo_id' => $periodo_id,
+                        'anho_escolar_id' => $anho_id,
+                    ])->exists();
+
+                    if ($exists && !auth()->user()->hasRol('SUPERADMIN') && !auth()->user()->hasRol('RECTOR')) {
+                        continue;
+                    }
+
                     ObservacionGradoCero::updateOrCreate([
                         'estudiante_id' => $estudiante_id,
                         'grado_academico_id' => $grado_id,
@@ -235,9 +270,19 @@ class CalificacionGradoCeroController extends Controller
             ->where('grado_academico_id', $grado->id)
             ->get();
 
-        $asignaturasIds = $grado->asignaturas->pluck('id');
+        // Obtenemos todos los criterios de todas las asignaturas relevantes para Grado Cero
+        // (Dimensiones, Cero, Transición)
+        $asignaturasCero = Asignatura::whereHas('hilo', function($q) {
+            $q->where('nombre_hilo', 'LIKE', '%CERO%')
+              ->orWhere('nombre_hilo', 'LIKE', '%TRANSICION%')
+              ->orWhere('nombre_hilo', 'LIKE', '%DIMENSION%');
+        })->orWhereHas('grados', function($q) {
+            $q->where('nombre_grado', 'LIKE', '%TRANSICION%')
+              ->orWhere('nombre_grado', 'LIKE', '%CERO%');
+        })->pluck('id');
+
         $criterios = CriterioGradoCero::with('asignatura')
-            ->whereIn('asignatura_id', $asignaturasIds)
+            ->whereIn('asignatura_id', $asignaturasCero)
             ->where('estado', 1)
             ->get()
             ->groupBy('asignatura.nombre_asignatura');

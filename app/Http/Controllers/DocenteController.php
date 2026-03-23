@@ -434,6 +434,30 @@ class DocenteController extends Controller
                 }
             }
 
+            // --- BLOQUEO DE EDICIÓN ---
+            $isAdmin = auth()->user()->hasRol('SUPERADMIN') || auth()->user()->hasRol('RECTOR');
+            $oldNota = Notas::where('matriculado_id', $matricula->id)
+                            ->where('asignatura_id', $request->asignatura_id)
+                            ->first();
+
+            if ($oldNota && !$isAdmin) {
+                // Si la nota ya existe y no es admin, mantenemos lo anterior si tenía valor
+                if ($oldNota->nota1 > 0) $nota1 = $oldNota->nota1;
+                if ($oldNota->nota2 > 0) $nota2 = $oldNota->nota2;
+                if ($oldNota->nota3 > 0) $nota3 = $oldNota->nota3;
+                if ($oldNota->nota4 > 0) $nota4 = $oldNota->nota4;
+                if (!empty($oldNota->observaciones)) $observaciones = $oldNota->observaciones;
+
+                // Recalcular definitiva con los valores bloqueados
+                $n1 = (float)$nota1; $n2 = (float)$nota2; $n3 = (float)$nota3; $n4 = (float)$nota4;
+                $definitiva = 0;
+                if ($n3 > 0) {
+                    if ($n4 > 0) $definitiva = ($n1 + $n2 + $n3 + $n4) / 4;
+                    else $definitiva = ($n1 + $n2 + $n3) / 3;
+                }
+            }
+            // --------------------------
+
             $newNota = Notas::updateOrCreate(
                 [
                     'matriculado_id' => $matricula->id,

@@ -141,9 +141,13 @@ class CertificadoController extends Controller
         return $pdf->download("Certificado_{$request->identificacion}_{$matricula->ano_lectivo}.pdf");
     }
 
-    public function generarPorMatricula($id)
+    public function generarPorMatricula(Request $request, $id)
     {
         $matricula = \App\Models\MatriculaFinal::with(['grado', 'sede', 'profesor'])->findOrFail($id);
+        $periodo = null;
+        if ($request->has('periodo_id')) {
+            $periodo = PeriodoAcademico::find($request->periodo_id);
+        }
 
         if ($matricula->estado === 'Retirado') {
             return back()->with('swal', [
@@ -208,6 +212,7 @@ class CertificadoController extends Controller
             'grado_solicitado' => $gradoAprobado,
             'notas'            => $notas,
             'matricula'        => $matricula,
+            'periodo'          => $periodo,
             'anho_lectivo'     => $matricula->ano_lectivo,
             'fecha'            => date('d/m/Y'),
         ];
@@ -230,6 +235,7 @@ class CertificadoController extends Controller
 
         $grado = \App\Models\GradoAcademico::with(['sede', 'docente.user', 'curso'])->findOrFail($request->grado_id);
         $gradoAprobado = trim(($grado->nombre_grado ?? '') . ' - ' . ($grado->bloque ?? ''));
+        $periodo = $request->periodo_id ? PeriodoAcademico::find($request->periodo_id) : null;
 
         // 1. Obtener TODAS las matrículas del grado y año (excepto retirados)
         $queryMatriculas = \App\Models\MatriculaFinal::with(['sede', 'profesor'])
@@ -319,6 +325,7 @@ class CertificadoController extends Controller
             'bulkData' => $bulkData,
             'fecha'    => date('d/m/Y'),
             'grado'    => $grado,
+            'periodo'  => $periodo,
         ]);
         $pdf->setPaper('legal', 'portrait');
 

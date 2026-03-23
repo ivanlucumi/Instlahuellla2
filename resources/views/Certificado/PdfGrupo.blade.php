@@ -21,6 +21,7 @@
                 'notas'            => $data['notas'],
                 'matricula'        => $data['matricula'],
                 'anho_lectivo'     => $data['anho_lectivo'],
+                'periodo'          => $periodo ?? null,
                 'fecha'            => $fecha
             ])
         </div>

@@ -194,6 +194,7 @@ class GradoAcademicoController extends Controller
 
         // 1. Contexto Académico
         $anhos = \App\Models\AnhoEscolar::orderBy('nombre_anho_escolar', 'desc')->get();
+        $periodos = \App\Models\PeriodoAcademico::all();
         $anhoId = $request->get('anho_escolar_id');
         $currentAnhoObj = $anhoId 
             ? $anhos->find($anhoId) 
@@ -210,6 +211,11 @@ class GradoAcademicoController extends Controller
             ->where('sede_id', $gradoAcademico->sede_id)
             ->with('curso')
             ->get();
+
+        $isGradoCero = (str_contains(strtoupper($gradoAcademico->nombre_grado), 'TRANSICION') || 
+                        str_contains(strtoupper($gradoAcademico->nombre_grado), 'CERO') ||
+                        str_contains(strtoupper($gradoAcademico->nombre_grado), 'DIMENSION'));
+
 
 
 
@@ -273,6 +279,8 @@ class GradoAcademicoController extends Controller
             'estudiantes',
             'matriculadosMF',
             'anhos', 
+            'periodos',
+            'isGradoCero',
             'currentAnhoObj',
             'esAnhoActual',
             'cursosDisponibles',

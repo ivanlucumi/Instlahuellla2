@@ -6,19 +6,25 @@
         <div class="col-12">
             <div class="bg-white rounded h-100 p-4 border shadow-sm">
                 <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                    @php
+                        $user = auth()->user();
+                        $isAdmin = $user->hasRol('SUPERADMIN') || $user->hasRol('RECTOR');
+                    @endphp
                     <div>
-                        <h4 class="mb-0 text-primary fw-bold">Matriz de Calificación: Transición</h4>
-                        <p class="text-muted mb-0 small">
-                            <i class="fa fa-graduation-cap me-1"></i> {{ $grado->nombre_grado }} ({{ $grado->curso->nombre_curso }}) 
-                            | <i class="fa fa-calendar-alt me-1"></i> {{ $periodo->nombre_periodo }} - {{ $anho->nombre_anho_escolar }}
-                        </p>
+                        <h4 class="mb-0 text-primary fw-bold">Matriz de Calificación: Grado Cero</h4>
+                        <div class="mt-1">
+                            <span class="badge bg-primary me-1"><i class="fa fa-graduation-cap me-1"></i> {{ $grado->nombre_grado }}</span>
+                            <span class="badge bg-info me-1"><i class="fa fa-calendar-alt me-1"></i> {{ $periodo->nombre_periodo }}</span>
+                            <span class="badge bg-secondary me-1"><i class="fa fa-clock me-1"></i> {{ $anho->nombre_anho_escolar }}</span>
+                            <span class="text-muted small ms-2">{{ $grado->curso->nombre_curso }} | {{ $grado->sede->nombre_sede }}</span>
+                        </div>
                     </div>
                     <div class="d-flex align-items-center">
                         <a href="{{ route('admin.grado-cero.calificaciones.promocion', $grado->id) }}" class="btn btn-primary btn-sm me-2 fw-bold">
                             <i class="fa fa-user-graduate me-2"></i>Promover Estudiantes
                         </a>
                         <a href="{{ route('admin.grado-cero.boletin.grupo', [$grado->id, $periodo->id, $anho->id]) }}" class="btn btn-outline-success btn-sm me-2" target="_blank">
-                            <i class="fa fa-file-pdf me-2"></i>Descargar Boletines
+                            <i class="fa fa-file-pdf me-2"></i>Boletines {{ $periodo->nombre_periodo }}
                         </a>
                         <a href="{{ route('admin.grado-cero.calificaciones.index') }}" class="btn btn-outline-secondary btn-sm">
                             <i class="fa fa-arrow-left me-2"></i>Volver
@@ -60,9 +66,17 @@
                                 @foreach($estudiantes as $e)
                                 <tr>
                                     <td class="sticky-col bg-light">
-                                        <div class="d-flex flex-column">
-                                            <span class="fw-bold text-dark" style="font-size: 0.85rem;">{{ strtoupper($e->user->name) }}</span>
-                                            <span class="text-muted small" style="font-size: 0.7rem;">ID: {{ $e->codigo_estudiante }}</span>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="d-flex flex-column">
+                                                <span class="fw-bold text-dark" style="font-size: 0.8rem;">{{ strtoupper($e->user->name) }}</span>
+                                                <span class="text-muted small" style="font-size: 0.65rem;">ID: {{ $e->codigo_estudiante }}</span>
+                                            </div>
+                                            <a href="{{ route('admin.grado-cero.boletin.descargar', [$e->id, $periodo->id, $anho->id]) }}" 
+                                               class="btn btn-outline-danger btn-xs py-0 px-1 border-0" 
+                                               target="_blank" 
+                                               title="Descargar Boletín Individual">
+                                                <i class="fa fa-file-pdf" style="font-size: 0.75rem;"></i>
+                                            </a>
                                         </div>
                                     </td>
                                     @foreach($criterios as $asignatura => $logros)
@@ -73,23 +87,44 @@
                                             @endphp
                                             <div class="d-flex justify-content-center gap-1">
                                                 <div class="form-check form-check-inline m-0 p-0" title="Siempre">
-                                                    <input class="form-check-input d-none" type="radio" name="calificaciones[{{ $e->id }}][{{ $l->id }}]" id="c_{{ $e->id }}_{{ $l->id }}_S" value="SIEMPRE" {{ $currentVal == 'SIEMPRE' ? 'checked' : '' }}>
-                                                    <label class="btn btn-outline-success btn-xs p-1" for="c_{{ $e->id }}_{{ $l->id }}_S" style="font-size: 0.6rem; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">S</label>
+                                                    <input class="form-check-input d-none" type="radio" 
+                                                           name="calificaciones[{{ $e->id }}][{{ $l->id }}]" 
+                                                           id="c_{{ $e->id }}_{{ $l->id }}_S" 
+                                                           value="SIEMPRE" {{ $currentVal == 'SIEMPRE' ? 'checked' : '' }}
+                                                           {{ (!$isAdmin && $currentVal) ? 'disabled' : '' }}>
+                                                    <label class="btn btn-outline-success btn-xs p-1" for="c_{{ $e->id }}_{{ $l->id }}_S" 
+                                                           style="font-size: 0.6rem; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; {{ (!$isAdmin && $currentVal && $currentVal != 'SIEMPRE') ? 'opacity: 0.3;' : '' }}">S</label>
                                                 </div>
                                                 <div class="form-check form-check-inline m-0 p-0" title="Algunas veces">
-                                                    <input class="form-check-input d-none" type="radio" name="calificaciones[{{ $e->id }}][{{ $l->id }}]" id="c_{{ $e->id }}_{{ $l->id }}_A" value="ALGUNAS_VECES" {{ $currentVal == 'ALGUNAS_VECES' ? 'checked' : '' }}>
-                                                    <label class="btn btn-outline-warning btn-xs p-1" for="c_{{ $e->id }}_{{ $l->id }}_A" style="font-size: 0.6rem; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">A</label>
+                                                    <input class="form-check-input d-none" type="radio" 
+                                                           name="calificaciones[{{ $e->id }}][{{ $l->id }}]" 
+                                                           id="c_{{ $e->id }}_{{ $l->id }}_A" 
+                                                           value="ALGUNAS_VECES" {{ $currentVal == 'ALGUNAS_VECES' ? 'checked' : '' }}
+                                                           {{ (!$isAdmin && $currentVal) ? 'disabled' : '' }}>
+                                                    <label class="btn btn-outline-warning btn-xs p-1" for="c_{{ $e->id }}_{{ $l->id }}_A" 
+                                                           style="font-size: 0.6rem; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; {{ (!$isAdmin && $currentVal && $currentVal != 'ALGUNAS_VECES') ? 'opacity: 0.3;' : '' }}">A</label>
                                                 </div>
                                                 <div class="form-check form-check-inline m-0 p-0" title="Nunca">
-                                                    <input class="form-check-input d-none" type="radio" name="calificaciones[{{ $e->id }}][{{ $l->id }}]" id="c_{{ $e->id }}_{{ $l->id }}_N" value="NUNCA" {{ $currentVal == 'NUNCA' ? 'checked' : '' }}>
-                                                    <label class="btn btn-outline-danger btn-xs p-1" for="c_{{ $e->id }}_{{ $l->id }}_N" style="font-size: 0.6rem; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">N</label>
+                                                    <input class="form-check-input d-none" type="radio" 
+                                                           name="calificaciones[{{ $e->id }}][{{ $l->id }}]" 
+                                                           id="c_{{ $e->id }}_{{ $l->id }}_N" 
+                                                           value="NUNCA" {{ $currentVal == 'NUNCA' ? 'checked' : '' }}
+                                                           {{ (!$isAdmin && $currentVal) ? 'disabled' : '' }}>
+                                                    <label class="btn btn-outline-danger btn-xs p-1" for="c_{{ $e->id }}_{{ $l->id }}_N" 
+                                                           style="font-size: 0.6rem; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; {{ (!$isAdmin && $currentVal && $currentVal != 'NUNCA') ? 'opacity: 0.3;' : '' }}">N</label>
                                                 </div>
                                             </div>
                                         </td>
                                         @endforeach
                                     @endforeach
                                     <td class="p-1">
-                                        <textarea name="observaciones[{{ $e->id }}]" class="form-control form-control-sm border-light bg-light" rows="2" style="font-size: 0.7rem;" placeholder="Observaciones...">{{ $observaciones[$e->id] ?? '' }}</textarea>
+                                        @php $obs = $observaciones[$e->id] ?? ''; @endphp
+                                        <textarea name="observaciones[{{ $e->id }}]" 
+                                                  class="form-control form-control-sm border-light bg-light" 
+                                                  rows="2" 
+                                                  style="font-size: 0.7rem;" 
+                                                  placeholder="Observaciones..."
+                                                  {{ (!$isAdmin && $obs) ? 'readonly' : '' }}>{{ $obs }}</textarea>
                                     </td>
                                 </tr>
                                 @endforeach

@@ -127,8 +127,13 @@
     </div>
 
     <div class="sub-header">
-        Informe Valorativo Año Lectivo: {{ $anho_lectivo }} <br>
-        CERTIFICACION DEL GRADO: {{ strtoupper($grado_solicitado) }}
+        @if(isset($periodo))
+            BOLETÍN DE CALIFICACIONES - {{ strtoupper($periodo->nombre_periodo) }} <br>
+        @else
+            INFORME VALORATIVO FINAL <br>
+        @endif
+        AÑO LECTIVO: {{ $anho_lectivo }} <br>
+        GRADO: {{ strtoupper($grado_solicitado) }}
     </div>
 
     <table class="info-table">
@@ -172,11 +177,21 @@
                 @endif
                 <tr>
                     <td class="subject-col">{{ $nota->nombre_asignatura }}</td>
-                    <td>{{ number_format($nota->nota_per1, 1) }}</td>
-                    <td>{{ number_format($nota->nota_per2, 1) }}</td>
-                    <td>{{ number_format($nota->nota_per3, 1) }}</td>
-                    <td>{{ number_format($nota->nota_per4, 1) }}</td>
-                    <td style="font-weight: bold;">{{ number_format($nota->nota_definitiva, 1) }}</td>
+                    <td>{{ $nota->nota_per1 > 0 ? number_format($nota->nota_per1, 1) : '-' }}</td>
+                    <td>{{ $nota->nota_per2 > 0 ? number_format($nota->nota_per2, 1) : '-' }}</td>
+                    <td>{{ $nota->nota_per3 > 0 ? number_format($nota->nota_per3, 1) : '-' }}</td>
+                    <td>{{ $nota->nota_per4 > 0 ? number_format($nota->nota_per4, 1) : '-' }}</td>
+                    <td style="font-weight: bold;">
+                        @php
+                            $notasValidas = array_filter([$nota->nota_per1, $nota->nota_per2, $nota->nota_per3, $nota->nota_per4], fn($v) => $v > 0);
+                            $count = count($notasValidas);
+                        @endphp
+                        @if($count >= 3)
+                            {{ number_format($nota->nota_definitiva, 1) }}
+                        @else
+                            -
+                        @endif
+                    </td>
                 </tr>
             @endforeach
         </tbody>

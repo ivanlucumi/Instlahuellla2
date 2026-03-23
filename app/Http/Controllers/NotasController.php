@@ -79,6 +79,8 @@ class NotasController extends Controller
 
     public function update(Request $request, Notas $nota)
     {
+        abort_unless(auth()->user()->hasRol('SUPERADMIN') || auth()->user()->hasRol('RECTOR'), 403, 'No tiene permisos para modificar calificaciones almacenadas.');
+        
         $notas = [$request->nota1, $request->nota2, $request->nota3, $request->nota4];
         $hasNotes = count(array_filter($notas, fn($n) => $n !== null && $n !== '')) > 0;
 
@@ -119,7 +121,7 @@ class NotasController extends Controller
 
     public function destroy(Notas $nota)
     {
-        abort_unless(auth()->user()->hasRol('SUPERADMIN'), 403, 'Solo el Súper Administrador puede eliminar registros.');
+        abort_unless(auth()->user()->hasRol('SUPERADMIN') || auth()->user()->hasRol('RECTOR'), 403, 'Solo el Rector o Súper Administrador pueden eliminar registros.');
 
         $nota->delete();
 

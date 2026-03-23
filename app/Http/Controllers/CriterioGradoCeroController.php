@@ -17,12 +17,12 @@ class CriterioGradoCeroController extends Controller
     public function create()
     {
         $asignaturas = Asignatura::whereHas('hilo', function($q) {
-            $q->where('nombre_hilo', 'LIKE', '%CERO%')
+            $q->where('nombre_hilo', 'LIKE', 'CERO%')
               ->orWhere('nombre_hilo', 'LIKE', '%TRANSICION%')
               ->orWhere('nombre_hilo', 'LIKE', '%DIMENSION%');
         })->orWhereHas('grados', function($q) {
             $q->where('nombre_grado', 'LIKE', '%TRANSICION%')
-              ->orWhere('nombre_grado', 'LIKE', '%CERO%');
+              ->orWhere('nombre_grado', 'LIKE', 'CERO%');
         })->orderBy('nombre_asignatura')->get();
         
         return view('GradoCero.Criterios.create', compact('asignaturas'));

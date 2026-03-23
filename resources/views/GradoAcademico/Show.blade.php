@@ -20,14 +20,22 @@
                             <strong>Director:</strong> {{ $gradoAcademico->docente->user->name ?? 'N/A' }}
                         </p>
                     </div>
-                    <div class="col-md-6 d-flex justify-content-md-end mt-3 mt-md-0 gap-2">
-                        <form action="{{ route('admin.gradoacademico.show', $gradoAcademico->id) }}" method="GET" class="d-flex align-items-center gap-2">
-                            <label class="text-white small text-nowrap">Año Lectivo:</label>
-                            <select name="anho_escolar_id" class="form-select form-select-sm bg-dark text-white border-secondary" onchange="this.form.submit()" style="width: 130px;">
+                    <div class="col-md-6 d-flex justify-content-md-end mt-3 mt-md-0 gap-2 flex-wrap">
+                        <form id="globalParams" action="{{ route('admin.gradoacademico.show', $gradoAcademico->id) }}" method="GET" class="d-flex align-items-center gap-2">
+                            <label class="text-white small text-nowrap">Ciclo:</label>
+                            <select name="anho_escolar_id" class="form-select form-select-sm bg-dark text-white border-secondary" onchange="this.form.submit()" style="width: 100px;">
                                 @foreach($anhos as $anho)
                                     <option value="{{ $anho->id }}" @selected($currentAnhoObj->id == $anho->id)>
                                         {{ $anho->nombre_anho_escolar }}
                                     </option>
+                                @endforeach
+                            </select>
+                            
+                            <label class="text-white small text-nowrap ms-1">Periodo:</label>
+                            @php $selectedPeriodId = request('periodo_id') ?? $periodos->where('estado', 1)->first()?->id ?? ($periodos->first()?->id ?? 1); @endphp
+                            <select name="periodo_id" id="sel_periodo_id" class="form-select form-select-sm bg-dark text-white border-secondary" onchange="this.form.submit()" style="width: 100px;">
+                                @foreach($periodos as $p)
+                                    <option value="{{ $p->id }}" @selected($selectedPeriodId == $p->id)>{{ $p->nombre_periodo }}</option>
                                 @endforeach
                             </select>
                         </form>
@@ -97,15 +105,27 @@
                     <h5 class="text-white mb-0">
                         <i class="fa fa-users me-2 text-primary"></i> Estudiantes en {{ $currentAnhoObj->nombre_anho_escolar }}
                     </h5>
-                    <div class="d-flex gap-2">
-                        <a href="{{ route('admin.certificados.generar-grupo', [
-                            'grado_id' => $gradoAcademico->id, 
-                            'ano_lectivo' => $currentAnhoObj->nombre_anho_escolar,
-                            'curso' => ($gradoAcademico->curso->nombre_curso ?? $gradoAcademico->bloque)
-                        ]) }}" 
-                           class="btn btn-sm btn-outline-info">
-                            <i class="fa fa-file-pdf me-1"></i> Certificado Grupal
-                        </a>
+                    <div class="d-flex gap-1 flex-wrap">
+                        @if($isGradoCero)
+                            <a href="{{ route('admin.grado-cero.calificaciones.matrix', ['grado_id' => $gradoAcademico->id, 'periodo_id' => $selectedPeriodId, 'anho_escolar_id' => $currentAnhoObj->id]) }}" 
+                               class="btn btn-sm btn-info fw-bold">
+                                <i class="fa fa-table me-1"></i> Planilla Grado Cero
+                            </a>
+                            <a href="{{ route('admin.grado-cero.boletin.grupo', [$gradoAcademico->id, $selectedPeriodId, $currentAnhoObj->id]) }}" 
+                               class="btn btn-sm btn-outline-success" target="_blank">
+                                <i class="fa fa-file-pdf me-1"></i> Boletín Grupal
+                            </a>
+                        @else
+                            <a href="{{ route('admin.certificados.generar-grupo', [
+                                'grado_id' => $gradoAcademico->id, 
+                                'ano_lectivo' => $currentAnhoObj->nombre_anho_escolar,
+                                'curso' => ($gradoAcademico->curso->nombre_curso ?? $gradoAcademico->bloque),
+                                'periodo_id' => $selectedPeriodId
+                            ]) }}" 
+                               class="btn btn-sm btn-outline-info">
+                                <i class="fa fa-file-pdf me-1"></i> Certificado Grupal
+                            </a>
+                        @endif
                         <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalMatricular">
                             <i class="fa fa-user-plus me-1"></i> Matricular
                         </button>
@@ -148,12 +168,19 @@
                                                     @endphp
                                                     
                                                     @if($mfRec)
-                                                    <a class="dropdown-item text-info cert-link"
-                                                       href="{{ route('admin.certificados.por-matricula', $mfRec->id) }}">
-                                                        <i class="fa fa-file-pdf me-2"></i>Generar Certificado
-                                                    </a>
+                                                        @if($isGradoCero)
+                                                            <a class="dropdown-item text-success" target="_blank"
+                                                               href="{{ route('admin.grado-cero.boletin.descargar', [$est->id, $selectedPeriodId, $currentAnhoObj->id]) }}">
+                                                                <i class="fa fa-file-pdf me-2"></i>Descargar Boletín Cero
+                                                            </a>
+                                                        @else
+                                                            <a class="dropdown-item text-info cert-link" target="_blank"
+                                                               href="{{ route('admin.certificados.por-matricula', ['id' => $mfRec->id, 'periodo_id' => $selectedPeriodId]) }}">
+                                                                <i class="fa fa-file-pdf me-2"></i>Generar Certificado
+                                                            </a>
+                                                        @endif
                                                     @else
-                                                    <span class="dropdown-item text-muted"><i class="fa fa-file-pdf me-2"></i>Sin matrícula</span>
+                                                        <span class="dropdown-item text-muted"><i class="fa fa-file-pdf me-2"></i>Sin matrícula</span>
                                                     @endif
                                                 </li>
                                                 @if(auth()->user()->hasRol('SUPERADMIN'))
