@@ -303,34 +303,42 @@ class DocenteController extends Controller
             ->where('ano_lectivo', $anoLectivo)
             ->pluck('documento_estudiante');
 
-        $estudiantes = Estudiante::with(['user', 'notas' => function($query) use ($asignaturaId, $gradoId) {
-            $query->where('asignatura_id', $asignaturaId)->where('grado_id', $gradoId);
-        }])
+        $estudiantes = Estudiante::with(['user'])
         ->whereIn('numero_identificacion_estudiante', $documentos)
         ->get();
 
-        // Si es histórico, intentar mapear desde NotasDefinitivas para mayor precisión
-        if (!$esAnoActual) {
-            $notasDefinitivas = \App\Models\NotasDefinitivas::where('asignatura_id', $asignaturaId)
-                ->whereIn('documento_estudiante', $documentos)
-                ->where('grado_aprobado', 'like', "%{$grado->nombre_grado}%")
-                ->get();
-            
-            foreach ($estudiantes as $est) {
-                $nd = $notasDefinitivas->where('documento_estudiante', $est->numero_identificacion_estudiante)->first();
-                if ($nd) {
-                    // Crear un objeto que imite el modelo Notas para que la vista funcione
-                    $mockNota = (object)[
-                        'nota1' => $nd->nota_per1,
-                        'nota2' => $nd->nota_per2,
-                        'nota3' => $nd->nota_per3,
-                        'nota4' => $nd->nota_per4,
-                        'nota_definitiva' => $nd->nota_definitiva,
-                        'observaciones' => 'Registro Histórico (' . $anoLectivo . ')'
-                    ];
-                    $est->setRelation('notas', collect([$mockNota]));
+        // Cargar las notas directas desde NotasDefinitivas para AMBOS (actual e historico)
+        $notasDefinitivas = \App\Models\NotasDefinitivas::where('asignatura_id', $asignaturaId)
+            ->whereIn('documento_estudiante', $documentos)
+            ->where('grado_aprobado', 'like', "%{$grado->nombre_grado}%")
+            ->get();
+        
+        foreach ($estudiantes as $est) {
+            if ($esAnoActual) {
+                $matriculaFinal = \App\Models\MatriculaFinal::where('documento_estudiante', $est->numero_identificacion_estudiante)
+                    ->where('ano_lectivo', $anoLectivo)
+                    ->first();
+                if ($matriculaFinal) {
+                    $nd = \App\Models\NotasDefinitivas::where('id_matricula', $matriculaFinal->id)
+                        ->where('asignatura_id', $asignaturaId)
+                        ->first();
+                } else {
+                    $nd = null;
                 }
+            } else {
+                $nd = $notasDefinitivas->where('documento_estudiante', $est->numero_identificacion_estudiante)->first();
             }
+
+            // Crear un objeto que imite el modelo Notas para que la vista funcione
+            $mockNota = (object)[
+                'nota1' => $nd->nota_per1 ?? null,
+                'nota2' => $nd->nota_per2 ?? null,
+                'nota3' => $nd->nota_per3 ?? null,
+                'nota4' => $nd->nota_per4 ?? null,
+                'nota_definitiva' => $nd->nota_definitiva ?? null,
+                'observaciones' => $nd->observaciones ?? ($esAnoActual ? '' : 'Registro Histórico (' . $anoLectivo . ')')
+            ];
+            $est->setRelation('notas', collect([$mockNota]));
         }
 
         $all_graded = $estudiantes->isNotEmpty();
@@ -343,6 +351,7 @@ class DocenteController extends Controller
         }
 
         $todosLosGrados = GradoAcademico::all();
+        $anhosEscolares = AnhoEscolar::all();
 
         return view('Docente.asignatura.estudiantes_asignatura', compact(
             'asignatura', 
@@ -352,7 +361,8 @@ class DocenteController extends Controller
             'all_graded',
             'esAnoActual',
             'anoLectivo',
-            'canEdit'
+            'canEdit',
+            'anhosEscolares'
         ));
     }
 
@@ -404,20 +414,16 @@ class DocenteController extends Controller
 
             $estudiante = Estudiante::findOrFail($estudianteId);
             
-            // Auto-matriculación si no existe para esta asignatura y año
-            $matricula = Matriculado::firstOrCreate(
-                [
-                    'estudiante_id'   => $estudianteId,
-                    'grado_id'        => $request->grado_id,
-                    'asignatura_id'   => $request->asignatura_id,
-                    'anho_escolar_id' => $anhoEscolarId,
-                ],
-                [
-                    'acudiente_id'    => $estudiante->acudiente_id ?? 1,
-                    'fecha_matricula' => now(),
-                    'estado'          => 'activo'
-                ]
-            );
+            // Buscar la matrícula oficial del estudiante en este año y grado
+            $matriculaFinal = \App\Models\MatriculaFinal::where('documento_estudiante', $estudiante->numero_identificacion_estudiante)
+                ->where('id_grado', $request->grado_id)
+                ->where('ano_lectivo', ($anhoEscolarObj->nombre_anho_escolar ?? date('Y')))
+                ->first();
+
+            if (!$matriculaFinal) {
+                $errors[] = "El estudiante $nombre no tiene registro oficial de matrícula actual en este grado.";
+                continue;
+            }
 
             // Calcular definitiva: solo promedia cuando se califique el 3er periodo
             $n1 = is_numeric($nota1) && $nota1 > 0 ? (float)$nota1 : 0;
@@ -436,16 +442,16 @@ class DocenteController extends Controller
 
             // --- BLOQUEO DE EDICIÓN ---
             $isAdmin = auth()->user()->hasRol('SUPERADMIN') || auth()->user()->hasRol('RECTOR');
-            $oldNota = Notas::where('matriculado_id', $matricula->id)
+            $oldNota = \App\Models\NotasDefinitivas::where('id_matricula', $matriculaFinal->id)
                             ->where('asignatura_id', $request->asignatura_id)
                             ->first();
 
             if ($oldNota && !$isAdmin) {
                 // Si la nota ya existe y no es admin, mantenemos lo anterior si tenía valor
-                if ($oldNota->nota1 > 0) $nota1 = $oldNota->nota1;
-                if ($oldNota->nota2 > 0) $nota2 = $oldNota->nota2;
-                if ($oldNota->nota3 > 0) $nota3 = $oldNota->nota3;
-                if ($oldNota->nota4 > 0) $nota4 = $oldNota->nota4;
+                if ($oldNota->nota_per1 > 0) $nota1 = $oldNota->nota_per1;
+                if ($oldNota->nota_per2 > 0) $nota2 = $oldNota->nota_per2;
+                if ($oldNota->nota_per3 > 0) $nota3 = $oldNota->nota_per3;
+                if ($oldNota->nota_per4 > 0) $nota4 = $oldNota->nota4;
                 if (!empty($oldNota->observaciones)) $observaciones = $oldNota->observaciones;
 
                 // Recalcular definitiva con los valores bloqueados
@@ -458,25 +464,55 @@ class DocenteController extends Controller
             }
             // --------------------------
 
-            $newNota = Notas::updateOrCreate(
+            // --- VALIDACIÓN SECUENCIAL (Backend) ---
+            if (!$isAdmin) {
+                // Comprobar secuencia (P4 requiere P3, P3 requiere P2, P2 requiere P1)
+                $n1 = is_numeric($nota1) && $nota1 > 0 ? (float)$nota1 : 0;
+                $n2 = is_numeric($nota2) && $nota2 > 0 ? (float)$nota2 : 0;
+                $n3 = is_numeric($nota3) && $nota3 > 0 ? (float)$nota3 : 0;
+                $n4 = is_numeric($nota4) && $nota4 > 0 ? (float)$nota4 : 0;
+
+                $seqError = false;
+                if ($n4 > 0 && $n3 == 0) $seqError = true;
+                if ($n3 > 0 && $n2 == 0) $seqError = true;
+                if ($n2 > 0 && $n1 == 0) $seqError = true;
+                
+                if ($seqError) {
+                    $errors[] = "Secuencia de periodos inválida para el estudiante $nombre. Las notas deben registrarse en orden (P1 -> P2 -> P3 -> P4).";
+                    continue; // Skip saving this record
+                }
+
+                if ($n1 > 5 || $n2 > 5 || $n3 > 5 || $n4 > 5) {
+                    $errors[] = "Las calificaciones no pueden ser mayores a 5.0 para el estudiante $nombre.";
+                    continue;
+                }
+            }
+            // ---------------------------------------
+
+            $asignaturaObj = \App\Models\Asignatura::find($request->asignatura_id);
+            $gradoAprobadoTxt = ($matriculaFinal->grado->nombre_grado ?? '') . ' - ' . ($matriculaFinal->grado->bloque ?? '');
+
+            \App\Models\NotasDefinitivas::updateOrCreate(
                 [
-                    'matriculado_id' => $matricula->id,
+                    'id_matricula' => $matriculaFinal->id,
                     'asignatura_id' => $request->asignatura_id,
                 ],
                 [
-                    'estudiante_id' => $estudianteId,
-                    'grado_id' => $request->grado_id,
-                    'nota1' => $nota1,
-                    'nota2' => $nota2,
-                    'nota3' => $nota3,
-                    'nota4' => $nota4,
+                    'documento_estudiante' => $estudiante->numero_identificacion_estudiante,
+                    'nombre_estudiante' => $estudiante->user->name,
+                    'grado_aprobado' => $gradoAprobadoTxt,
+                    'nota_per1' => $nota1,
+                    'nota_per2' => $nota2,
+                    'nota_per3' => $nota3,
+                    'nota_per4' => $nota4,
                     'nota_definitiva' => $definitiva,
+                    'nombre_asignatura' => $asignaturaObj->nombre_asignatura ?? 'Desconocida',
+                    'curso' => $matriculaFinal->curso ?? '',
                     'observaciones' => $observaciones,
                 ]
             );
 
-            // Sincronización en tiempo real con NotasDefinitivas (Histórico/Certificados)
-            $this->syncToNotasDefinitivas($newNota);
+
 
             $savedCount++;
         }
@@ -507,10 +543,12 @@ class DocenteController extends Controller
     public function promoverEstudiantes(Request $request)
     {
         $request->validate([
-            'estudiantes' => 'required|array',
+            'estudiantes_promovidos' => 'nullable|array',
+            'estudiantes_reprobados' => 'nullable|array',
             'grado_destino_id' => 'required|exists:grado_academicos,id',
             'grado_origen_id' => 'required|exists:grado_academicos,id',
             'asignatura_id' => 'required|exists:asignaturas,id',
+            'ano_lectivo' => 'required',
         ]);
 
         $user = auth()->user();
@@ -525,117 +563,89 @@ class DocenteController extends Controller
             ->where('docente_id', $user->id)
             ->exists();
 
-        if (!$isSuperAdmin && !$isDirectorOfThisGrade && !$isAssignedTeacher) {
+        if (!$isSuperAdmin && (!$isDirectorOfThisGrade && !$isAssignedTeacher)) {
             abort(403, 'No tiene permisos para realizar promociones en este grado/asignatura.');
         }
 
+        $promovidos = $request->estudiantes_promovidos ?? [];
+        $reprobados = $request->estudiantes_reprobados ?? [];
+        $todos = array_merge($promovidos, $reprobados);
+
+        if (empty($todos)) {
+            return back()->with('swal', [
+                'icon' => 'warning',
+                'title' => 'Sin selección',
+                'text' => 'No se han seleccionado estudiantes procesar.'
+            ]);
+        }
+
+        $anoDestinoNum = intval($request->ano_lectivo) + 1;
+        $nombreAnoDestino = strval($anoDestinoNum);
+
+        $anoDestinoObj = AnhoEscolar::firstOrCreate(
+            ['nombre_anho_escolar' => $nombreAnoDestino],
+            ['estado_anho_escolar' => 0]
+        );
+
         $errors = [];
-        $promotedCount = 0;
-        $gradoDestino = GradoAcademico::findOrFail($request->grado_destino_id);
+        $processedCount = 0;
         $asignatura = Asignatura::findOrFail($request->asignatura_id);
 
-        foreach ($request->estudiantes as $estudianteId) {
+        foreach ($todos as $estudianteId) {
+            $isPromoted = in_array($estudianteId, $promovidos);
+            $targetGradoId = $isPromoted ? $request->grado_destino_id : $request->grado_origen_id;
+            $gradoDestinoObj = GradoAcademico::find($targetGradoId);
+
             $estudiante = Estudiante::with('user')->findOrFail($estudianteId);
-            
-            // Grado actual del estudiante (del cual se está promoviendo)
-            $gradoActual = GradoAcademico::find($estudiante->grado_academico_id);
 
-            // Buscar la nota de la asignatura actual
-            $nota = Notas::where('estudiante_id', $estudianteId)
-                ->where('asignatura_id', $request->asignatura_id)
-                ->where('grado_id', $estudiante->grado_academico_id)
-                ->first();
-
-            if (!$nota || $nota->nota_definitiva < 3) {
-                $defVal = $nota ? $nota->nota_definitiva : 'N/A';
-                $errors[] = "{$estudiante->user->name} no cumple el requisito (Nota: $defVal).";
-                continue;
-            }
-
-            // 0. Buscar la matrícula final actual para vincular las notas
+            // Validar si fue promovido pero nota < 3 (Solo log/warning, no bloqueamos x confirmación de JS)
             $currentMatriculaFinal = \App\Models\MatriculaFinal::where([
                 'documento_estudiante' => $estudiante->numero_identificacion_estudiante,
                 'id_grado'             => $request->grado_origen_id,
             ])->orderBy('id', 'desc')->first();
 
-            // 1. Almacenar en NotasDefinitivas (Histórico)
-            \App\Models\NotasDefinitivas::updateOrCreate(
-                [
-                    'documento_estudiante' => $estudiante->numero_identificacion_estudiante,
-                    'asignatura_id'        => $asignatura->id,
-                    'grado_aprobado'       => ($gradoActual->nombre_grado ?? 'N/A') . ' - ' . ($gradoActual->bloque ?? ''),
-                ],
-                [
-                    'id_matricula'      => $currentMatriculaFinal?->id,
-                    'nombre_estudiante' => $estudiante->user->name,
-                    'nombre_asignatura' => $asignatura->nombre_asignatura,
-                    'nota_per1'         => $nota->nota1 ?? 0,
-                    'nota_per2'         => $nota->nota2 ?? 0,
-                    'nota_per3'         => $nota->nota3 ?? 0,
-                    'nota_per4'         => $nota->nota4 ?? 0,
-                    'nota_definitiva'   => $nota->nota_definitiva,
-                    'curso'             => $gradoActual->bloque ?? '1',
-                ]
-            );
+            $notaDefinitiva = \App\Models\NotasDefinitivas::where('id_matricula', $currentMatriculaFinal?->id)
+                ->where('asignatura_id', $request->asignatura_id)
+                ->first();
 
-            // 2. Ascender al estudiante al grado destino
+            if ($isPromoted && (!$notaDefinitiva || $notaDefinitiva->nota_definitiva < 3)) {
+                $defVal = $notaDefinitiva ? $notaDefinitiva->nota_definitiva : 'N/A';
+                $errors[] = "{$estudiante->user->name} fue promovido a pesar de nota baja ($defVal).";
+            }
+
+            // Actualizar grado academico principal del estudiante
             $estudiante->update([
-                'grado_academico_id' => $request->grado_destino_id
+                'grado_academico_id' => $targetGradoId
             ]);
 
-            $anhoEscolarId = AnhoEscolar::where('estado_anho_escolar', 1)
-                ->orderBy('nombre_anho_escolar', 'desc')
-                ->first()?->id ?? 1;
-
-            $nuevaMatricula = Matriculado::updateOrCreate(
-                [
-                    'estudiante_id'   => $estudianteId,
-                    'grado_id'        => $request->grado_destino_id,
-                    'anho_escolar_id' => $anhoEscolarId,
-                ],
-                [
-                    'fecha_matricula' => now(),
-                    'estado'          => 'activo',
-                    'acudiente_id'    => $estudiante->acudiente_id ?? 1
-                ]
-            );
-
-            // Sincronizar con MatriculaFinal (usando el método privado si estuviera en un Trait, 
-            // pero como está en otro controlador lo hacemos manual o movemos el método. 
-            // Por simplicidad en este paso, lo replicamos o movemos a un Service).
-            // Replicamos la lógica aquí para este controlador:
+            // Crear matrícula oficial para el nuevo año y nuevo grado
             \App\Models\MatriculaFinal::updateOrCreate(
                 [
                     'documento_estudiante' => $estudiante->numero_identificacion_estudiante,
-                    'id_grado'             => $request->grado_destino_id,
-                    'ano_lectivo'          => AnhoEscolar::find($anhoEscolarId)->nombre_anho_escolar ?? date('Y'),
+                    'id_grado'             => $targetGradoId,
+                    'ano_lectivo'          => $nombreAnoDestino,
                 ],
                 [
-                    'id_sede'              => $gradoDestino->sede_id ?? 1,
-                    'curso'                => $gradoDestino->curso->nombre_curso ?? $gradoDestino->bloque ?? '1',
+                    'id_sede'              => $gradoDestinoObj->sede_id ?? 1,
+                    'curso'                => $gradoDestinoObj->curso->nombre_curso ?? $gradoDestinoObj->bloque ?? '1',
                     'fecha'                => now(),
                     'estado'               => 'activo',
-                    'id_profesor'          => $gradoDestino->docente_id ?? auth()->id(),
+                    'id_profesor'          => $gradoDestinoObj->docente_id ?? auth()->id(),
                     'documento_acudiente'  => $estudiante->acudiente->numero_identificacion_acudiente ?? null,
                     'parentezco_acudiente' => $estudiante->acudiente->parentezco ?? 'Padre/Madre',
                 ]
             );
 
-            $promotedCount++;
+            $processedCount++;
         }
 
-        if (count($errors) > 0) {
-            return back()->with('swal', [
-                'icon' => $promotedCount > 0 ? 'warning' : 'error',
-                'title' => $promotedCount > 0 ? 'Promoción Parcial' : 'Error',
-                'text' => implode('\n', $errors)
-            ]);
-        }
+        $numPromovidos = count($promovidos);
+        $numReprobados = count($reprobados);
 
         return back()->with('swal', [
             'icon' => 'success',
-            'title' => '¡Éxito!',
-            'text' => "Se han promovido $promotedCount estudiantes, se archivaron sus notas definitivas y se generaron sus nuevas matrículas."
+            'title' => '¡Procesamiento Exitoso!',
+            'text' => implode('\n', array_merge(["Se generaron matrículas para el año $nombreAnoDestino:", "- $numPromovidos Promovidos", "- $numReprobados No Promovidos"], $errors))
         ]);
     }
 

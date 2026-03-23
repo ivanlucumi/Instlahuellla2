@@ -21,6 +21,7 @@ class NotasDefinitivas extends Model
         'nota_definitiva',
         'nombre_asignatura',
         'curso',
+        'observaciones',
     ];
 
     public function asignatura()

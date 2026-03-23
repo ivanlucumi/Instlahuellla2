@@ -182,11 +182,7 @@
                     <td>{{ $nota->nota_per3 > 0 ? number_format($nota->nota_per3, 1) : '-' }}</td>
                     <td>{{ $nota->nota_per4 > 0 ? number_format($nota->nota_per4, 1) : '-' }}</td>
                     <td style="font-weight: bold;">
-                        @php
-                            $notasValidas = array_filter([$nota->nota_per1, $nota->nota_per2, $nota->nota_per3, $nota->nota_per4], fn($v) => $v > 0);
-                            $count = count($notasValidas);
-                        @endphp
-                        @if($count >= 3)
+                        @if($nota->nota_per3 > 0)
                             {{ number_format($nota->nota_definitiva, 1) }}
                         @else
                             -

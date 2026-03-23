@@ -19,7 +19,12 @@
                 @endif
             </div>
         </div>
-        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <div class="col-md-4 text-md-end mt-3 mt-md-0 d-flex justify-content-md-end gap-2">
+            @if($esAnoActual && $canEdit)
+                <button type="button" class="btn btn-primary rounded-pill px-4" onclick="enableMassEdit()">
+                    <i class="fa fa-edit me-1"></i> Habilitar Edición Masiva
+                </button>
+            @endif
             <a href="{{ route('docente.dashboard') }}" class="btn btn-outline-secondary rounded-pill px-4">
                 <i class="fa fa-arrow-left me-1"></i> Volver al Panel
             </a>
@@ -60,6 +65,10 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    @php
+                                        $userObj = auth()->user();
+                                        $isAdmin = $userObj->hasRol('SUPERADMIN') || $userObj->hasRol('RECTOR');
+                                    @endphp
                                     @foreach($estudiantes as $estudiante)
                                         @php
                                             $notaObj = $estudiante->notas->first(); 
@@ -147,31 +156,33 @@
                                     <i class="bi bi-mortarboard-fill me-2 text-secondary"></i> Promover Estudiantes
                                 </h5>
                                 
-                                <form action="{{ route('docente.estudiantes.promover') }}" method="POST" id="promote-form">
-                                    @csrf
-                                    <input type="hidden" name="asignatura_id" value="{{ $asignatura->id }}">
-                                    <input type="hidden" name="grado_origen_id" value="{{ $grado->id }}">
+                                    <form action="{{ route('docente.estudiantes.promover') }}" method="POST" id="promote-form">
+                                        @csrf
+                                        <input type="hidden" name="ano_lectivo" value="{{ $anoLectivo }}">
+                                        <input type="hidden" name="asignatura_id" value="{{ $asignatura->id }}">
+                                        <input type="hidden" name="grado_origen_id" value="{{ $grado->id }}">
                                     <div id="selected-students-container"></div>
                                     
-                                    <div class="row g-3">
-                                        <div class="col-md-5">
-                                            <label class="form-label text-dark small fw-bold">Grado de Destino</label>
-                                            <select name="grado_destino_id" class="form-select border-0 shadow-sm" required>
-                                                <option value="">Seleccione el curso...</option>
-                                                @foreach($todosLosGrados as $g)
-                                                    <option value="{{ $g->id }}">{{ $g->nombre_grado }} - {{ $g->bloque }}</option>
-                                                @endforeach
-                                            </select>
+                                            <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label text-dark small fw-bold">Grado Destino (Promovidos)</label>
+                                                <select name="grado_destino_id" class="form-select border-0 shadow-sm" required>
+                                                    <option value="">Seleccione curso superior...</option>
+                                                    @foreach($todosLosGrados as $g)
+                                                        <option value="{{ $g->id }}">{{ $g->nombre_grado }} - {{ $g->bloque }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <div class="form-text mt-2"><i class="bi bi-info-circle"></i> Los estudiantes NO promovidos permanecerán en el grado actual automáticamente en el año siguiente ({{ (intval($anoLectivo) + 1) }}).</div>
+                                            </div>
+                                            <div class="col-md-6 mt-4 d-flex justify-content-end align-items-start gap-2">
+                                                <button type="button" onclick="submitPromotion('manual')" class="btn btn-dark rounded-pill px-4">
+                                                    <i class="bi bi-person-check me-1"></i> Promover (Manual)
+                                                </button>
+                                                <button type="button" onclick="submitPromotion('total')" class="btn btn-outline-dark rounded-pill px-4">
+                                                    <i class="bi bi-people-fill me-1"></i> Promover Inteligente (x Notas)
+                                                </button>
+                                            </div>
                                         </div>
-                                        <div class="col-md-7 d-flex align-items-end gap-2">
-                                            <button type="button" onclick="submitPromotion('manual')" class="btn btn-dark rounded-pill px-4">
-                                                <i class="bi bi-person-check me-1"></i> Promover Seleccionados
-                                            </button>
-                                            <button type="button" onclick="submitPromotion('total')" class="btn btn-outline-dark rounded-pill px-4">
-                                                <i class="bi bi-people-fill me-1"></i> Promover Grupo Apto
-                                            </button>
-                                        </div>
-                                    </div>
                                 </form>
                             </div>
                         </div>
@@ -257,18 +268,26 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Requerir observaciones visualmente si hay calificacion
-        if (hasValues) {
+        // Requerir observaciones y habilitarlo SOLO si P3 tiene nota
+        const isEditingRow = row.classList.contains('row-editing');
+        
+        if (n3 > 0) {
+            if (isEditingRow) {
+                obsInput.readOnly = false;
+                obsInput.classList.remove('bg-light');
+                obsInput.classList.add('bg-white');
+            }
             if (obsInput.value.trim() === '') {
                 obsInput.classList.add('border', 'border-warning');
-                obsInput.classList.remove('border-0');
+                obsInput.classList.remove('border-0', 'border-secondary');
             } else {
                 obsInput.classList.remove('border', 'border-warning');
                 obsInput.classList.add('border-0');
             }
         } else {
-            obsInput.classList.remove('border', 'border-warning');
-            obsInput.classList.add('border-0');
+            obsInput.readOnly = true;
+            obsInput.classList.add('bg-light', 'border-0');
+            obsInput.classList.remove('bg-white', 'border', 'border-warning', 'border-secondary');
         }
 
         validateForm();
@@ -283,25 +302,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
         editedRows.forEach(row => {
             const studentId = row.id.replace('row-', '');
-            const studentInputs = row.querySelectorAll('.nota-input');
+            const n3Val = parseFloat(row.querySelector(`input[name="notas[${studentId}][nota3]"]`).value) || 0;
             const obsInput = row.querySelector('.obs-input');
             
-            let hasGrades = false;
-            studentInputs.forEach(input => {
-                if (input.value !== '') hasGrades = true;
-            });
-
-            if (hasGrades && obsInput.value.trim() === '') {
+            if (n3Val > 0 && obsInput.value.trim() === '') {
                 allValid = false;
             }
         });
 
         saveBtn.disabled = !anyChanges || !allValid;
         editWarning.style.display = (anyChanges && !allValid) ? 'inline' : 'none';
+        if (anyChanges && !allValid) {
+            editWarning.innerHTML = '<i class="bi bi-info-circle me-1 text-warning"></i> Complete las observaciones en P3 para guardar.';
+        }
     }
 
     inputs.forEach(input => {
         input.addEventListener('input', function() {
+            if (parseFloat(this.value) > 5) {
+                this.value = '5.0';
+            }
             calculateRow(this.dataset.student);
         });
     });
@@ -313,26 +333,70 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    window.enableMassEdit = function() {
+        checkboxes.forEach(cb => {
+            enableEdit(cb.value);
+        });
+        const btn = event.currentTarget;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-check-circle"></i> Edición Habilitada';
+    };
+
     window.enableEdit = function(studentId) {
         const row = document.getElementById(`row-${studentId}`);
-        const inputs = row.querySelectorAll('.nota-input, .obs-input');
+        const inputs = row.querySelectorAll('.nota-input');
+        const obsInput = row.querySelector('.obs-input');
         const btn = row.querySelector('.edit-btn');
+        const isAdmin = {{ $isAdmin ? 'true' : 'false' }};
 
         row.classList.add('row-editing', 'table-primary');
-        row.style.backgroundColor = 'rgba(13, 110, 253, 0.1)';
+        row.style.backgroundColor = 'rgba(13, 110, 253, 0.05)';
         
-        inputs.forEach(input => {
-            input.readOnly = false;
-            input.classList.remove('border-0');
-            input.classList.add('border-secondary');
+        let firstEmptyFound = false;
+        
+        inputs.forEach((input, index) => {
+            const hasValue = parseFloat(input.value) > 0;
+            
+            if (isAdmin) {
+                // Admin puede editar todo lo que no sea histórico
+                input.readOnly = false;
+                input.classList.remove('bg-light', 'border-0');
+                input.classList.add('bg-white', 'border-secondary');
+            } else {
+                // Docente: solo el primer vacío si los anteriores están llenos
+                if (!hasValue && !firstEmptyFound) {
+                    // Verificar si es el primero o si el anterior tiene valor
+                    let canEnable = true;
+                    if (index > 0) {
+                        const prevInput = inputs[index-1];
+                        if (!(parseFloat(prevInput.value) > 0)) {
+                            canEnable = false;
+                        }
+                    }
+                    
+                    if (canEnable) {
+                        input.readOnly = false;
+                        input.classList.remove('bg-light', 'border-0');
+                        input.classList.add('bg-white', 'border-primary', 'border-2');
+                        input.style.boxShadow = '0 0 0 0.2rem rgba(13, 110, 253, 0.1)';
+                        firstEmptyFound = true;
+                    }
+                } else {
+                    input.readOnly = true;
+                    input.classList.add('bg-light', 'text-muted');
+                    input.style.opacity = '0.7';
+                }
+            }
         });
 
-        btn.classList.remove('btn-outline-info');
-        btn.classList.add('btn-info');
-        btn.innerHTML = '<i class="fa fa-unlock"></i> Editando';
-        btn.disabled = true;
+        if (btn) {
+            btn.innerHTML = '<i class="fa fa-unlock"></i> Editando';
+            btn.disabled = true;
+            btn.classList.add('text-muted');
+        }
 
-        validateForm();
+        // Trigger calculaterow to update visual state correctly based on P3 dynamically
+        calculateRow(studentId);
     };
 });
 
@@ -341,49 +405,75 @@ function submitPromotion(type) {
     const container = document.getElementById('selected-students-container');
     container.innerHTML = '';
     
-    let selectedIds = [];
+    const gradoDestino = form.querySelector('[name="grado_destino_id"]').value;
+
+    if (!gradoDestino) {
+        alert('Por favor seleccione el Grado Destino para los promovidos.');
+        return;
+    }
+
+    let promovidos = [];
+    let reprobados = [];
     let ineligibleStudents = [];
     
     if (type === 'manual') {
         const checked = document.querySelectorAll('.student-checkbox:checked');
-        if (checked.length === 0) {
-            alert('Por favor seleccione al menos un estudiante.');
+        if (checked.length === 0 && !confirm('No ha seleccionado ningún estudiante para promover. ¿Desea continuar registrando a todos como NO promovidos?')) {
             return;
         }
         
-        checked.forEach(cb => {
-            if (cb.dataset.apto === '1') {
-                selectedIds.push(cb.value);
+        document.querySelectorAll('.student-checkbox').forEach(cb => {
+            if (cb.checked) {
+                if (cb.dataset.apto === '1') {
+                    promovidos.push(cb.value);
+                } else {
+                    ineligibleStudents.push(cb.dataset.nombre);
+                    // Los forzamos a repetidores si no cumplen, a pesar de estar chuleados?
+                    // Según instrucción, solo validamos advertencia
+                }
             } else {
-                ineligibleStudents.push(cb.dataset.nombre);
+                reprobados.push(cb.value);
             }
         });
 
         if (ineligibleStudents.length > 0) {
-            alert('Los siguientes estudiantes no son aptos para promoción (Nota < 3.0 o sin notas):\n- ' + ineligibleStudents.join('\n- '));
-            if (selectedIds.length === 0) return;
-            if (!confirm('¿Desea continuar promoviendo solo a los estudiantes aptos?')) return;
+            alert('ADVERTENCIA: Ha seleccionado estudiantes que no cumplen con la nota (menor a 3.0):\n- ' + ineligibleStudents.join('\n- '));
+            if (!confirm('¿Desea CUALQUIER MODO promoverlos? Si elige Cancelar, detendremos la operación.')) {
+                return;
+            } else {
+                // If they confirm, we add them to promovidos
+                document.querySelectorAll('.student-checkbox:checked').forEach(cb => {
+                    if (cb.dataset.apto !== '1') promovidos.push(cb.value);
+                });
+            }
         }
     } else {
-        const all = document.querySelectorAll('.student-checkbox');
-        all.forEach(cb => {
+        // Total - Inteligente
+        document.querySelectorAll('.student-checkbox').forEach(cb => {
             if (cb.dataset.apto === '1') {
-                selectedIds.push(cb.value);
+                promovidos.push(cb.value);
+            } else {
+                reprobados.push(cb.value);
             }
         });
 
-        if (selectedIds.length === 0) {
-            alert('No hay estudiantes aptos para promoción en este grupo.');
+        if (!confirm(`Se promoverán automáticamente ${promovidos.length} estudiantes aprobados y ${reprobados.length} estudiantes repetirán el año. ¿Está seguro?`)) {
             return;
         }
-
-        if (!confirm('Se promoverán ' + selectedIds.length + ' estudiantes aptos. ¿Está seguro?')) return;
     }
 
-    selectedIds.forEach(id => {
+    promovidos.forEach(id => {
         const input = document.createElement('input');
         input.type = 'hidden';
-        input.name = 'estudiantes[]';
+        input.name = 'estudiantes_promovidos[]';
+        input.value = id;
+        container.appendChild(input);
+    });
+
+    reprobados.forEach(id => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'estudiantes_reprobados[]';
         input.value = id;
         container.appendChild(input);
     });
