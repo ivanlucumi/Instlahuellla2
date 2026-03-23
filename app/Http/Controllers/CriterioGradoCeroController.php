@@ -32,16 +32,25 @@ class CriterioGradoCeroController extends Controller
     {
         $request->validate([
             'asignatura_id' => 'required|exists:asignaturas,id',
-            'nombre_criterio' => 'required|string|max:255',
+            'criterios' => 'required|array|min:1',
+            'criterios.*' => 'required|string|max:255',
             'estado' => 'boolean',
         ]);
 
-        CriterioGradoCero::create($request->all());
+        foreach ($request->criterios as $nombre) {
+            if ($nombre) {
+                CriterioGradoCero::create([
+                    'asignatura_id' => $request->asignatura_id,
+                    'nombre_criterio' => $nombre,
+                    'estado' => $request->estado ?? 1,
+                ]);
+            }
+        }
 
         return redirect()->route('admin.grado-cero.criterios.index')->with('swal', [
             'icon' => 'success',
             'title' => '¡Éxito!',
-            'text' => 'El criterio ha sido creado correctamente.'
+            'text' => 'Los criterios han sido creados correctamente.'
         ]);
     }
 

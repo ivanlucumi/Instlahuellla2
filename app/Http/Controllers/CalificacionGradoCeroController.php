@@ -81,10 +81,19 @@ class CalificacionGradoCeroController extends Controller
             ->get()
             ->sortBy('user.name');
 
-        // Obtenemos todos los criterios de todas las asignaturas del grado
-        $asignaturasIds = $grado->asignaturas->pluck('id');
+        // Obtenemos todos los criterios de todas las asignaturas relevantes para Grado Cero
+        // (Dimensiones, Cero, Transición)
+        $asignaturasCero = Asignatura::whereHas('hilo', function($q) {
+            $q->where('nombre_hilo', 'LIKE', '%CERO%')
+              ->orWhere('nombre_hilo', 'LIKE', '%TRANSICION%')
+              ->orWhere('nombre_hilo', 'LIKE', '%DIMENSION%');
+        })->orWhereHas('grados', function($q) {
+            $q->where('nombre_grado', 'LIKE', '%TRANSICION%')
+              ->orWhere('nombre_grado', 'LIKE', '%CERO%');
+        })->pluck('id');
+
         $criterios = CriterioGradoCero::with('asignatura')
-            ->whereIn('asignatura_id', $asignaturasIds)
+            ->whereIn('asignatura_id', $asignaturasCero)
             ->where('estado', 1)
             ->get()
             ->groupBy('asignatura.nombre_asignatura');
@@ -182,10 +191,18 @@ class CalificacionGradoCeroController extends Controller
 
         $grado = $estudiante->gradoAcademico;
         
-        // Criterios agrupados por asignatura
-        $asignaturasIds = $grado->asignaturas->pluck('id');
+        // Criterios agrupados por asignatura (Matriz Completa de Grado Cero)
+        $asignaturasCero = Asignatura::whereHas('hilo', function($q) {
+            $q->where('nombre_hilo', 'LIKE', '%CERO%')
+              ->orWhere('nombre_hilo', 'LIKE', '%TRANSICION%')
+              ->orWhere('nombre_hilo', 'LIKE', '%DIMENSION%');
+        })->orWhereHas('grados', function($q) {
+            $q->where('nombre_grado', 'LIKE', '%TRANSICION%')
+              ->orWhere('nombre_grado', 'LIKE', '%CERO%');
+        })->pluck('id');
+
         $criterios = CriterioGradoCero::with('asignatura')
-            ->whereIn('asignatura_id', $asignaturasIds)
+            ->whereIn('asignatura_id', $asignaturasCero)
             ->where('estado', 1)
             ->get()
             ->groupBy('asignatura.nombre_asignatura');

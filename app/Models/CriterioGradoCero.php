@@ -25,4 +25,5 @@ class CriterioGradoCero extends Model
     {
         return $this->hasMany(CalificacionGradoCero::class, 'criterio_id');
     }
+    
 }
