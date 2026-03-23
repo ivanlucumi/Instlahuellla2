@@ -18,8 +18,8 @@ class CursoController extends Controller
             $query->where('nombre_curso', 'LIKE', '%' . $request->search . '%');
         }
 
-        $perPage = $request->get('per_page', 10);
-        $cursos = $query->orderBy('id', 'desc')->paginate($perPage)->appends($request->all());
+        $perPage = $request->get('per_page', 30);
+        $cursos = $query->orderBy('nombre_curso', 'asc')->paginate($perPage)->appends($request->all());
 
         return view('Curso.Index', compact('cursos'));
     }

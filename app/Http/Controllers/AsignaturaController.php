@@ -34,8 +34,8 @@ class AsignaturaController extends Controller
             $query->where('nivel_educativo', $request->nivel_educativo);
         }
 
-        $perPage = $request->get('per_page', 15);
-        $asignaturas = $query->orderBy('id', 'desc')->paginate($perPage)->appends($request->all());
+        $perPage = $request->get('per_page', 50);
+        $asignaturas = $query->orderBy('nombre_asignatura', 'asc')->paginate($perPage)->appends($request->all());
         
         $hilos = \App\Models\Hilo::orderBy('nombre_hilo')->get();
         return view('Asignatura.Index', compact('asignaturas', 'hilos'));

@@ -90,8 +90,8 @@ class GradoAcademicoController extends Controller
             }
         }
 
-        $perPage = $request->get('per_page', 15);
-        $grados = $query->orderBy('id', 'desc')->paginate($perPage)->appends($request->all());
+        $perPage = $request->get('per_page', 30);
+        $grados = $query->orderBy('nombre_grado', 'asc')->paginate($perPage)->appends($request->all());
         
         return view('GradoAcademico.Index', compact('grados', 'cursos', 'anhos', 'allGrados', 'asignaturas', 'enrollmentsResults', 'searchSummary', 'currentAnho'));
     }
@@ -232,8 +232,6 @@ class GradoAcademicoController extends Controller
             ->where('id_sede', $gradoAcademico->sede_id) // Filter by the grade's sede
             ->where('estado', '!=', 'Retirado')
             ->get();
-
-           // DD($cursoTarget, $gradoAcademico->sede_id, $anoLectivo, $gradoAcademico);
         
         $documentosMatriculados = $matriculadosMF->pluck('documento_estudiante');
 

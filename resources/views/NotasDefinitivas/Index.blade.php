@@ -80,7 +80,7 @@
                                 <th scope="col" class="text-center">P3</th>
                                 <th scope="col" class="text-center">P4</th>
                                 <th scope="col" class="text-center">Def.</th>
-                                @if(auth()->user()->hasRol('SUPERADMIN'))
+                                @if(auth()->user()->hasRol('SUPERADMIN1'))
                                     <th scope="col">Acciones</th>
                                 @endif
                             </tr>
@@ -98,13 +98,13 @@
                                     <td class="text-center">{{ $nota->nota_per3 }}</td>
                                     <td class="text-center">{{ $nota->nota_per4 }}</td>
                                     <td class="text-center fw-bold text-primary">{{ $nota->nota_definitiva }}</td>
-                                    @if(auth()->user()->hasRol('SUPERADMIN'))
+                                    @if(auth()->user()->hasRol('SUPERADMIN1'))
                                         <td>
                                             <div class="btn-group" role="group">
                                                 <a href="{{ route('admin.notas-definitivas.edit', $nota->id) }}" 
                                                    class="btn btn-sm btn-warning me-1"
                                                    title="Editar">
-                                                    <i class="fa fa-pen"></i>
+                                                    <i class="fa fa-pen" disabled></i>
                                                 </a>
                                                 
                                                 <form action="{{ route('admin.notas-definitivas.destroy', $nota->id) }}" 
@@ -116,7 +116,7 @@
                                                             class="btn btn-sm btn-danger"
                                                             title="Eliminar"
                                                             onclick="return confirm('¿Está seguro de eliminar este registro?')">
-                                                        <i class="fa fa-trash"></i>
+                                                        <i class="fa fa-trash" disabled></i>
                                                     </button>
                                                 </form>
                                             </div>

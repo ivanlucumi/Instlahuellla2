@@ -151,6 +151,21 @@ Route::middleware(['auth', 'role_secure:SUPERADMIN,ADMIN,DIRECTOR'])
 
         Route::get('/pazysalvo', [App\Http\Controllers\PazYSalvoController::class, 'index'])->name('admin.pazysalvo.index');
         Route::get('/pazysalvo/generar', [App\Http\Controllers\PazYSalvoController::class, 'generar'])->name('admin.pazysalvo.generar');
+
+        // RUTAS GRADO CERO (TRANSICIÓN)
+        Route::prefix('grado-cero')->group(function () {
+            // Criterios (SuperAdmin)
+            Route::resource('criterios', App\Http\Controllers\CriterioGradoCeroController::class)->names('admin.grado-cero.criterios');
+            
+            // Calificaciones (Director/Docente)
+            Route::get('/calificaciones', [App\Http\Controllers\CalificacionGradoCeroController::class, 'index'])->name('admin.grado-cero.calificaciones.index');
+            Route::get('/calificaciones/matriz', [App\Http\Controllers\CalificacionGradoCeroController::class, 'matrix'])->name('admin.grado-cero.calificaciones.matrix');
+            Route::post('/calificaciones/guardar', [App\Http\Controllers\CalificacionGradoCeroController::class, 'store'])->name('admin.grado-cero.calificaciones.store');
+            
+            // Descargas de Boletines
+            Route::get('/boletin/estudiante/{estudiante}/{periodo}/{anho}', [App\Http\Controllers\CalificacionGradoCeroController::class, 'descargarBoletin'])->name('admin.grado-cero.boletin.descargar');
+            Route::get('/boletin/grupo/{grado}/{periodo}/{anho}', [App\Http\Controllers\CalificacionGradoCeroController::class, 'descargarGrupo'])->name('admin.grado-cero.boletin.grupo');
+        });
     });
 
 // RUTAS PARA ESTUDIANTE
