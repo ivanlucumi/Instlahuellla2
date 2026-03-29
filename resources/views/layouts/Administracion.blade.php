@@ -5,7 +5,7 @@
     <meta charset="utf-8">
      <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>DarkPan - Bootstrap 5 Admin Template</title>
+    {{-- Title is set dynamically below --}}
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -59,7 +59,24 @@
         }
     </style>
 
-    <title>@yield('title')</title>
+    @php
+        $user = auth()->user();
+        $rolLabel = 'Usuario';
+        if ($user) {
+            if ($user->hasRol('SUPERADMIN'))      $rolLabel = 'SuperAdmin';
+            elseif ($user->hasRol('ADMIN'))       $rolLabel = 'Administrador';
+            elseif ($user->hasRol('RECTOR'))      $rolLabel = 'Rector';
+            elseif ($user->hasRol('SECRETARIO'))  $rolLabel = 'Secretario';
+            elseif ($user->hasRol('DIRECTOR'))    $rolLabel = 'Director de Grado';
+            elseif ($user->hasRol('DOCENTE'))     $rolLabel = 'Docente';
+            elseif ($user->hasRol('ESTUDIANTE'))  $rolLabel = 'Estudiante';
+        }
+        $pageTitle = trim($__env->yieldContent('title'));
+        $fullTitle  = $pageTitle
+            ? $rolLabel . ' | ' . $pageTitle . ' — IET La Huella'
+            : $rolLabel . ' — IET La Huella';
+    @endphp
+    <title>{{ $fullTitle }}</title>
     
 
     <!-- Favicon -->
@@ -208,6 +225,16 @@
                             @endif
 
                         @endforeach
+                        
+                        {{-- SECCIÓN DE SEGURIDAD (PARA RECTOR Y ADMINS) --}}
+                        @if(auth()->user()->hasRol('RECTOR') || auth()->user()->hasRol('SUPERADMIN') || auth()->user()->hasRol('ADMIN'))
+                            <div class="nav-item">
+                                <a href="{{ route('admin.usuarios.password-reset') }}" 
+                                   class="nav-link {{ request()->routeIs('admin.usuarios.password-reset') ? 'active' : '' }}">
+                                    <i class="fa fa-user-shield me-2"></i> Seguridad
+                                </a>
+                            </div>
+                        @endif
 
                     @endauth
 
@@ -242,9 +269,15 @@
                             <span class="d-none d-lg-inline-flex">{{ auth()->user()->name }}</span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom m-0">
+                            <a href="{{ route('profile.edit') }}" class="dropdown-item">
+                                <i class="fa fa-user-circle me-2"></i> Mi Perfil
+                            </a>
+                            <div class="dropdown-divider border-secondary opacity-50"></div>
                            <form action="{{ route('logout') }}" method="POST">
                                 @csrf
-                                <button type="submit" class="dropdown-item">Cerrar Sesi&oacute;n</button>
+                                <button type="submit" class="dropdown-item text-danger">
+                                    <i class="fa fa-sign-out-alt me-2"></i> Cerrar Sesión
+                                </button>
                             </form> 
                         </div>
                     </div>
@@ -269,15 +302,13 @@
 
             <!-- Footer Start -->
             <div class="container-fluid pt-4 px-4 mt-auto">
-                <div class="bg-secondary rounded-top p-4">
-                    <div class="row">
-                        <div class="col-12 col-sm-6 text-center text-sm-start">
-                            &copy; <a href="#">Your Site Name</a>, All Right Reserved. 
+                <div class="rounded-top p-4 shadow-sm" style="background:#fff !important; border-top: 1px solid #e2e8f0;">
+                    <div class="row align-items-center">
+                        <div class="col-12 col-sm-6 text-center text-sm-start text-muted small">
+                            &copy; {{ date('Y') }} <span class="fw-bold text-primary">IET La Huella</span>. Todos los derechos reservados.
                         </div>
-                        <div class="col-12 col-sm-6 text-center text-sm-end">
-                            <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
-                            Designed By <a href="https://htmlcodex.com">HTML Codex</a>
-                            <br>Distributed By: <a href="https://themewagon.com" target="_blank">ThemeWagon</a>
+                        <div class="col-12 col-sm-6 text-center text-sm-end text-muted small">
+                            Desarrollado por: <span class="fw-bold" style="color:#334155;">IL, WR</span>
                         </div>
                     </div>
                 </div>

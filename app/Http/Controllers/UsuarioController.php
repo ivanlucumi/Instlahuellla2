@@ -4,9 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Rol;
+use App\Models\Docente;
+use App\Models\Estudiante;
+use App\Models\Acudiente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class UsuarioController extends Controller
 {
@@ -69,42 +73,57 @@ class UsuarioController extends Controller
         ]);
 
         DB::transaction(function() use ($request) {
+            // NOTE: The User model has 'password' => 'hashed' cast,
+            // so we pass the PLAIN password and Eloquent hashes it automatically.
             $user = User::create([
                 'name'     => $request->name,
                 'email'    => $request->email,
-                'password' => Hash::make($request->password),
+                'password' => $request->password, // cast handles hashing
                 'genero'   => $request->genero,
             ]);
 
             $user->roles()->attach($request->roles);
 
-            // Automatización: crear perfil de docente o estudiante según el rol asignado
+            // Auto-create profile based on assigned role
             $roleNames = Rol::whereIn('id', $request->roles)->pluck('nombre')->toArray();
 
             if (in_array('DOCENTE', $roleNames)) {
-                \App\Models\Docente::firstOrCreate(
+                Docente::firstOrCreate(
                     ['user_id' => $user->id],
                     [
-                        'codigo_docente' => 'DOC-' . strtoupper(substr(uniqid(), -6)),
+                        'codigo_docente' => 'DOC-' . strtoupper(Str::random(6)),
                         'genero_docente' => $request->genero ?? 'Masculino',
-                        'foto_docente'   => 'default.png',
+                        'foto_docente'   => 'images/default_user.png',
                         'estado_docente' => true,
                     ]
                 );
             }
 
             if (in_array('ESTUDIANTE', $roleNames)) {
-                \App\Models\Estudiante::firstOrCreate(
+                Estudiante::firstOrCreate(
                     ['user_id' => $user->id],
                     [
-                        'codigo_estudiante' => 'EST-' . strtoupper(substr(uniqid(), -6)),
-                        'genero_estudiante' => $request->genero ?? 'Masculino',
-                        'foto_estudiante'   => 'images/default_user.png',
-                        'email_estudiante'  => $request->email,
-                        'estado_estudiante' => true,
-                        'anho_curso_estudiante' => date('Y'),
-                        'tipo_identificacion_estudiante' => 'TI',
-                        'numero_identificacion_estudiante' => 'ID-' . strtoupper(substr(uniqid(), -6)),
+                        'codigo_estudiante'                => 'EST-' . strtoupper(Str::random(6)),
+                        'genero_estudiante'                => $request->genero ?? 'Masculino',
+                        'foto_estudiante'                  => 'images/default_user.png',
+                        'email_estudiante'                 => $request->email,
+                        'estado_estudiante'                => true,
+                        'anho_curso_estudiante'            => date('Y'),
+                        'tipo_identificacion_estudiante'   => 'TI',
+                        'numero_identificacion_estudiante' => 'ID-' . strtoupper(Str::random(8)),
+                    ]
+                );
+            }
+
+            if (in_array('ACUDIENTE', $roleNames)) {
+                Acudiente::firstOrCreate(
+                    ['user_id' => $user->id],
+                    [
+                        'celular_acudiente'    => '',
+                        'direccion_acudiente'  => '',
+                        'genero_acudiente'     => $request->genero ?? 'Masculino',
+                        'parentesco_acudiente' => 'Familiar',
+                        'estado_acudiente'     => true,
                     ]
                 );
             }
@@ -148,7 +167,8 @@ class UsuarioController extends Controller
             ];
 
             if ($request->filled('password')) {
-                $data['password'] = Hash::make($request->password);
+                // Pass plain password; the 'hashed' cast will hash it automatically
+                $data['password'] = $request->password;
             }
 
             $user->update($data);

@@ -15,6 +15,17 @@ Route::get('/logout', function () {
     return redirect('/login');
 })->name('logout.get');
 
+// PERFIL DE USUARIO (Acceso para todos los roles)
+Route::middleware(['auth'])->group(function () {
+    Route::get('institucion/perfil', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('institucion/perfil', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+});
+
+// Confirmación de cambio de correo (Signed Route)
+Route::get('institucion/perfil/confirmar-correo/{user}/{email}', [App\Http\Controllers\ProfileController::class, 'confirmEmail'])
+    ->name('profile.confirm-email')
+    ->middleware('signed');
+
 // DASHBOARD PRINCIPAL (Redireccionador)
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
@@ -30,6 +41,10 @@ Route::middleware(['auth', 'role_secure:SUPERADMIN,ADMIN'])
         Route::get('/usuarios/{user}/editar', [App\Http\Controllers\UsuarioController::class, 'edit'])->name('admin.usuarios.edit');
         Route::put('/usuarios/{user}', [App\Http\Controllers\UsuarioController::class, 'update'])->name('admin.usuarios.update');
         Route::delete('/usuarios/{user}', [App\Http\Controllers\UsuarioController::class, 'destroy'])->name('admin.usuarios.destroy');
+
+        // GESTIÓN DE SEGURIDAD (PARA RECTOR Y ADMINS)
+        Route::get('/gestion-claves', [App\Http\Controllers\UserManagementController::class, 'index'])->name('admin.usuarios.password-reset');
+        Route::put('/gestion-claves/{user}/actualizar', [App\Http\Controllers\UserManagementController::class, 'updatePassword'])->name('admin.usuarios.update-password');
 
         Route::get('/institucion', [App\Http\Controllers\InstitucionController::class, 'Index'])->name('admin.institucion.index');
         Route::get('/institucion/crear', [App\Http\Controllers\InstitucionController::class, 'Create'])->name('admin.institucion.create');
@@ -154,8 +169,8 @@ Route::middleware(['auth', 'role_secure:SUPERADMIN,ADMIN,DIRECTOR'])
         Route::get('/certificados/grupo', [App\Http\Controllers\CertificadoController::class, 'generarGrupo'])->name('admin.certificados.generar-grupo');
         Route::get('/certificados/matricula/{id}', [App\Http\Controllers\CertificadoController::class, 'generarPorMatricula'])->name('admin.certificados.por-matricula');
 
-        Route::get('/pazysalvo', [App\Http\Controllers\PazYSalvoController::class, 'index'])->name('admin.pazysalvo.index');
-        Route::get('/pazysalvo/generar', [App\Http\Controllers\PazYSalvoController::class, 'generar'])->name('admin.pazysalvo.generar');
+        // Route::get('/pazysalvo', [App\Http\Controllers\PazYSalvoController::class, 'index'])->name('admin.pazysalvo.index');
+        // Route::get('/pazysalvo/generar', [App\Http\Controllers\PazYSalvoController::class, 'generar'])->name('admin.pazysalvo.generar');
 
         // RUTAS GRADO CERO (TRANSICIÓN)
         Route::prefix('grado-cero')->group(function () {
