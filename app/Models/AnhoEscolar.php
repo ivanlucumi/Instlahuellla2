@@ -6,8 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Asignatura;
 
+use App\Traits\Auditable;
+
 class AnhoEscolar extends Model
 {
+    use Auditable;
     protected $table = 'anho_escolar';
     protected $fillable = [
         'nombre_anho_escolar',

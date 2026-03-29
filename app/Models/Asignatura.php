@@ -7,8 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Hilo;
 use App\Models\GradoAcademico;
 
+use App\Traits\Auditable;
+
 class Asignatura extends Model
 {
+    use Auditable;
     protected $table = 'asignaturas';
     protected $fillable = [
         'nombre_asignatura',

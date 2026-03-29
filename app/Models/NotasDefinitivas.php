@@ -8,6 +8,7 @@ use App\Traits\Auditable;
 
 class NotasDefinitivas extends Model
 {
+    use Auditable;
     protected $fillable = [
         'id_matricula',
         'asignatura_id',

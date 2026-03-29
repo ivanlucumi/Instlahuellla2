@@ -4,8 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+use App\Traits\Auditable;
+
 class GradoAcademico extends Model
 {
+    use Auditable;
     //
     protected $table = 'grado_academicos';
     protected $fillable = [

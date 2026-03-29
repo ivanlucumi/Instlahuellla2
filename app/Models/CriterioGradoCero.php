@@ -6,8 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use App\Traits\Auditable;
+
 class CriterioGradoCero extends Model
 {
+    use Auditable;
     protected $table = 'criterios_grado_cero';
 
     protected $fillable = [

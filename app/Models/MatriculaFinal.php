@@ -4,8 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+use App\Traits\Auditable;
+
 class MatriculaFinal extends Model
 {
+    use Auditable;
     protected $table = 'matricula_finals';
 
     protected $fillable = [

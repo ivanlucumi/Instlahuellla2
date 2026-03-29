@@ -7,8 +7,11 @@ use App\Models\RolUser;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Traits\Auditable;
+
 class Rol extends Model
 {
+    use Auditable;
     //  Tabla
     protected $table = 'rol';
     protected $fillable = [
