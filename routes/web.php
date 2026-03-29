@@ -169,8 +169,8 @@ Route::middleware(['auth', 'role_secure:SUPERADMIN,ADMIN,DIRECTOR'])
         Route::get('/certificados/grupo', [App\Http\Controllers\CertificadoController::class, 'generarGrupo'])->name('admin.certificados.generar-grupo');
         Route::get('/certificados/matricula/{id}', [App\Http\Controllers\CertificadoController::class, 'generarPorMatricula'])->name('admin.certificados.por-matricula');
 
-        // Route::get('/pazysalvo', [App\Http\Controllers\PazYSalvoController::class, 'index'])->name('admin.pazysalvo.index');
-        // Route::get('/pazysalvo/generar', [App\Http\Controllers\PazYSalvoController::class, 'generar'])->name('admin.pazysalvo.generar');
+        Route::get('/pazysalvo', [App\Http\Controllers\PazYSalvoController::class, 'index'])->name('admin.pazysalvo.index');
+        Route::get('/pazysalvo/generar', [App\Http\Controllers\PazYSalvoController::class, 'generar'])->name('admin.pazysalvo.generar');
 
         // RUTAS GRADO CERO (TRANSICIÓN)
         Route::prefix('grado-cero')->group(function () {

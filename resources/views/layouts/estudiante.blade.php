@@ -5,7 +5,7 @@
     <meta charset="utf-8">
      <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>DarkPan - Bootstrap 5 Admin Template</title>
+    <title>Estudiante | IET La Huella</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -136,7 +136,7 @@
                                     });
                                 @endphp
                                 <div class="nav-item dropdown">
-                                    <a href="{{ $items->first()->url ? route($items->first()->url) : 'javascript:void(0)' }}" 
+                                    <a href="{{ ($items->first()->url && Route::has($items->first()->url)) ? route($items->first()->url) : 'javascript:void(0)' }}" 
                                        class="nav-link dropdown-toggle {{ $isActive ? 'active show' : '' }}" 
                                        data-bs-toggle="dropdown"
                                        aria-expanded="{{ $isActive ? 'true' : 'false' }}">
@@ -157,7 +157,7 @@
                                                     }
                                                 }
                                             @endphp
-                                            <a href="{{ route($submenu->url) }}" 
+                                            <a href="{{ ($submenu->url && Route::has($submenu->url)) ? route($submenu->url) : 'javascript:void(0)' }}" 
                                                class="dropdown-item {{ $submenuActive ? 'active' : '' }}">
                                                 <i class="{{ $submenu->icono }} me-2"></i>
                                                 {{ $submenu->nombre_submenu }}
@@ -168,11 +168,11 @@
 
                             {{-- MENÚ SENCILLO --}}
                             @else
-                                <a href="{{ route($items->first()->url) }}" 
+                                <a href="{{ ($items->first()->url && Route::has($items->first()->url)) ? route($items->first()->url) : 'javascript:void(0)' }}" 
                                    class="nav-item nav-link {{ request()->routeIs($items->first()->url) ? 'active' : '' }}">
                                     <i class="{{ $items->first()->icono }} me-2"></i>
                                     {{ $nombreMenu }}
-                                </a>
+                                 </a>
                             @endif
 
                         @endforeach
@@ -231,15 +231,13 @@
 
             <!-- Footer Start -->
             <div class="container-fluid pt-4 px-4 mt-auto">
-                <div class="bg-secondary rounded-top p-4">
-                    <div class="row">
-                        <div class="col-12 col-sm-6 text-center text-sm-start">
-                            &copy; <a href="#">Your Site Name</a>, All Right Reserved. 
+                <div class="rounded-top p-4 shadow-sm" style="background:#fff !important; border-top: 1px solid #e2e8f0;">
+                    <div class="row align-items-center">
+                        <div class="col-12 col-sm-6 text-center text-sm-start text-muted small">
+                            &copy; {{ date('Y') }} <span class="fw-bold text-primary">IET La Huella</span>. Todos los derechos reservados.
                         </div>
-                        <div class="col-12 col-sm-6 text-center text-sm-end">
-                            <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
-                            Designed By <a href="https://htmlcodex.com">HTML Codex</a>
-                            <br>Distributed By: <a href="https://themewagon.com" target="_blank">ThemeWagon</a>
+                        <div class="col-12 col-sm-6 text-center text-sm-end text-muted small">
+                            Desarrollado por: <span class="fw-bold" style="color:#334155;">IL, WR</span>
                         </div>
                     </div>
                 </div>

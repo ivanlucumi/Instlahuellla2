@@ -185,7 +185,7 @@
                                     });
                                 @endphp
                                 <div class="nav-item dropdown">
-                                    <a href="{{ $items->first()->url ? route($items->first()->url) : 'javascript:void(0)' }}" 
+                                    <a href="{{ ($items->first()->url && Route::has($items->first()->url)) ? route($items->first()->url) : 'javascript:void(0)' }}" 
                                        class="nav-link dropdown-toggle {{ $isActive ? 'active show' : '' }}" 
                                        data-bs-toggle="dropdown"
                                        aria-expanded="{{ $isActive ? 'true' : 'false' }}">
@@ -206,7 +206,7 @@
                                                     }
                                                 }
                                             @endphp
-                                            <a href="{{ route($submenu->url) }}" 
+                                            <a href="{{ ($submenu->url && Route::has($submenu->url)) ? route($submenu->url) : 'javascript:void(0)' }}" 
                                                class="dropdown-item {{ $submenuActive ? 'active' : '' }}">
                                                 <i class="{{ $submenu->icono }} me-2"></i>
                                                 {{ $submenu->nombre_submenu }}
@@ -217,7 +217,7 @@
 
                             {{-- MENÚ SENCILLO --}}
                             @else
-                                <a href="{{ route($items->first()->url) }}" 
+                                <a href="{{ ($items->first()->url && Route::has($items->first()->url)) ? route($items->first()->url) : 'javascript:void(0)' }}" 
                                    class="nav-item nav-link {{ request()->routeIs($items->first()->url) ? 'active' : '' }}">
                                     <i class="{{ $items->first()->icono }} me-2"></i>
                                     {{ $nombreMenu }}
