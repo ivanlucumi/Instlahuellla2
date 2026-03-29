@@ -68,6 +68,10 @@ class User extends Authenticatable
             ->where('estado', true)
             ->orderBy('orden')
             ->get()
+            // Descartar duplicados si el usuario tiene múltiples roles con acceso al mismo menú
+            ->unique(function ($item) {
+                return $item->nombre . $item->nombre_submenu . $item->url;
+            })
             ->groupBy('nombre');
     }
     

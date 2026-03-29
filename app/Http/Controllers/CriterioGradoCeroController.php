@@ -10,6 +10,15 @@ class CriterioGradoCeroController extends Controller
 {
     public function index()
     {
+        $user = auth()->user();
+        if (!$user->hasRol('SUPERADMIN') && !$user->hasRol('ADMIN') && !$user->hasRol('RECTOR')) {
+            return redirect()->route('home')->with('swal', [
+                'icon' => 'error',
+                'title' => 'Acceso Denegado',
+                'text' => 'No tiene permisos para gestionar criterios de Grado Cero.'
+            ]);
+        }
+
         $criterios = CriterioGradoCero::with('asignatura')->orderBy('asignatura_id')->paginate(50);
         return view('GradoCero.Criterios.index', compact('criterios'));
     }

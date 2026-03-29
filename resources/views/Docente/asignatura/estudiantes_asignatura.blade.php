@@ -148,49 +148,11 @@
                         @endif
                     </form>
 
-                    @if($all_graded && $esAnoActual)
-                    <div class="mt-5 pt-4 border-top">
-                        <div class="card border-0 bg-light shadow-none">
-                            <div class="card-body p-4">
-                                <h5 class="fw-bold text-dark mb-4">
-                                    <i class="bi bi-mortarboard-fill me-2 text-secondary"></i> Promover Estudiantes
-                                </h5>
-                                
-                                    <form action="{{ route('docente.estudiantes.promover') }}" method="POST" id="promote-form">
-                                        @csrf
-                                        <input type="hidden" name="ano_lectivo" value="{{ $anoLectivo }}">
-                                        <input type="hidden" name="asignatura_id" value="{{ $asignatura->id }}">
-                                        <input type="hidden" name="grado_origen_id" value="{{ $grado->id }}">
-                                    <div id="selected-students-container"></div>
-                                    
-                                            <div class="row g-3">
-                                            <div class="col-md-6">
-                                                <label class="form-label text-dark small fw-bold">Grado Destino (Promovidos)</label>
-                                                <select name="grado_destino_id" class="form-select border-0 shadow-sm" required>
-                                                    <option value="">Seleccione curso superior...</option>
-                                                    @foreach($todosLosGrados as $g)
-                                                        <option value="{{ $g->id }}">{{ $g->nombre_grado }} - {{ $g->bloque }}</option>
-                                                    @endforeach
-                                                </select>
-                                                <div class="form-text mt-2"><i class="bi bi-info-circle"></i> Los estudiantes NO promovidos permanecerán en el grado actual automáticamente en el año siguiente ({{ (intval($anoLectivo) + 1) }}).</div>
-                                            </div>
-                                            <div class="col-md-6 mt-4 d-flex justify-content-end align-items-start gap-2">
-                                                <button type="button" onclick="submitPromotion('manual')" class="btn btn-dark rounded-pill px-4">
-                                                    <i class="bi bi-person-check me-1"></i> Promover (Manual)
-                                                </button>
-                                                <button type="button" onclick="submitPromotion('total')" class="btn btn-outline-dark rounded-pill px-4">
-                                                    <i class="bi bi-people-fill me-1"></i> Promover Inteligente (x Notas)
-                                                </button>
-                                            </div>
-                                        </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    @elseif($esAnoActual)
+                    {{-- La sección de promoción se ha trasladado al módulo centralizado de Promoción de Grado --}}
+                    @if($esAnoActual)
                     <div class="alert alert-light border shadow-sm mt-5 mb-0">
                         <i class="bi bi-info-circle me-2 text-info"></i>
-                        La sección de promoción se habilitará cuando **todos** los estudiantes tengan calificación definitiva.
+                        Las promociones ahora se gestionan desde el módulo centralizado de **Promoción de Grado** para validar todas las materias simultáneamente.
                     </div>
                     @endif
                 </div>

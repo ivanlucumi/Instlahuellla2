@@ -65,6 +65,15 @@ class RolSeeder extends Seeder
     'created_at' => '2026-03-09 23:40:00',
     'updated_at' => '2026-03-09 23:40:00',
   ),
+  6 => 
+  array (
+    'id' => 7,
+    'nombre' => 'SECRETARIO',
+    'descripcion' => 'Secretario académico o administrativo',
+    'estado' => 1,
+    'created_at' => '2026-03-29 15:36:00',
+    'updated_at' => '2026-03-29 15:36:00',
+  ),
 );
 
         foreach ($data as $row) {

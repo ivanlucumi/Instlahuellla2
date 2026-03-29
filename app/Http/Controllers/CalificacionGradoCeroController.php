@@ -27,18 +27,21 @@ class CalificacionGradoCeroController extends Controller
               ->orWhere('nombre_grado', 'LIKE', 'CERO%');
         });
 
-        // Si es DIRECTOR, filtrar solo los que tiene a cargo
-        if ($user->hasRol('DIRECTOR')) {
+        // 1. Roles con acceso total (pueden ver todos los grados de transición)
+        if ($user->hasRol('SUPERADMIN') || $user->hasRol('ADMIN') || $user->hasRol('RECTOR')) {
+            // No se aplica filtro adicional a la query
+        } 
+        // 2. DIRECTOR (Solo ve el grado que tiene asignado como director)
+        elseif ($user->hasRol('DIRECTOR')) {
             $docente = Docente::where('user_id', $user->id)->first();
             if ($docente) {
                 $query->where('docente_id', $docente->id);
             } else {
-                // Si es director pero no tiene perfil de docente, no ve nada
                 $query->whereRaw('1 = 0');
             }
         } 
-        // Si no es SUPERADMIN ni DIRECTOR, no debería ver nada
-        elseif (!$user->hasRol('SUPERADMIN')) {
+        // 3. Otros roles: Acceso denegado
+        else {
             return redirect()->route('home')->with('swal', [
                 'icon' => 'error',
                 'title' => 'Acceso Denegado',
@@ -65,13 +68,18 @@ class CalificacionGradoCeroController extends Controller
         $grado = GradoAcademico::with(['sede', 'curso', 'asignaturas'])->findOrFail($request->grado_id);
 
         // Validación de permisos para la matriz
-        if ($user->hasRol('DIRECTOR')) {
+        $canAccess = false;
+        if ($user->hasRol('SUPERADMIN') || $user->hasRol('ADMIN') || $user->hasRol('RECTOR')) {
+            $canAccess = true;
+        } elseif ($user->hasRol('DIRECTOR')) {
             $docente = Docente::where('user_id', $user->id)->first();
-            if (!$docente || $grado->docente_id != $docente->id) {
-                abort(403, 'No tiene permiso para calificar este grado.');
+            if ($docente && $grado->docente_id == $docente->id) {
+                $canAccess = true;
             }
-        } elseif (!$user->hasRol('SUPERADMIN')) {
-            abort(403);
+        }
+
+        if (!$canAccess) {
+            abort(403, 'No tiene permiso para calificar este grado.');
         }
         $periodo = PeriodoAcademico::findOrFail($request->periodo_id);
         $anho = AnhoEscolar::findOrFail($request->anho_escolar_id);

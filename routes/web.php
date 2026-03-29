@@ -144,6 +144,11 @@ Route::middleware(['auth', 'role_secure:SUPERADMIN,ADMIN,DIRECTOR'])
         Route::resource('notas', App\Http\Controllers\NotasController::class)->names('admin.notas');
         Route::resource('notas-definitivas', App\Http\Controllers\NotasDefinitivasController::class)->names('admin.notas-definitivas');
 
+        // Rutas de Promoción de Grado
+        Route::get('/promocion', [App\Http\Controllers\PromocionController::class, 'index'])->name('admin.promocion.index');
+        Route::get('/promocion/{id}', [App\Http\Controllers\PromocionController::class, 'show'])->name('admin.promocion.show');
+        Route::post('/promocion/procesar', [App\Http\Controllers\PromocionController::class, 'promover'])->name('admin.promocion.procesar');
+
         Route::get('/certificados', [App\Http\Controllers\CertificadoController::class, 'index'])->name('admin.certificados.index');
         Route::get('/certificados/generar', [App\Http\Controllers\CertificadoController::class, 'generar'])->name('admin.certificados.generar');
         Route::get('/certificados/grupo', [App\Http\Controllers\CertificadoController::class, 'generarGrupo'])->name('admin.certificados.generar-grupo');

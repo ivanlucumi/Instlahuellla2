@@ -375,6 +375,48 @@ class MenuSeeder extends Seeder
     'created_at' => '2026-02-28 03:54:41',
     'updated_at' => '2026-02-28 03:54:41',
   ),
+  26 => 
+  array (
+    'id' => 30,
+    'nombre' => 'Grado Cero',
+    'nombre_submenu' => NULL,
+    'icono' => 'fa fa-child',
+    'url' => NULL,
+    'tipo' => 'dropdown',
+    'estado' => 1,
+    'rol_id' => 1,
+    'orden' => '99',
+    'created_at' => now(),
+    'updated_at' => now(),
+  ),
+  27 => 
+  array (
+    'id' => 31,
+    'nombre' => 'Grado Cero',
+    'nombre_submenu' => 'Criterios Evaluación',
+    'icono' => 'fa fa-edit',
+    'url' => 'admin.grado-cero.criterios.index',
+    'tipo' => 'dropdown',
+    'estado' => 1,
+    'rol_id' => 1,
+    'orden' => '100',
+    'created_at' => now(),
+    'updated_at' => now(),
+  ),
+  28 => 
+  array (
+    'id' => 32,
+    'nombre' => 'Promoción de Grado',
+    'nombre_submenu' => NULL,
+    'icono' => 'fa fa-graduation-cap',
+    'url' => 'admin.promocion.index',
+    'tipo' => 'sencillo',
+    'estado' => 1,
+    'rol_id' => 1,
+    'orden' => '120',
+    'created_at' => now(),
+    'updated_at' => now(),
+  ),
 );
 
         foreach ($data as $row) {

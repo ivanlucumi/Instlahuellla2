@@ -23,9 +23,9 @@ class HomeController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->hasRol('SUPERADMIN') || $user->hasRol('ADMIN')) {
+        if ($user->hasRol('SUPERADMIN') || $user->hasRol('ADMIN') || $user->hasRol('RECTOR') || $user->hasRol('SECRETARIO')) {
             return redirect()->route('admin.dashboard');
-        }
+        } 
 
         if ($user->hasRol('DIRECTOR')) {
             return redirect()->route('director.dashboard');
