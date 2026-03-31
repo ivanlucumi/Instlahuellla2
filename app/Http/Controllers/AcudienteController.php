@@ -9,6 +9,9 @@ class AcudienteController extends Controller
 {
     public function index(Request $request)
     {
+        $user = auth()->user();
+        abort_unless($user->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'DIRECTOR']) || $user->isGradeDirector(), 403, 'No tiene permisos para ver los acudientes.');
+
         $query = Acudiente::with('user')->orderBy('id', 'desc');
 
         if ($request->filled('search')) {
@@ -36,6 +39,8 @@ class AcudienteController extends Controller
      */
     public function create()
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'DIRECTOR']), 403, 'No tiene permisos para crear registros. Solo roles directivos pueden hacerlo.');
+
         $usuarios = \App\Models\User::whereDoesntHave('acudiente')->orderBy('name')->get();
         return view('Acudiente.Create', compact('usuarios'));
     }
@@ -45,6 +50,8 @@ class AcudienteController extends Controller
      */
     public function store(Request $request)
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'DIRECTOR']), 403, 'No tiene permisos para modificar estos datos. Solo roles directivos pueden hacerlo.');
+
         $request->validate([
             'name'                 => 'required|string|max:255',
             'email'                => 'required|string|email|max:255|unique:users',
@@ -101,6 +108,8 @@ class AcudienteController extends Controller
      */
     public function edit(Acudiente $acudiente)
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'DIRECTOR']), 403, 'No tiene permisos para modificar estos datos. Solo roles directivos pueden hacerlo.');
+
         return view('Acudiente.Edit', compact('acudiente'));
     }
 
@@ -109,6 +118,8 @@ class AcudienteController extends Controller
      */
     public function update(Request $request, Acudiente $acudiente)
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'DIRECTOR']), 403, 'No tiene permisos para modificar estos datos. Solo roles directivos pueden hacerlo.');
+
         $request->validate([
             'name'                 => 'required|string|max:255',
             'email'                => 'required|string|email|max:255|unique:users,email,' . $acudiente->user_id,
@@ -169,6 +180,8 @@ class AcudienteController extends Controller
 
     public function storeQuick(Request $request)
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'DIRECTOR']), 403, 'No tiene permisos para modificar estos datos. Solo roles directivos pueden hacerlo.');
+
         $request->validate([
             'name'                 => 'required|string|max:255',
             'email'                => 'required|string|email|max:255|unique:users',

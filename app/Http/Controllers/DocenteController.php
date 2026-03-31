@@ -47,6 +47,8 @@ class DocenteController extends Controller
      */
     public function create()
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'DIRECTOR']), 403, 'No tiene permisos para crear registros. Solo roles directivos pueden hacerlo.');
+
         $usuarios = \App\Models\User::orderBy('name')->get();
         return view('Docente.Create', compact('usuarios'));
     }
@@ -56,6 +58,8 @@ class DocenteController extends Controller
      */
     public function store(Request $request)
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'DIRECTOR']), 403, 'No tiene permisos para modificar estos datos. Solo roles directivos pueden hacerlo.');
+
         // 🔒 Validación
         $request->validate([
             'name'            => 'required|string|max:255',
@@ -118,6 +122,8 @@ class DocenteController extends Controller
      */
     public function edit(Docente $docente)
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'DIRECTOR']), 403, 'No tiene permisos para modificar estos datos. Solo roles directivos pueden hacerlo.');
+
         // No necesitamos lista de usuarios, ya editamos el propio
         return view('Docente.Edit', compact('docente'));
     }
@@ -127,6 +133,8 @@ class DocenteController extends Controller
      */
     public function update(Request $request, Docente $docente)
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'DIRECTOR']), 403, 'No tiene permisos para modificar estos datos. Solo roles directivos pueden hacerlo.');
+
         // 🔒 Validación
         $request->validate([
             'name'            => 'required|string|max:255',

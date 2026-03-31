@@ -83,6 +83,19 @@ class User extends Authenticatable
         return $this->roles()->where('nombre', $rol)->exists();
     }
     
+    public function hasAnyRol(array $roles)
+    {
+        return $this->roles()->whereIn('nombre', $roles)->exists();
+    }
+    
+    public function isGradeDirector()
+    {
+        if (!$this->hasRol('DOCENTE') || !$this->docente) {
+            return false;
+        }
+        return \App\Models\GradoAcademico::where('docente_id', $this->docente->id)->exists();
+    }
+    
     
 
 

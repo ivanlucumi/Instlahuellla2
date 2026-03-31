@@ -12,6 +12,8 @@ class GradoAcademicoController extends Controller
      */
     public function index(Request $request)
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para acceder a esta sección.');
+
         $allGrados = GradoAcademico::orderBy('nombre_grado')->get();
         $cursos = \App\Models\Curso::orderBy('nombre_curso')->get();
         $anhos = \App\Models\AnhoEscolar::orderBy('nombre_anho_escolar', 'desc')->get();
@@ -101,6 +103,8 @@ class GradoAcademicoController extends Controller
      */
     public function create()
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para crear registros.');
+
         $sedes = \App\Models\Sede::orderBy('nombre_sede')->get();
         $docentes = \App\Models\Docente::with('user')->get(); // For Director de Grado
         $users = \App\Models\User::whereHas('docente')->orderBy('name')->get(); // For Specialist Teachers
@@ -115,6 +119,8 @@ class GradoAcademicoController extends Controller
      */
     public function store(Request $request)
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para crear registros.');
+
         $request->validate([
             'nombre_grado'           => 'required|string|max:255',
             'bloque'                 => 'nullable|string|max:255',
@@ -295,6 +301,8 @@ class GradoAcademicoController extends Controller
      */
     public function edit(GradoAcademico $gradoAcademico)
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para modificar estos datos.');
+
         $sedes = \App\Models\Sede::orderBy('nombre_sede')->get();
         $docentes = \App\Models\Docente::with('user')->get(); // For Director de Grado
         $users = \App\Models\User::whereHas('docente')->orderBy('name')->get(); // For Specialist Teachers
@@ -309,6 +317,8 @@ class GradoAcademicoController extends Controller
      */
     public function update(Request $request, GradoAcademico $gradoAcademico)
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para modificar estos datos.');
+
         $request->validate([
             'nombre_grado'           => 'required|string|max:255',
             'bloque'                 => 'nullable|string|max:255',
@@ -401,6 +411,8 @@ class GradoAcademicoController extends Controller
 
     public function storeQuick(Request $request)
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para crear registros.');
+
         $request->validate([
             'nombre_grado' => 'required|string|max:255',
             'bloque'       => 'required|string|max:255',

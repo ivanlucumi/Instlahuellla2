@@ -9,6 +9,8 @@ class AsignaturaController extends Controller
 {
     public function index(Request $request)
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para ver este listado.');
+
         $query = Asignatura::with(['hilo', 'grados']);
         
         // Si es DIRECTOR y no SUPERADMIN/ADMIN, solo ve asignaturas de sus grados asignados
@@ -46,6 +48,8 @@ class AsignaturaController extends Controller
      */
     public function create(Request $request)
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para crear registros. Solo roles directivos pueden hacerlo.');
+
         $hilos = \App\Models\Hilo::where('estado', 'activo')->orderBy('nombre_hilo')->get();
         $grados = \App\Models\GradoAcademico::orderBy('nombre_grado')->get();
         $selectedGradoId = $request->query('grado_id');
@@ -57,6 +61,8 @@ class AsignaturaController extends Controller
      */
     public function store(Request $request)
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para modificar estos datos. Solo roles directivos pueden hacerlo.');
+
         $request->validate([
             'nombre_asignatura' => 'required|string|max:255',
             'nivel_educativo'   => 'required|in:primaria,secundaria',
@@ -86,6 +92,8 @@ class AsignaturaController extends Controller
      */
     public function edit(Asignatura $asignatura)
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para modificar estos datos. Solo roles directivos pueden hacerlo.');
+
         $hilos = \App\Models\Hilo::where('estado', 'activo')->orderBy('nombre_hilo')->get();
         $grados = \App\Models\GradoAcademico::orderBy('nombre_grado')->get();
         return view('Asignatura.Edit', compact('asignatura', 'hilos', 'grados'));
@@ -96,6 +104,8 @@ class AsignaturaController extends Controller
      */
     public function update(Request $request, Asignatura $asignatura)
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para modificar estos datos. Solo roles directivos pueden hacerlo.');
+
         $request->validate([
             'nombre_asignatura' => 'required|string|max:255',
             'nivel_educativo'   => 'required|in:primaria,secundaria',
@@ -130,6 +140,8 @@ class AsignaturaController extends Controller
 
     public function storeQuick(Request $request)
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para modificar estos datos. Solo roles directivos pueden hacerlo.');
+
         $request->validate([
             'nombre_asignatura' => 'required|string|max:255',
             'nivel_educativo'   => 'required|in:primaria,secundaria',

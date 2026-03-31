@@ -13,12 +13,16 @@ class InstitucionController extends Controller
 {
     public function index()
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para acceder a esta sección.');
+
         $instituciones = Institucion::with('rector')->orderBy('id')->get();
         return view('Institucion.Index', compact('instituciones'));
     }
 
     public function create()
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para crear registros.');
+
         $existe = Institucion::exists();
 
         if ($existe) {
@@ -32,6 +36,8 @@ class InstitucionController extends Controller
 
     public function store(Request $request)    
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para crear registros.');
+
         // 🔒 Validación
         $request->validate([
             'nombre_institucion'        => 'required|string|max:255',
@@ -91,6 +97,8 @@ class InstitucionController extends Controller
 
     public function edit(Institucion $institucion)
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para modificar estos datos.');
+
         $rectores = User::orderBy('name')->get();
         $institucion = Institucion::first();
         //dd($institucion->id);
@@ -99,6 +107,8 @@ class InstitucionController extends Controller
 
     public function update(Request $request, Institucion $institucion)
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para modificar estos datos.');
+
         $request->validate([
             'nombre_institucion'       => 'required|string',
             'codigo_dane'              => 'required|unique:institucions,codigo_dane,' . $institucion->id,
