@@ -12,8 +12,6 @@ class GradoAcademicoController extends Controller
      */
     public function index(Request $request)
     {
-        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para acceder a esta sección.');
-
         $allGrados = GradoAcademico::orderBy('nombre_grado')->get();
         $cursos = \App\Models\Curso::orderBy('nombre_curso')->get();
         $anhos = \App\Models\AnhoEscolar::orderBy('nombre_anho_escolar', 'desc')->get();
@@ -21,10 +19,10 @@ class GradoAcademicoController extends Controller
 
         $query = GradoAcademico::with(['sede', 'docente.user', 'asignaturas', 'curso']);
 
-        // Si es DIRECTOR y no SUPERADMIN/ADMIN, solo ve sus propios grados
-        if (auth()->user()->hasRol('DIRECTOR') && !auth()->user()->hasRol('SUPERADMIN') && !auth()->user()->hasRol('ADMIN')) {
-            $query->whereHas('docente', function ($q) {
-                $q->where('user_id', auth()->id());
+        $user = auth()->user();
+        if (!$user->hasAnyRol(['SUPERADMIN', 'ADMIN', 'RECTOR', 'SECRETARIO'])) {
+            $query->whereHas('docente', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
             });
         }
 

@@ -83,10 +83,10 @@
 
                                     @if(isset($asig->is_virtual_grado_cero) && $asig->is_virtual_grado_cero)
                                         <div class="d-grid gap-2">
-                                            <a href="{{ route('admin.criterio-grado-cero.index') }}" class="btn btn-outline-warning rounded-pill py-2 shadow-sm dashboard-btn-hover">
+                                            <a href="{{ route('admin.grado-cero.criterios.index') }}" class="btn btn-outline-warning rounded-pill py-2 shadow-sm dashboard-btn-hover">
                                                 <i class="fa fa-list me-2"></i> Criterios de Evaluación
                                             </a>
-                                            <a href="{{ route('admin.calificacion-grado-cero.index') }}" class="btn btn-outline-success rounded-pill py-2 shadow-sm dashboard-btn-hover">
+                                            <a href="{{ route('admin.grado-cero.calificaciones.index') }}" class="btn btn-outline-success rounded-pill py-2 shadow-sm dashboard-btn-hover">
                                                 <i class="fa fa-pencil-alt me-2"></i> Calificar Transición
                                             </a>
                                         </div>

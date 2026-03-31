@@ -9,13 +9,11 @@ class AsignaturaController extends Controller
 {
     public function index(Request $request)
     {
-        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para ver este listado.');
-
         $query = Asignatura::with(['hilo', 'grados']);
         
-        // Si es DIRECTOR y no SUPERADMIN/ADMIN, solo ve asignaturas de sus grados asignados
-        if (auth()->user()->hasRol('DIRECTOR') && !auth()->user()->hasRol('SUPERADMIN') && !auth()->user()->hasRol('ADMIN')) {
-            $directorId = auth()->id();
+        $user = auth()->user();
+        if (!$user->hasAnyRol(['SUPERADMIN', 'ADMIN', 'RECTOR', 'SECRETARIO'])) {
+            $directorId = $user->id;
             $query->whereHas('grados', function($q) use ($directorId) {
                 $q->whereHas('docente', function($sq) use ($directorId) {
                     $sq->where('user_id', $directorId);

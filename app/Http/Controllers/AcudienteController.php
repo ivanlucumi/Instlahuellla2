@@ -9,10 +9,18 @@ class AcudienteController extends Controller
 {
     public function index(Request $request)
     {
-        $user = auth()->user();
-        abort_unless($user->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'DIRECTOR']) || $user->isGradeDirector(), 403, 'No tiene permisos para ver los acudientes.');
-
         $query = Acudiente::with('user')->orderBy('id', 'desc');
+
+        $user = auth()->user();
+        if (!$user->hasAnyRol(['SUPERADMIN', 'ADMIN', 'RECTOR', 'SECRETARIO', 'DIRECTOR'])) {
+            $directorId = $user->docente->id ?? null;
+            $query->whereHas('estudiantes', function ($q) use ($directorId) {
+                // Filtramos por el grado académico que este docente dirige
+                $q->whereHas('gradoAcademico', function ($sq) use ($directorId) {
+                    $sq->where('docente_id', $directorId);
+                });
+            });
+        }
 
         if ($request->filled('search')) {
             $search = $request->get('search');

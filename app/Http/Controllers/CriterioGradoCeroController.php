@@ -11,7 +11,7 @@ class CriterioGradoCeroController extends Controller
     public function index()
     {
         $user = auth()->user();
-        if (!$user->hasRol('SUPERADMIN') && !$user->hasRol('ADMIN') && !$user->hasRol('RECTOR')) {
+        if (!$user->hasAnyRol(['SUPERADMIN', 'ADMIN', 'RECTOR', 'SECRETARIO']) && !$user->isGradeDirector()) {
             return redirect()->route('home')->with('swal', [
                 'icon' => 'error',
                 'title' => 'Acceso Denegado',
@@ -25,6 +25,9 @@ class CriterioGradoCeroController extends Controller
 
     public function create()
     {
+        $user = auth()->user();
+        abort_unless($user->hasAnyRol(['SUPERADMIN', 'ADMIN', 'RECTOR', 'SECRETARIO']) || $user->isGradeDirector(), 403, 'No tiene permisos para gestionar criterios de Grado Cero.');
+
         $asignaturas = Asignatura::whereHas('hilo', function($q) {
             $q->where('nombre_hilo', 'LIKE', 'CERO%')
               ->orWhere('nombre_hilo', 'LIKE', '%TRANSICION%')
@@ -39,6 +42,9 @@ class CriterioGradoCeroController extends Controller
 
     public function store(Request $request)
     {
+        $user = auth()->user();
+        abort_unless($user->hasAnyRol(['SUPERADMIN', 'ADMIN', 'RECTOR', 'SECRETARIO']) || $user->isGradeDirector(), 403, 'No tiene permisos para gestionar criterios de Grado Cero.');
+
         $request->validate([
             'asignatura_id' => 'required|exists:asignaturas,id',
             'criterios' => 'required|array|min:1',
@@ -65,6 +71,9 @@ class CriterioGradoCeroController extends Controller
 
     public function edit(CriterioGradoCero $criterio)
     {
+        $user = auth()->user();
+        abort_unless($user->hasAnyRol(['SUPERADMIN', 'ADMIN', 'RECTOR', 'SECRETARIO']) || $user->isGradeDirector(), 403, 'No tiene permisos para gestionar criterios de Grado Cero.');
+
         $asignaturas = Asignatura::whereHas('hilo', function($q) {
             $q->where('nombre_hilo', 'LIKE', '%CERO%')
               ->orWhere('nombre_hilo', 'LIKE', '%TRANSICION%')
@@ -79,6 +88,9 @@ class CriterioGradoCeroController extends Controller
 
     public function update(Request $request, CriterioGradoCero $criterio)
     {
+        $user = auth()->user();
+        abort_unless($user->hasAnyRol(['SUPERADMIN', 'ADMIN', 'RECTOR', 'SECRETARIO']) || $user->isGradeDirector(), 403, 'No tiene permisos para gestionar criterios de Grado Cero.');
+
         $request->validate([
             'asignatura_id' => 'required|exists:asignaturas,id',
             'nombre_criterio' => 'required|string|max:255',
@@ -96,6 +108,9 @@ class CriterioGradoCeroController extends Controller
 
     public function destroy(CriterioGradoCero $criterio)
     {
+        $user = auth()->user();
+        abort_unless($user->hasAnyRol(['SUPERADMIN', 'ADMIN', 'RECTOR', 'SECRETARIO']), 403, 'Solo roles directivos pueden eliminar criterios de Grado Cero.');
+
         $criterio->delete();
         return redirect()->route('admin.grado-cero.criterios.index')->with('swal', [
             'icon' => 'success',

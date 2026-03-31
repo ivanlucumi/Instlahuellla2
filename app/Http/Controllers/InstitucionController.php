@@ -13,8 +13,6 @@ class InstitucionController extends Controller
 {
     public function index()
     {
-        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para acceder a esta sección.');
-
         $instituciones = Institucion::with('rector')->orderBy('id')->get();
         return view('Institucion.Index', compact('instituciones'));
     }
