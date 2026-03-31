@@ -64,10 +64,9 @@ class User extends Authenticatable
 
     public function menus()
     {
-        return Menu::whereIn(
-                'rol_id',
-                $this->roles->pluck('id')
-            )
+        $rolesIds = $this->roles->pluck('id')->toArray();
+        
+        return Menu::whereIn('rol_id', $rolesIds)
             ->where('estado', true)
             ->orderBy('orden')
             ->get()
@@ -75,6 +74,7 @@ class User extends Authenticatable
             ->unique(function ($item) {
                 return $item->nombre . $item->nombre_submenu . $item->url;
             })
+            ->sortBy('orden')
             ->groupBy('nombre');
     }
     

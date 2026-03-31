@@ -262,9 +262,32 @@ class DocenteController extends Controller
             }
         }
 
+        // Extra: Módulo Grado Cero como "Asignatura" Virtual
+        if (!$isSuperAdmin && $docenteId && $user->hasRol('DOCENTE')) {
+            $gradosCero = GradoAcademico::where('docente_id', $docenteId)
+                ->where('nombre_grado', 'CERO')
+                ->get();
+
+            foreach ($gradosCero as $gc) {
+                // Agregar ID virtual para evitar choques con asignaturas reales
+                $assignments->push((object)[
+                    'id'                => 'grado_cero_' . $gc->id, 
+                    'nombre_asignatura' => '<span class="badge bg-warning text-dark"><i class="fa fa-child"></i> Módulo Transición (Grado Cero)</span>',
+                    'hilo_nombre'       => 'Evaluación Integral',
+                    'grado_id'          => $gc->id,
+                    'grado_nombre'      => $gc->nombre_grado . ' - ' . $gc->bloque,
+                    'docente_nombre'    => $user->name,
+                    'is_virtual_grado_cero' => true // Flag for the view
+                ]);
+            }
+        }
+
         $institucion = \App\Models\Institucion::first();
 
-        return view('Docente.asignatura.asignatura_docente', compact('assignments', 'isSuperAdmin', 'isDirector', 'institucion'));
+        // Agrupar asignaturas por nombre_grado para mejor organización visual
+        $groupedAssignments = $assignments->groupBy('grado_nombre');
+
+        return view('Docente.asignatura.asignatura_docente', compact('groupedAssignments', 'assignments', 'isSuperAdmin', 'isDirector', 'institucion'));
     }
 
     public function estudiantesAsignatura($asignaturaId, $gradoId)

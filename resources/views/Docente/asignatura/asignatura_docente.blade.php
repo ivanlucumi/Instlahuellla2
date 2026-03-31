@@ -44,47 +44,65 @@
         </div>
     </div>
 
-    @if($assignments->isEmpty())
+    @if($groupedAssignments->isEmpty())
         <div class="alert bg-dark text-white-50 border-secondary shadow-sm dashboard-animate-slide-up">
             <i class="fa fa-info-circle me-2 text-info"></i> {{ $isSuperAdmin ? 'No hay materias asignadas en el sistema todavía.' : 'No tienes materias asignadas en ningún grado en este momento.' }}
         </div>
     @else
-        <div class="row g-4">
-            @foreach ($assignments as $index => $asig)
-                <div class="col-sm-6 col-xl-4 dashboard-animate-slide-up" style="animation-delay: {{ 0.3 + ($index * 0.1) }}s">
-                    <div class="bg-secondary rounded shadow-sm h-100 overflow-hidden hover-elevate border border-transparent transition-all">
-                        <div class="p-4">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div class="p-3 bg-dark rounded shadow-sm border border-success border-opacity-25">
-                                    <i class="fa fa-book fa-2x text-success"></i>
-                                </div>
-                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">{{ $asig->hilo_nombre }}</span>
-                            </div>
-                            
-                            <h5 class="text-white fw-bold mb-3">{{ $asig->nombre_asignatura }}</h5>
-                            
-                            <div class="mb-4 space-y-2">
-                                <div class="d-flex align-items-center text-white-50 small mb-2">
-                                    <i class="fa fa-graduation-cap me-3 text-success"></i>
-                                    <strong>Grado:</strong> <span class="ms-2 text-white">{{ $asig->grado_nombre }}</span>
-                                </div>
-                                @if($isSuperAdmin || $isDirector)
-                                    <div class="d-flex align-items-center text-white-50 small">
-                                        <i class="fa fa-user-tie me-3 text-warning"></i>
-                                        <strong>Docente:</strong> <span class="ms-2 text-white">{{ $asig->docente_nombre }}</span>
+        @foreach($groupedAssignments as $gradoNombre => $materias)
+            <div class="mb-5 dashboard-animate-fade-in">
+                <h3 class="text-success border-bottom border-success pb-2 mb-4 fw-bold">
+                    <i class="fa fa-layer-group me-2"></i> {{ $gradoNombre }}
+                </h3>
+                <div class="row g-4">
+                    @foreach ($materias as $index => $asig)
+                        <div class="col-sm-6 col-xl-4 dashboard-animate-slide-up" style="animation-delay: {{ 0.1 + (($index % 10) * 0.1) }}s">
+                            <div class="bg-secondary rounded shadow-sm h-100 overflow-hidden hover-elevate border border-transparent transition-all">
+                                <div class="p-4">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div class="p-3 bg-dark rounded shadow-sm border border-success border-opacity-25">
+                                            <i class="fa fa-book fa-2x text-success"></i>
+                                        </div>
+                                        <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">{{ $asig->hilo_nombre }}</span>
                                     </div>
-                                @endif
-                            </div>
+                                    
+                                    <h5 class="text-white fw-bold mb-3">{!! $asig->nombre_asignatura !!}</h5>
+                                    
+                                    <div class="mb-4 space-y-2">
+                                        <div class="d-flex align-items-center text-white-50 small mb-2">
+                                            <i class="fa fa-graduation-cap me-3 text-success"></i>
+                                            <strong>Grado:</strong> <span class="ms-2 text-white">{{ $asig->grado_nombre }}</span>
+                                        </div>
+                                        @if($isSuperAdmin || $isDirector)
+                                            <div class="d-flex align-items-center text-white-50 small">
+                                                <i class="fa fa-user-tie me-3 text-warning"></i>
+                                                <strong>Docente:</strong> <span class="ms-2 text-white">{{ $asig->docente_nombre }}</span>
+                                            </div>
+                                        @endif
+                                    </div>
 
-                            <a href="{{ route('docente.asignatura.estudiantes', [$asig->id, $asig->grado_id]) }}" 
-                               class="btn btn-outline-success w-100 rounded-pill py-2 dashboard-btn-hover shadow-sm">
-                                <i class="fa fa-pencil-alt me-2"></i> {{ ($isSuperAdmin || $isDirector) ? 'Ver Detalles' : 'Calificar Estudiantes' }}
-                            </a>
+                                    @if(isset($asig->is_virtual_grado_cero) && $asig->is_virtual_grado_cero)
+                                        <div class="d-grid gap-2">
+                                            <a href="{{ route('admin.criterio-grado-cero.index') }}" class="btn btn-outline-warning rounded-pill py-2 shadow-sm dashboard-btn-hover">
+                                                <i class="fa fa-list me-2"></i> Criterios de Evaluación
+                                            </a>
+                                            <a href="{{ route('admin.calificacion-grado-cero.index') }}" class="btn btn-outline-success rounded-pill py-2 shadow-sm dashboard-btn-hover">
+                                                <i class="fa fa-pencil-alt me-2"></i> Calificar Transición
+                                            </a>
+                                        </div>
+                                    @else
+                                        <a href="{{ route('docente.asignatura.estudiantes', [$asig->id, $asig->grado_id]) }}" 
+                                           class="btn btn-outline-success w-100 rounded-pill py-2 dashboard-btn-hover shadow-sm">
+                                            <i class="fa fa-pencil-alt me-2"></i> {{ ($isSuperAdmin || $isDirector) ? 'Ver Detalles' : 'Calificar Estudiantes' }}
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    @endforeach
                 </div>
-            @endforeach
-        </div>
+            </div>
+        @endforeach
     @endif
 </div>
 
