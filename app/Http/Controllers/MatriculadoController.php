@@ -75,22 +75,32 @@ class MatriculadoController extends Controller
             'estado'               => 'required|in:activo,inactivo,retirado',
             'id_profesor'          => 'nullable|exists:users,id',
             'documento_acudiente'  => 'nullable|string',
-            // student direct fields
-            'name'                        => 'required|string',
+            // student profile - only required if student DOES NOT exist
+            'name'                        => 'required_without_all:estudiante_id,documento_estudiante_exists|string',
             'email'                       => 'nullable|email|unique:users,email,' . $userId,
-            'fecha_nacimiento_estudiante'  => 'required|date',
+            'fecha_nacimiento_estudiante'  => 'required_without_all:estudiante_id,documento_estudiante_exists|date',
         ], [
             'email.unique' => 'Este correo electrónico ya está registrado por otro usuario en el sistema. Debe usar uno distinto o dejarlo vacío si el estudiante no cuenta con uno.'
         ]);
 
-        // Validar duplicado exacto
-        $existe = MatriculaFinal::where('documento_estudiante', $request->documento_estudiante)
+        // --- VALIDACIÓN MEJORADA ---
+        $matriculaExistente = MatriculaFinal::with('grado')
+            ->where('documento_estudiante', $request->documento_estudiante)
             ->where('ano_lectivo', $request->ano_lectivo)
-            ->exists();
+            ->first();
 
-        if ($existe) {
-            return back()->withErrors([
-                'documento_estudiante' => 'Este estudiante ya tiene una matrícula para el año lectivo seleccionado.'
+        if ($matriculaExistente) {
+            $msg = "El estudiante ya cuenta con una matrícula para el año {$request->ano_lectivo}";
+            if ($matriculaExistente->grado) {
+                $msg .= " en el grado {$matriculaExistente->grado->nombre_grado} - {$matriculaExistente->curso}.";
+            } else {
+                $msg .= ".";
+            }
+            
+            return back()->with('swal', [
+                'icon'  => 'warning',
+                'title' => 'Estudiante ya matriculado',
+                'text'  => $msg
             ])->withInput();
         }
 
@@ -100,7 +110,7 @@ class MatriculadoController extends Controller
             $realSedeId = $grado ? $grado->sede_id : null;
 
             $docEstudiante = $request->documento_estudiante;
-            $estudiante = \App\Models\Estudiante::where('numero_identificacion_estudiante', $docEstudiante)->first();
+            $estudiante = \App\Models\Estudiante::with('user')->where('numero_identificacion_estudiante', $docEstudiante)->first();
 
             if (!$estudiante) {
                 // 1. Crear Usuario Estudiante
@@ -130,10 +140,10 @@ class MatriculadoController extends Controller
                     'grado_academico_id'               => $request->id_grado,
                  ]);
             } else {
-                // Actualizar info si ya existía
+                // Actualizar info si ya existía y se pasaron datos
                 if ($estudiante->user) {
                     $estudiante->user->update([
-                        'name' => $request->name,
+                        'name' => $request->name ?? $estudiante->user->name,
                         'email' => $request->email ?? $estudiante->user->email
                     ]);
                 }
@@ -374,5 +384,39 @@ class MatriculadoController extends Controller
             'title' => 'Eliminada',
             'text'  => 'La matrícula fue eliminada correctamente.'
         ]);
+    }
+
+    /**
+     * Endpoint para búsqueda AJAX de estudiantes en Select2.
+     */
+    public function searchStudents(Request $request)
+    {
+        $term = $request->get('q');
+        
+        $estudiantes = Estudiante::with('user')
+            ->where(function($query) use ($term) {
+                $query->where('numero_identificacion_estudiante', 'LIKE', "%$term%")
+                      ->orWhereHas('user', function($q) use ($term) {
+                          $q->where('name', 'LIKE', "%$term%");
+                      });
+            })
+            ->limit(20)
+            ->get();
+
+        $results = $estudiantes->map(function($e) {
+            return [
+                'id' => $e->numero_identificacion_estudiante, // Usamos el documento como ID para el select
+                'text' => ($e->user->name ?? 'Sin Nombre') . " (" . $e->numero_identificacion_estudiante . ")",
+                'name' => $e->user->name ?? '',
+                'fecha_nacimiento' => $e->fecha_nacimiento_estudiante,
+                'email' => $e->user->email ?? '',
+                'tipo_id' => $e->tipo_identificacion_estudiante,
+                'celular' => $e->celular_estudiante,
+                'genero' => $e->genero_estudiante,
+                'direccion' => $e->direccion_estudiante
+            ];
+        });
+
+        return response()->json(['results' => $results]);
     }
 }

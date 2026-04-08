@@ -126,9 +126,9 @@
                                 <i class="fa fa-file-pdf me-1"></i> Certificado Grupal
                             </a>
                         @endif
-                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalMatricular">
+                        <!--button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalMatricular">
                             <i class="fa fa-user-plus me-1"></i> Matricular
-                        </button>
+                        </button-->
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -332,15 +332,21 @@
                     <div class="row g-3 mt-2">
                         <div class="col-md-12">
                             <label class="form-label">Seleccionar Estudiante</label>
-                            <select name="estudiante_id" class="form-select bg-dark text-white border-secondary select2-modal" required>
+                            <select name="documento_estudiante" id="select_estudiante_ajax" class="form-select bg-dark text-white border-secondary" required>
                                 <option value="">Buscar por nombre o documento...</option>
-                                @foreach($estudiantesDisponibles as $e)
-                                    <option value="{{ $e->id }}">
-                                        {{ $e->user->name }} ({{ $e->numero_identificacion_estudiante }})
-                                    </option>
-                                @endforeach
                             </select>
                         </div>
+                        
+                        <!-- Campos ocultos para datos de perfil (requeridos si el estudiante es nuevo) -->
+                        <input type="hidden" name="documento_estudiante_exists" id="documento_estudiante_exists" value="">
+                        <input type="hidden" name="name" id="hidden_name">
+                        <input type="hidden" name="fecha_nacimiento_estudiante" id="hidden_fecha_nacimiento">
+                        <input type="hidden" name="email" id="hidden_email">
+                        <input type="hidden" name="tipo_identificacion_estudiante" id="hidden_tipo_id">
+                        <input type="hidden" name="genero_estudiante" id="hidden_genero">
+                        <input type="hidden" name="celular_estudiante" id="hidden_celular">
+                        <input type="hidden" name="direccion_estudiante" id="hidden_direccion">
+                        <input type="hidden" name="curso" value="{{ $gradoAcademico->bloque }}">
                         
                         <!-- Enrollment needs a subject in this app's current logic, 
                              or maybe just a general enrollment? 
@@ -362,13 +368,10 @@
                         <div class="col-md-12">
                             <label class="form-label">Acudiente Responsable</label>
                             <select name="acudiente_id" class="form-select bg-dark text-white border-secondary" required>
-                                <option value="1">Acudiente General</option>
-                                @foreach($estudiantesDisponibles->take(10) as $e)
-                                    @if($e->acudiente)
-                                        <option value="{{ $e->acudiente_id }}">Padre/Madre de {{ $e->user->name }}</option>
-                                    @endif
-                                @endforeach
+                                <option value="1" selected>Acudiente General (ID: 1)</option>
+                                {{-- Otros acudientes pueden ser gestionados mediante edición de matrícula --}}
                             </select>
+                            <small class="text-muted">Por defecto se asigna el acudiente institucional. Puede cambiarlo después si es necesario.</small>
                         </div>
 
                         <div class="col-md-12">
@@ -414,6 +417,40 @@
                     }
                 });
             }
+        });
+
+        // Select2 AJAX para Matrícula
+        $('#select_estudiante_ajax').select2({
+            theme: 'bootstrap-5',
+            dropdownParent: $('#modalMatricular'),
+            placeholder: 'Buscar por nombre o documento...',
+            minimumInputLength: 2,
+            ajax: {
+                url: "{{ route('admin.matriculado.search') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.results
+                    };
+                },
+                cache: true
+            }
+        }).on('select2:select', function (e) {
+            var data = e.params.data;
+            $('#documento_estudiante_exists').val('1');
+            $('#hidden_name').val(data.name);
+            $('#hidden_fecha_nacimiento').val(data.fecha_nacimiento);
+            $('#hidden_email').val(data.email);
+            $('#hidden_tipo_id').val(data.tipo_id);
+            $('#hidden_genero').val(data.genero);
+            $('#hidden_celular').val(data.celular);
+            $('#hidden_direccion').val(data.direccion);
         });
     });
 </script>

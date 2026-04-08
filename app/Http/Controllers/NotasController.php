@@ -44,9 +44,8 @@ class NotasController extends Controller
             'nota2'          => 'nullable|numeric|min:0|max:5',
             'nota3'          => 'nullable|numeric|min:0|max:5',
             'nota4'          => 'nullable|numeric|min:0|max:5',
-            'observaciones'  => 'required|string|max:255',
+            'observaciones'  => 'nullable|string|max:255',
         ], [
-            'observaciones.required' => 'Las observaciones son obligatorias al asignar calificaciones.'
         ]);
 
         $data = $request->all();
@@ -99,9 +98,8 @@ class NotasController extends Controller
             'nota2'          => 'nullable|numeric|min:0|max:5',
             'nota3'          => 'nullable|numeric|min:0|max:5',
             'nota4'          => 'nullable|numeric|min:0|max:5',
-            'observaciones'  => 'required|string|max:255',
+            'observaciones'  => 'nullable|string|max:255',
         ], [
-            'observaciones.required' => 'Las observaciones son obligatorias al asignar calificaciones.'
         ]);
 
         $data = $request->all();

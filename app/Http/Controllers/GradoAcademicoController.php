@@ -272,12 +272,6 @@ class GradoAcademicoController extends Controller
         $allAsignaturas = \App\Models\Asignatura::orderBy('nombre_asignatura')->get();
         $allUsers = \App\Models\User::whereHas('docente')->orderBy('name')->get();
         
-        // Estudiantes disponibles para matricular (los que NO están en este grado/año)
-        $estudiantesDisponibles = \App\Models\Estudiante::with('user')
-            ->whereNotIn('numero_identificacion_estudiante', $documentosMatriculados)
-            ->limit(100)
-            ->get();
-
         return view('GradoAcademico.Show', compact(
             'gradoAcademico', 
             'estudiantes',
@@ -289,8 +283,7 @@ class GradoAcademicoController extends Controller
             'esAnhoActual',
             'cursosDisponibles',
             'allAsignaturas',
-            'allUsers',
-            'estudiantesDisponibles'
+            'allUsers'
         ));
     }
 

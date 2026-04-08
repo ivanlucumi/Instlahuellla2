@@ -68,6 +68,10 @@
                                     @php
                                         $userObj = auth()->user();
                                         $isAdmin = $userObj->hasRol('SUPERADMIN') || $userObj->hasRol('RECTOR');
+                                        $esGradoCero = (
+                                            str_contains(strtoupper($grado->nombre_grado), 'CERO') || 
+                                            str_contains(strtoupper($grado->nombre_grado), 'TRANSICION')
+                                        );
                                     @endphp
                                     @foreach($estudiantes as $estudiante)
                                         @php
@@ -167,6 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const checkboxes = document.querySelectorAll('.student-checkbox');
     const saveBtn = document.getElementById('save-btn');
     const editWarning = document.getElementById('edit-warning');
+    const esGradoCero = {{ $esGradoCero ? 'true' : 'false' }};
     
     if (selectAll) {
         selectAll.addEventListener('change', function() {
@@ -230,10 +235,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Requerir observaciones y habilitarlo SOLO si P3 tiene nota
+        // Requerir observaciones SOLO para Grado Cero y si P3 tiene nota
         const isEditingRow = row.classList.contains('row-editing');
         
-        if (n3 > 0) {
+        if (esGradoCero && n3 > 0) {
             if (isEditingRow) {
                 obsInput.readOnly = false;
                 obsInput.classList.remove('bg-light');
@@ -247,9 +252,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 obsInput.classList.add('border-0');
             }
         } else {
-            obsInput.readOnly = true;
-            obsInput.classList.add('bg-light', 'border-0');
-            obsInput.classList.remove('bg-white', 'border', 'border-warning', 'border-secondary');
+            // Para grados 1-11 o si no hay nota en P3, habilitamos edición pero no es obligatorio
+            if (isEditingRow) {
+                obsInput.readOnly = false;
+                obsInput.classList.remove('bg-light');
+                obsInput.classList.add('bg-white');
+            } else {
+                obsInput.readOnly = true;
+                obsInput.classList.add('bg-light');
+                obsInput.classList.remove('bg-white');
+            }
+            obsInput.classList.remove('border', 'border-warning', 'border-secondary');
+            obsInput.classList.add('border-0');
         }
 
         validateForm();
@@ -267,7 +281,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const n3Val = parseFloat(row.querySelector(`input[name="notas[${studentId}][nota3]"]`).value) || 0;
             const obsInput = row.querySelector('.obs-input');
             
-            if (n3Val > 0 && obsInput.value.trim() === '') {
+            // Solo invalidar si es Grado Cero y falta la observación en P3
+            if (esGradoCero && n3Val > 0 && obsInput.value.trim() === '') {
                 allValid = false;
             }
         });

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Informe Valorativo - {{ $estudiante->user->name }}</title>
@@ -7,37 +8,44 @@
         @page {
             margin: 1.5cm;
         }
+
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
             color: #000;
             line-height: 1.2;
             font-size: 10px;
         }
+
         .header {
             text-align: center;
             margin-bottom: 10px;
             position: relative;
         }
+
         .logo {
             position: absolute;
             left: 0;
             top: 0;
             width: 70px;
         }
+
         .header-text {
             display: inline-block;
             width: 80%;
         }
+
         .header h1 {
             margin: 0;
             font-size: 16px;
             font-weight: bold;
         }
+
         .header p {
             margin: 2px 0;
             font-size: 10px;
             font-weight: normal;
         }
+
         .sub-header {
             text-align: center;
             margin-bottom: 15px;
@@ -47,22 +55,27 @@
             text-transform: uppercase;
             font-weight: bold;
         }
+
         .info-table {
             width: 100%;
             margin-bottom: 15px;
         }
+
         .info-table td {
             padding: 2px 0;
         }
+
         .label {
             font-weight: bold;
             width: 180px;
         }
+
         .grades-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
         }
+
         .grades-table th {
             background-color: #f2f2f2;
             color: #000;
@@ -72,40 +85,49 @@
             text-align: center;
             font-size: 9px;
         }
+
         .grades-table td {
             padding: 4px;
             border: 1px solid #000;
             text-align: center;
         }
+
         .subject-col {
             text-align: left !important;
             font-weight: bold;
         }
+
         .scale-table {
             width: 100%;
             margin-top: 20px;
             font-size: 9px;
             border-collapse: collapse;
         }
+
         .scale-table th {
             text-align: left;
             padding-bottom: 5px;
         }
+
         .scale-table td {
             width: 25%;
         }
+
         .observations {
             margin-top: 30px;
         }
+
         .observations p {
             margin: 0;
             font-weight: bold;
         }
+
         .line {
             border-bottom: 1px solid #000;
             height: 15px;
             margin-bottom: 5px;
         }
+
         .footer-sign {
             margin-top: 15px;
             text-align: center;
@@ -113,6 +135,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="header">
         <img src="{{ public_path('panelAdmin/img/LOGOROMBO1.png') }}" class="logo">
@@ -169,7 +192,8 @@
             @foreach($notas as $nota)
                 @if($nota->nucleo != $currentNucleo)
                     <tr style="background-color: #f9f9f9;">
-                        <td colspan="6" style="text-align: left; padding-left: 10px; font-weight: bold; border-top: 2px solid #000;">
+                        <td colspan="6"
+                            style="text-align: left; padding-left: 10px; font-weight: bold; border-top: 2px solid #000;">
                             NUCLEO: {{ strtoupper($nota->nucleo) }}
                         </td>
                     </tr>
@@ -212,8 +236,14 @@
         <div class="line"></div>
         <div class="line"></div>
         <div class="footer-sign">
-            DOCENTE DIRECTOR DEL GRADO ACADEMICO: {{ strtoupper($matricula->profesor->name ?? 'N/A') }}
+            <br>
+            <br>
+            <br>
+            ___________________________________________<br>
+            DOCENTE DIRECTOR DEL GRADO ACADEMICO:
+            {{ strtoupper($matricula->grado->docente->user->name ?? $matricula->profesor->name ?? 'N/A') }}
         </div>
     </div>
 </body>
+
 </html>

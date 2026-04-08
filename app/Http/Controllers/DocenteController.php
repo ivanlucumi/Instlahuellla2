@@ -422,6 +422,12 @@ class DocenteController extends Controller
             ->orderBy('nombre_anho_escolar', 'desc')
             ->first()?->id ?? 1; // Fallback to 1 if none active
 
+        $gradoOficial = GradoAcademico::find($request->grado_id);
+        $esGradoCero = $gradoOficial && (
+            str_contains(strtoupper($gradoOficial->nombre_grado), 'CERO') || 
+            str_contains(strtoupper($gradoOficial->nombre_grado), 'TRANSICION')
+        );
+
         $errors = [];
         $savedCount = 0;
 
@@ -436,10 +442,11 @@ class DocenteController extends Controller
                 continue;
             }
 
-            if (empty($observaciones)) {
+            // --- REQUERIMIENTO: Solo obligatorio para Grado Cero/Transición ---
+            if ($esGradoCero && empty($observaciones)) {
                 $estudiante = Estudiante::find($estudianteId);
                 $nombre = $estudiante ? $estudiante->user->name : "ID: $estudianteId";
-                $errors[] = "Las observaciones son obligatorias para el estudiante $nombre.";
+                $errors[] = "Las observaciones son obligatorias para el estudiante $nombre en este grado.";
                 continue;
             }
 

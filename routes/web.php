@@ -155,6 +155,7 @@ Route::middleware(['auth', 'role_secure:SUPERADMIN,ADMIN,DIRECTOR'])
         Route::get('/gradoacademico/list', [App\Http\Controllers\GradoAcademicoController::class, 'list'])->name('admin.gradoacademico.list');
         Route::get('/anho-escolar/list', [App\Http\Controllers\AnhoEscolarController::class, 'list'])->name('admin.anhoescolar.list');
 
+        Route::get('/matriculado/search', [App\Http\Controllers\MatriculadoController::class, 'searchStudents'])->name('admin.matriculado.search');
         Route::resource('matriculado', App\Http\Controllers\MatriculadoController::class)->names('admin.matriculado');
         Route::resource('notas', App\Http\Controllers\NotasController::class)->names('admin.notas');
         Route::resource('notas-definitivas', App\Http\Controllers\NotasDefinitivasController::class)->names('admin.notas-definitivas');
