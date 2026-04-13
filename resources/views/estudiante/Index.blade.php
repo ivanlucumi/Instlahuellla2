@@ -82,9 +82,11 @@
                         <a href="{{ route('admin.estudiante.index') }}" class="btn btn-outline-light" title="Limpiar Filtros">
                             <i class="fa fa-sync-alt"></i>
                         </a>
+                        @if(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']))
                         <a href="{{ route('admin.estudiante.import') }}" class="btn btn-success" title="Importar Estudiantes">
                             <i class="fa fa-file-excel"></i>
                         </a>
+                        @endif
                         @if(request('grado_id'))
                             <a href="{{ route('admin.certificados.generar-grupo', array_merge(request()->all(), ['grado_id' => request('grado_id'), 'ano_lectivo' => $currentAnho->nombre_anho_escolar])) }}" 
                                class="btn btn-info text-dark fw-bold" target="_blank" title="Reporte del Grupo">
@@ -156,11 +158,13 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <div class="d-flex gap-1">
+                                         <div class="d-flex gap-1">
+                                            @if(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']))
                                             <a href="{{ route('admin.estudiante.edit', $estudiante) }}" 
                                                class="btn btn-warning btn-sm">
                                                 <i class="fa fa-edit"></i>
                                             </a>
+                                            @endif
                                             @if(auth()->user()->hasRol('SUPERADMIN'))
                                             <form action="{{ route('admin.estudiante.destroy', $estudiante) }}" 
                                                   method="POST" 

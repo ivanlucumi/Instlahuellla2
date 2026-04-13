@@ -42,9 +42,11 @@
                         <a href="{{ route('admin.docente.index') }}" class="btn btn-outline-light" title="Limpiar Filtros">
                             <i class="fa fa-sync-alt"></i>
                         </a>
+                        @if(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']))
                         <a href="{{ route('admin.docente.create') }}" class="btn btn-primary">
                             <i class="fa fa-plus me-1"></i> Nuevo Docente
                         </a>
+                        @endif
                     </div>
                 </form>
             </div>
@@ -95,10 +97,12 @@
                                         </span>
                                     </td>
                                     <td>
+                                        @if(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']))
                                         <a href="{{ route('admin.docente.edit', $docente) }}" 
                                            class="btn btn-warning btn-sm">
                                             <i class="fa fa-edit"></i>
                                         </a>
+                                        @endif
                                         
                                         @if(auth()->user()->hasRol('SUPERADMIN'))
                                         <form action="{{ route('admin.docente.destroy', $docente) }}" 

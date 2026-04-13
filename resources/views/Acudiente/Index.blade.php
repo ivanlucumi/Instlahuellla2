@@ -43,9 +43,11 @@
                         <a href="{{ route('admin.acudiente.index') }}" class="btn btn-outline-light" title="Limpiar Filtros">
                             <i class="fa fa-sync-alt"></i>
                         </a>
+                        @if(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']))
                         <a href="{{ route('admin.acudiente.create') }}" class="btn btn-primary">
                             <i class="fa fa-plus me-1"></i> Nuevo Acudiente
                         </a>
+                        @endif
                     </div>
                 </form>
             </div>
@@ -84,10 +86,12 @@
                                         </span>
                                     </td>
                                     <td>
+                                        @if(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']))
                                         <a href="{{ route('admin.acudiente.edit', $acudiente) }}" 
                                            class="btn btn-warning btn-sm">
                                             <i class="fa fa-edit"></i>
                                         </a>
+                                        @endif
                                         
                                         @if(auth()->user()->hasRol('SUPERADMIN'))
                                         <form action="{{ route('admin.acudiente.destroy', $acudiente) }}" 

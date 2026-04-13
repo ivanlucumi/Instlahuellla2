@@ -47,7 +47,7 @@ class DocenteController extends Controller
      */
     public function create()
     {
-        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'DIRECTOR']), 403, 'No tiene permisos para crear registros. Solo roles directivos pueden hacerlo.');
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para crear registros. Solo roles directivos pueden hacerlo.');
 
         $usuarios = \App\Models\User::orderBy('name')->get();
         return view('Docente.Create', compact('usuarios'));
@@ -58,7 +58,7 @@ class DocenteController extends Controller
      */
     public function store(Request $request)
     {
-        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'DIRECTOR']), 403, 'No tiene permisos para modificar estos datos. Solo roles directivos pueden hacerlo.');
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para modificar estos datos. Solo roles directivos pueden hacerlo.');
 
         // 🔒 Validación
         $request->validate([
@@ -122,7 +122,7 @@ class DocenteController extends Controller
      */
     public function edit(Docente $docente)
     {
-        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'DIRECTOR']), 403, 'No tiene permisos para modificar estos datos. Solo roles directivos pueden hacerlo.');
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para modificar estos datos. Solo roles directivos pueden hacerlo.');
 
         // No necesitamos lista de usuarios, ya editamos el propio
         return view('Docente.Edit', compact('docente'));
@@ -133,7 +133,7 @@ class DocenteController extends Controller
      */
     public function update(Request $request, Docente $docente)
     {
-        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'DIRECTOR']), 403, 'No tiene permisos para modificar estos datos. Solo roles directivos pueden hacerlo.');
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para modificar estos datos. Solo roles directivos pueden hacerlo.');
 
         // 🔒 Validación
         $request->validate([
@@ -406,7 +406,7 @@ class DocenteController extends Controller
         ]);
 
         $user = auth()->user();
-        $isSuperAdmin = $user->hasRol('SUPERADMIN') || $user->hasRol('ADMIN');
+        $isAdmin = $user->hasAnyRol(['SUPERADMIN', 'RECTOR', 'ADMIN']);
         
         $isAssignedTeacher = \DB::table('asignatura_grado_docente')
             ->where('grado_academico_id', $request->grado_id)
@@ -414,13 +414,15 @@ class DocenteController extends Controller
             ->where('docente_id', $user->id)
             ->exists();
 
-        if (!$isSuperAdmin && !$isAssignedTeacher) {
+        if (!$isAdmin && !$isAssignedTeacher) {
             abort(403, 'No tiene permisos para modificar las calificaciones de esta asignatura.');
         }
 
-        $anhoEscolarId = AnhoEscolar::where('estado_anho_escolar', 1)
+        $anhoEscolarObj = AnhoEscolar::where('estado_anho_escolar', 1)
             ->orderBy('nombre_anho_escolar', 'desc')
-            ->first()?->id ?? 1; // Fallback to 1 if none active
+            ->first();
+            
+        $anhoEscolarId = $anhoEscolarObj?->id ?? 1;
 
         $gradoOficial = GradoAcademico::find($request->grado_id);
         $esGradoCero = $gradoOficial && (
@@ -471,28 +473,6 @@ class DocenteController extends Controller
                 }
             }
 
-            // --- BLOQUEO DE EDICIÓN ---
-            $isAdmin = auth()->user()->hasRol('SUPERADMIN') || auth()->user()->hasRol('RECTOR');
-            $oldNota = \App\Models\NotasDefinitivas::where('id_matricula', $matriculaFinal->id)
-                            ->where('asignatura_id', $request->asignatura_id)
-                            ->first();
-
-            if ($oldNota && !$isAdmin) {
-                // Si la nota ya existe y no es admin, mantenemos lo anterior si tenía valor
-                if ($oldNota->nota_per1 > 0) $nota1 = $oldNota->nota_per1;
-                if ($oldNota->nota_per2 > 0) $nota2 = $oldNota->nota_per2;
-                if ($oldNota->nota_per3 > 0) $nota3 = $oldNota->nota_per3;
-                if ($oldNota->nota_per4 > 0) $nota4 = $oldNota->nota4;
-                if (!empty($oldNota->observaciones)) $observaciones = $oldNota->observaciones;
-
-                // Recalcular definitiva con los valores bloqueados
-                $n1 = (float)$nota1; $n2 = (float)$nota2; $n3 = (float)$nota3; $n4 = (float)$nota4;
-                $definitiva = 0;
-                if ($n3 > 0) {
-                    if ($n4 > 0) $definitiva = ($n1 + $n2 + $n3 + $n4) / 4;
-                    else $definitiva = ($n1 + $n2 + $n3) / 3;
-                }
-            }
             // --------------------------
 
             // --- VALIDACIÓN SECUENCIAL (Backend) ---

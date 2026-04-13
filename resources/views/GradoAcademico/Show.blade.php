@@ -230,33 +230,70 @@
                 @endif
                 
                 <div class="list-group list-group-flush list-group-dark">
-                    @forelse($gradoAcademico->asignaturas as $asig)
-                        <div class="list-group-item bg-transparent text-white border-secondary py-3 px-0">
-                            <div class="d-flex w-100 justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-1 text-info">{{ $asig->nombre_asignatura }}</h6>
+                    @php
+                        $user_id = auth()->id();
+                        $misAsignaturas = $gradoAcademico->asignaturas->filter(fn($as) => $as->pivot->docente_id == $user_id);
+                        $otrasAsignaturas = $gradoAcademico->asignaturas->filter(fn($as) => $as->pivot->docente_id != $user_id);
+                        $isAdmin = auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'ADMIN']);
+                    @endphp
+
+                    {{-- 1. Mis Asignaturas --}}
+                    @if($misAsignaturas->isNotEmpty())
+                        <h6 class="text-primary mt-2 mb-3 px-2 border-start border-2 border-primary py-1" style="background: rgba(13, 110, 253, 0.05);">
+                            <i class="fa fa-user-check me-2"></i>MIS ASIGNATURAS
+                            <small class="text-muted d-block" style="font-size: 0.65rem; font-weight: normal;">Materias que imparto en este grado y puedo calificar.</small>
+                        </h6>
+                        @foreach($misAsignaturas as $asig)
+                            <div class="list-group-item bg-transparent text-white border-secondary py-3 px-2 mb-2 rounded border">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1 text-info">{{ $asig->nombre_asignatura }}</h6>
+                                        <small class="d-block text-white-50">
+                                            <i class="fa fa-layer-group me-1"></i> {{ $asig->hilo->nombre_hilo ?? 'Sin núcleo' }}
+                                        </small>
+                                    </div>
                                     @if($esAnhoActual)
-                                    @php
-                                        $docenteAsig = $asig->docentes->firstWhere('id', $asig->pivot->docente_id);
-                                    @endphp
-                                    <small class="text-muted">
-                                        <i class="fa fa-chalkboard-teacher me-1"></i>
-                                        {{ $docenteAsig ? $docenteAsig->name : 'Docente sin asignar' }}
-                                    </small>
+                                    <a href="{{ route('docente.asignatura.estudiantes', ['asignatura' => $asig->id, 'grado' => $gradoAcademico->id, 'ano_lectivo' => $currentAnhoObj->nombre_anho_escolar]) }}" 
+                                       class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm" style="font-size: 0.75rem;">
+                                       <i class="fa fa-edit me-1"></i> Calificar
+                                    </a>
                                     @endif
-                                    <small class="d-block text-white-50">
-                                        <i class="fa fa-layer-group me-1"></i> {{ $asig->hilo->nombre_hilo ?? 'Sin núcleo' }}
-                                    </small>
                                 </div>
-                                @if($esAnhoActual)
-                                <a href="{{ route('docente.asignatura.estudiantes', ['asignatura' => $asig->id, 'grado' => $gradoAcademico->id, 'ano_lectivo' => $currentAnhoObj->nombre_anho_escolar]) }}" 
-                                   class="btn btn-xs btn-outline-info rounded-pill px-3" style="font-size: 0.7rem;">
-                                   Planilla <i class="fa fa-chevron-right ms-1"></i>
-                                </a>
-                                @endif
                             </div>
-                        </div>
-                    @empty
+                        @endforeach
+                    @endif
+
+                    {{-- 2. Otras Asignaturas --}}
+                    @if($otrasAsignaturas->isNotEmpty())
+                        <h6 class="text-white-50 mt-4 mb-3 px-2 border-start border-2 border-secondary py-1">
+                            <i class="fa fa-users me-2"></i>OTRAS MATERIAS DEL GRADO
+                            <small class="text-muted d-block" style="font-size: 0.65rem; font-weight: normal;">Materias impartidas por otros docentes (Modo Supervisión).</small>
+                        </h6>
+                        @foreach($otrasAsignaturas as $asig)
+                            <div class="list-group-item bg-transparent text-white border-secondary py-2 px-2 mb-1 opacity-75">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1" style="font-size: 0.9rem;">{{ $asig->nombre_asignatura }}</h6>
+                                        @php
+                                            $docenteAsig = $asig->docentes->firstWhere('id', $asig->pivot->docente_id);
+                                        @endphp
+                                        <small class="text-muted" style="font-size: 0.7rem;">
+                                            <i class="fa fa-chalkboard-teacher me-1"></i>
+                                            {{ $docenteAsig ? $docenteAsig->name : 'Docente sin asignar' }}
+                                        </small>
+                                    </div>
+                                    @if($esAnhoActual)
+                                    <a href="{{ route('docente.asignatura.estudiantes', ['asignatura' => $asig->id, 'grado' => $gradoAcademico->id, 'ano_lectivo' => $currentAnhoObj->nombre_anho_escolar]) }}" 
+                                       class="btn btn-xs btn-outline-info rounded-pill px-2" style="font-size: 0.65rem;">
+                                       <i class="fa fa-eye me-1"></i> Ver Detalle
+                                    </a>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    @endif
+
+                    @if($gradoAcademico->asignaturas->isEmpty())
                         <div class="text-center py-4 text-muted border border-secondary border-dashed rounded">
                             @if($esAnhoActual)
                                 <i class="fa fa-info-circle me-1"></i> No hay materias asignadas a este grado.
@@ -264,7 +301,7 @@
                                 <i class="fa fa-info-circle me-1"></i> No hay notas registradas para el año {{ $currentAnhoObj->nombre_anho_escolar }}.
                             @endif
                         </div>
-                    @endforelse
+                    @endif
                 </div>
 
                 @if($esAnhoActual)

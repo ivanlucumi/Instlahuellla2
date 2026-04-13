@@ -9,12 +9,14 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <h4 class="text-white">Matrículas Registradas</h4>
-                <div class="d-flex align-items-center">
-                    <input type="text" class="form-control form-control-sm me-3 search-table" placeholder="Buscar matrícula..." style="width: 250px;">
-                    <a href="{{ route('admin.matriculado.create') }}" class="btn btn-primary">
-                        <i class="fa fa-plus me-1"></i> Nueva Matrícula
-                    </a>
-                </div>
+                    <div class="d-flex align-items-center">
+                        <input type="text" class="form-control form-control-sm me-3 search-table" placeholder="Buscar matrícula..." style="width: 250px;">
+                        @if(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'ADMIN']))
+                        <a href="{{ route('admin.matriculado.create') }}" class="btn btn-primary">
+                            <i class="fa fa-plus me-1"></i> Nueva Matrícula
+                        </a>
+                        @endif
+                    </div>
             </div>
         </div>
     </div>
@@ -62,11 +64,13 @@
                                         </span>
                                     </td>
                                     <td>{{ $matriculado->fecha ? date('d/m/Y', strtotime($matriculado->fecha)) : 'N/A' }}</td>
-                                    <td>
+                                     <td>
+                                        @if(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'ADMIN']))
                                         <a href="{{ route('admin.matriculado.edit', $matriculado) }}" 
                                            class="btn btn-warning btn-sm">
                                             <i class="fa fa-edit"></i>
                                         </a>
+                                        @endif
                                         
                                         @if(auth()->user()->hasRol('SUPERADMIN'))
                                         <form action="{{ route('admin.matriculado.destroy', $matriculado) }}" 

@@ -65,11 +65,18 @@ class User extends Authenticatable
     public function menus()
     {
         $rolesIds = $this->roles->pluck('id')->toArray();
+        $isAdmin = $this->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'ADMIN']);
         
-        return Menu::whereIn('rol_id', $rolesIds)
+        $query = Menu::whereIn('rol_id', $rolesIds)
             ->where('estado', true)
-            ->orderBy('orden')
-            ->get()
+            ->orderBy('orden');
+
+        // Restricción: Solo Admins/Rector/Secretario ven 'Institución'
+        if (!$isAdmin) {
+            $query->where('nombre', '!=', 'Institución');
+        }
+
+        return $query->get()
             // Descartar duplicados si el usuario tiene múltiples roles con acceso al mismo menú
             ->unique(function ($item) {
                 return $item->nombre . $item->nombre_submenu . $item->url;

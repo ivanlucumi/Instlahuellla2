@@ -340,24 +340,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 input.classList.remove('bg-light', 'border-0');
                 input.classList.add('bg-white', 'border-secondary');
             } else {
-                // Docente: solo el primer vacío si los anteriores están llenos
-                if (!hasValue && !firstEmptyFound) {
-                    // Verificar si es el primero o si el anterior tiene valor
-                    let canEnable = true;
-                    if (index > 0) {
+                // Docente: permitir editar si ya tiene valor
+                // O si es el primero vacío y el anterior tiene valor
+                let canEnable = false;
+                if (hasValue) {
+                    canEnable = true;
+                } else if (!firstEmptyFound) {
+                    if (index === 0) {
+                        canEnable = true;
+                    } else {
                         const prevInput = inputs[index-1];
-                        if (!(parseFloat(prevInput.value) > 0)) {
-                            canEnable = false;
+                        if (parseFloat(prevInput.value) > 0) {
+                            canEnable = true;
                         }
                     }
-                    
-                    if (canEnable) {
-                        input.readOnly = false;
-                        input.classList.remove('bg-light', 'border-0');
-                        input.classList.add('bg-white', 'border-primary', 'border-2');
-                        input.style.boxShadow = '0 0 0 0.2rem rgba(13, 110, 253, 0.1)';
-                        firstEmptyFound = true;
-                    }
+                }
+
+                if (canEnable) {
+                    input.readOnly = false;
+                    input.classList.remove('bg-light', 'border-0');
+                    input.classList.add('bg-white', 'border-primary', 'border-2');
+                    input.style.boxShadow = '0 0 0 0.2rem rgba(13, 110, 253, 0.1)';
+                    if (!hasValue) firstEmptyFound = true;
                 } else {
                     input.readOnly = true;
                     input.classList.add('bg-light', 'text-muted');

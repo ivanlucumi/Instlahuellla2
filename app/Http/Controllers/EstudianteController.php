@@ -125,7 +125,7 @@ class EstudianteController extends Controller
      */
     public function create()
     {
-        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'DIRECTOR']), 403, 'No tiene permisos para crear registros. Solo roles directivos pueden hacerlo.');
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para crear registros. Solo roles directivos pueden hacerlo.');
 
         $usuarios = \App\Models\User::whereDoesntHave('estudiante')->whereDoesntHave('docente')->orderBy('name')->get();
         $acudientes = \App\Models\Acudiente::with('user')->get();
@@ -138,7 +138,7 @@ class EstudianteController extends Controller
      */
     public function store(Request $request)
     {
-        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'DIRECTOR']), 403, 'No tiene permisos para modificar estos datos. Solo roles directivos pueden hacerlo.');
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para modificar estos datos. Solo roles directivos pueden hacerlo.');
 
         $request->validate([
             'name'                           => 'required|string|max:255',
@@ -202,13 +202,7 @@ class EstudianteController extends Controller
      */
     public function edit(Estudiante $estudiante)
     {
-        $user = auth()->user();
-        $canEdit = $user->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'DIRECTOR']);
-        if (!$canEdit && $user->isGradeDirector()) {
-            // Un Docente solo puede editar a los estudiantes de su grado asignado
-            $canEdit = $estudiante->grado_academico_id && \App\Models\GradoAcademico::where('id', $estudiante->grado_academico_id)->where('docente_id', $user->docente->id ?? null)->exists();
-        }
-        abort_unless($canEdit, 403, 'No tiene permisos para modificar estos datos. Solo roles directivos o el director del grado pueden hacerlo.');
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para modificar estos datos. Solo roles directivos pueden hacerlo.');
 
         $acudientes = \App\Models\Acudiente::with('user')->get();
         $grados = \App\Models\GradoAcademico::orderBy('nombre_grado')->get();
@@ -220,12 +214,7 @@ class EstudianteController extends Controller
      */
     public function update(Request $request, Estudiante $estudiante)
     {
-        $user = auth()->user();
-        $canEdit = $user->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'DIRECTOR']);
-        if (!$canEdit && $user->isGradeDirector()) {
-            $canEdit = $estudiante->grado_academico_id && \App\Models\GradoAcademico::where('id', $estudiante->grado_academico_id)->where('docente_id', $user->docente->id ?? null)->exists();
-        }
-        abort_unless($canEdit, 403, 'No tiene permisos para modificar estos datos. Solo roles directivos o el director del grado pueden hacerlo.');
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para modificar estos datos. Solo roles directivos pueden hacerlo.');
 
         $request->validate([
             'name'                           => 'required|string|max:255',
@@ -419,6 +408,8 @@ class EstudianteController extends Controller
 
     public function storeQuick(Request $request)
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']), 403, 'No tiene permisos para modificar estos datos.');
+
         $request->validate([
             'name'                           => 'required|string|max:255',
             'email'                          => 'required|string|email|max:255|unique:users',

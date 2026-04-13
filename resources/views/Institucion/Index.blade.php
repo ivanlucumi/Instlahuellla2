@@ -54,10 +54,14 @@
                 </div>
 
                 <div class="card-footer bg-transparent border-0 text-center pb-4">
+                    @if(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']))
                     <a href="{{ route('admin.institucion.edit', $inst) }}"
                        class="btn btn-warning px-4">
                         <i class="fa fa-edit me-1"></i> Editar institución
                     </a>
+                    @else
+                    <span class="text-muted small"><i class="fa fa-info-circle me-1"></i> Solo lectura</span>
+                    @endif
                 </div>
 
             </div>
@@ -68,9 +72,11 @@
             <div class="alert alert-warning">
                 No hay instituciones registradas
             </div>
+            @if(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO']))
             <a href="{{ route('admin.institucion.create') }}" class="btn btn-primary">
                 Crear Institución
             </a>
+            @endif
         </div>
     @endforelse
 </div>

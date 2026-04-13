@@ -40,6 +40,7 @@ class MatriculadoController extends Controller
 
     public function create()
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'ADMIN']), 403, 'No tiene permisos para crear matrículas.');
         $matriculado = new MatriculaFinal(); 
         $estudiantes = Estudiante::with('user')->orderBy('id')->get();
         // Cargar todos los catálogos para los dropdowns
@@ -62,6 +63,7 @@ class MatriculadoController extends Controller
 
     public function store(Request $request)
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'ADMIN']), 403, 'No tiene permisos para crear matrículas.');
         $docEstudiante = $request->documento_estudiante;
         $estudiante = \App\Models\Estudiante::where('numero_identificacion_estudiante', $docEstudiante)->first();
         $userId = $estudiante ? $estudiante->user_id : null;
@@ -233,6 +235,7 @@ class MatriculadoController extends Controller
 
     public function edit($id)
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'ADMIN']), 403, 'No tiene permisos para editar matrículas.');
         $matriculado = MatriculaFinal::findOrFail($id);
         $estudiantes = Estudiante::with('user')->orderBy('id')->get();
         $sedes = Sede::orderBy('nombre_sede')->get();
@@ -254,6 +257,7 @@ class MatriculadoController extends Controller
 
     public function update(Request $request, $id)
     {
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'ADMIN']), 403, 'No tiene permisos para editar matrículas.');
         $matricula = MatriculaFinal::with('estudiante.user')->findOrFail($id);
 
         $request->validate([
