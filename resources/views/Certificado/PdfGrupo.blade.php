@@ -22,7 +22,8 @@
                 'matricula'        => $data['matricula'],
                 'anho_lectivo'     => $data['anho_lectivo'],
                 'periodo'          => $periodo ?? null,
-                'fecha'            => $fecha
+                'fecha'            => $fecha,
+                'institucion'      => $institucion ?? null
             ])
         </div>
     @endforeach

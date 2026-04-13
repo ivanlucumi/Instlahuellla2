@@ -137,14 +137,20 @@
 </head>
 
 <body>
+    @php
+        $inst = $institucion ?? \App\Models\Institucion::first();
+    @endphp
     <div class="header">
         <img src="{{ public_path('panelAdmin/img/LOGOROMBO1.png') }}" class="logo">
         <div class="header-text">
-            <h1>CENTRO EDUCATIVO RURAL MIXTO LA HUELLA</h1>
-            <p>Resolución 0434 del 26 de abril del 2004 y 10695 del 30 de diciembre de 2009</p>
-            <p>CODIGO DANE 219142000506</p>
-            <p>RESGUARDO INDIGENA DE HUELLAS CALOTO</p>
-            <p>MUNICIPIO DE CALOTO CAUCA</p>
+            <h1>{{ strtoupper($inst->nombre_institucion ?? 'INSTITUCIÓN EDUCATIVA TÉCNICA AGROPECUARIA LA HUELLA') }}
+            </h1>
+            <p>{{ $inst->resolucion_institucion ?? 'Resolución 0434 del 26 de abril del 2004 y 10695 del 30 de diciembre de 2009' }}
+            </p>
+            <p>CODIGO DANE {{ $inst->codigo_dane ?? '219142000506' }}</p>
+            <p>{{ $inst->descripcion_institucion ?? 'RESGUARDO INDIGENA DE HUELLAS CALOTO' }}</p>
+            <p>MUNICIPIO DE {{ strtoupper($inst->ciudad_institucion ?? 'CALOTO') }}
+                {{ strtoupper($inst->departamento_institucion ?? 'CAUCA') }}</p>
             <p>Sede: {{ $matricula->sede->nombre_sede ?? 'C.E.R.M LA HUELLA' }}</p>
         </div>
     </div>
@@ -153,7 +159,7 @@
         @if(isset($periodo))
             BOLETÍN DE CALIFICACIONES - {{ strtoupper($periodo->nombre_periodo) }} <br>
         @else
-            INFORME VALORATIVO FINAL <br>
+            INFORME VALORATIVO<br>
         @endif
         AÑO LECTIVO: {{ $anho_lectivo }} <br>
         GRADO: {{ strtoupper($grado_solicitado) }}
@@ -161,7 +167,7 @@
 
     <table class="info-table">
         <tr>
-            <td class="label">Grado / Nivel:</td>
+            <td class="label">Grado:</td>
             <td style="font-weight: bold; font-size: 11px;">{{ strtoupper($grado_solicitado) }}</td>
             <td class="label" style="width: 50px;">Grupo:</td>
             <td>{{ $notas->first()->curso ?? '1' }}</td>
@@ -179,11 +185,11 @@
     <table class="grades-table">
         <thead>
             <tr>
-                <th style="width: 45%;">NUCLEO y ASIGNATURAS</th>
-                <th>PER-1</th>
-                <th>PER-2</th>
-                <th>PER-3</th>
-                <th>PER-4</th>
+                <th style="width: 45%;">ASIGNATURAS</th>
+                <th>&Eacute;POCA-1</th>
+                <th>&Eacute;POCA-2</th>
+                <th>&Eacute;POCA-3</th>
+                <th>&Eacute;POCA-4</th>
                 <th>FINAL</th>
             </tr>
         </thead>
@@ -194,7 +200,7 @@
                     <tr style="background-color: #f9f9f9;">
                         <td colspan="6"
                             style="text-align: left; padding-left: 10px; font-weight: bold; border-top: 2px solid #000;">
-                            NUCLEO: {{ strtoupper($nota->nucleo) }}
+                            {{ strtoupper($nota->nucleo) }}
                         </td>
                     </tr>
                     @php $currentNucleo = $nota->nucleo; @endphp

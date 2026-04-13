@@ -126,6 +126,8 @@ class CertificadoController extends Controller
 
         $notasDefinitivas = $notasDefinitivas->sortBy('nucleo');
 
+        $institucion = \App\Models\Institucion::first();
+
         $viewData = [
             'estudiante' => $estudiante,
             'grado_solicitado' => $request->grado_aprobado,
@@ -133,6 +135,7 @@ class CertificadoController extends Controller
             'matricula' => $matricula,
             'anho_lectivo' => $matricula->ano_lectivo,
             'fecha' => date('d/m/Y'),
+            'institucion' => $institucion,
         ];
 
         $pdf = Pdf::loadView('Certificado.Pdf', $viewData);
@@ -207,6 +210,8 @@ class CertificadoController extends Controller
         $grado = $matricula->grado;
         $gradoAprobado = trim(($grado->nombre_grado ?? '') . ' - ' . ($grado->bloque ?? ''));
 
+        $institucion = \App\Models\Institucion::first();
+
         $viewData = [
             'estudiante' => $estudiante,
             'grado_solicitado' => $gradoAprobado,
@@ -215,6 +220,7 @@ class CertificadoController extends Controller
             'periodo' => $periodo,
             'anho_lectivo' => $matricula->ano_lectivo,
             'fecha' => date('d/m/Y'),
+            'institucion' => $institucion,
         ];
 
         $nombreArchivo = "Certificado_{$matricula->documento_estudiante}_{$gradoAprobado}_{$matricula->ano_lectivo}.pdf";
@@ -322,11 +328,14 @@ class CertificadoController extends Controller
 
         $nombreArchivo = str_replace([' ', '/'], '_', "Certificados_{$gradoAprobado}_{$request->ano_lectivo}.pdf");
 
+        $institucion = \App\Models\Institucion::first();
+
         $pdf = Pdf::loadView('Certificado.PdfGrupo', [
             'bulkData' => $bulkData,
             'fecha' => date('d/m/Y'),
             'grado' => $grado,
             'periodo' => $periodo,
+            'institucion' => $institucion,
         ]);
         $pdf->setPaper('legal', 'portrait');
 
