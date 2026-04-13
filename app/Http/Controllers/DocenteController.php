@@ -443,6 +443,7 @@ class DocenteController extends Controller
             }
 
             $estudiante = Estudiante::findOrFail($estudianteId);
+            $nombre = $estudiante ? $estudiante->user->name : "ID: $estudianteId";
             
             // Buscar la matrícula oficial del estudiante en este año y grado
             $matriculaFinal = \App\Models\MatriculaFinal::where('documento_estudiante', $estudiante->numero_identificacion_estudiante)

@@ -150,14 +150,15 @@
             <p>CODIGO DANE {{ $inst->codigo_dane ?? '219142000506' }}</p>
             <p>{{ $inst->descripcion_institucion ?? 'RESGUARDO INDIGENA DE HUELLAS CALOTO' }}</p>
             <p>MUNICIPIO DE {{ strtoupper($inst->ciudad_institucion ?? 'CALOTO') }}
-                {{ strtoupper($inst->departamento_institucion ?? 'CAUCA') }}</p>
+                {{ strtoupper($inst->departamento_institucion ?? 'CAUCA') }}
+            </p>
             <p>Sede: {{ $matricula->sede->nombre_sede ?? 'C.E.R.M LA HUELLA' }}</p>
         </div>
     </div>
 
     <div class="sub-header">
         @if(isset($periodo))
-            BOLETÍN DE CALIFICACIONES - {{ strtoupper($periodo->nombre_periodo) }} <br>
+            INFORME DE VALORACIONES - {{ strtoupper($periodo->nombre_periodo) }} <br>
         @else
             INFORME VALORATIVO<br>
         @endif
@@ -226,7 +227,7 @@
     @php
         $totalDefinitivas = 0;
         $countDefinitivas = 0;
-        foreach($notas as $itemNota) {
+        foreach ($notas as $itemNota) {
             if ($itemNota->nota_per3 > 0) {
                 $totalDefinitivas += $itemNota->nota_definitiva;
                 $countDefinitivas++;
@@ -238,7 +239,8 @@
     @if($promedioGeneral > 0)
         <table style="width: 100%; margin-bottom: 10px;">
             <tr>
-                <td style="text-align: right; font-weight: bold; font-size: 11px;">PROMEDIO GENERAL: {{ number_format($promedioGeneral, 1) }}</td>
+                <td style="text-align: right; font-weight: bold; font-size: 11px;">PROMEDIO GENERAL:
+                    {{ number_format($promedioGeneral, 1) }}</td>
                 <td style="width: 10%;"></td>
             </tr>
         </table>
