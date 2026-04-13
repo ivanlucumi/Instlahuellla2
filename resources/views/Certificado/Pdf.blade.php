@@ -270,8 +270,8 @@
             <br>
             <br>
             ___________________________________________<br>
-            DOCENTE DIRECTOR DEL GRADO ACADEMICO:
             {{ strtoupper($matricula->grado->docente->user->name ?? $matricula->profesor->name ?? 'N/A') }}
+            <br> DOCENTE DIRECTOR DEL GRADO ACADEMICO:
         </div>
     </div>
 </body>
