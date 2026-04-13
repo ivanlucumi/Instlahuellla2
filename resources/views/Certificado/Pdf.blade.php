@@ -186,7 +186,7 @@
     <table class="grades-table">
         <thead>
             <tr>
-                <th style="width: 45%;">ASIGNATURAS</th>
+                <th style="width: 45%;">HILOS Y ASIGNATURAS</th>
                 <th>&Eacute;POCA-1</th>
                 <th>&Eacute;POCA-2</th>
                 <th>&Eacute;POCA-3</th>
@@ -240,7 +240,8 @@
         <table style="width: 100%; margin-bottom: 10px;">
             <tr>
                 <td style="text-align: right; font-weight: bold; font-size: 11px;">PROMEDIO GENERAL:
-                    {{ number_format($promedioGeneral, 1) }}</td>
+                    {{ number_format($promedioGeneral, 1) }}
+                </td>
                 <td style="width: 10%;"></td>
             </tr>
         </table>
