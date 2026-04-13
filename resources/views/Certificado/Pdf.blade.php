@@ -223,6 +223,27 @@
         </tbody>
     </table>
 
+    @php
+        $totalDefinitivas = 0;
+        $countDefinitivas = 0;
+        foreach($notas as $itemNota) {
+            if ($itemNota->nota_per3 > 0) {
+                $totalDefinitivas += $itemNota->nota_definitiva;
+                $countDefinitivas++;
+            }
+        }
+        $promedioGeneral = $countDefinitivas > 0 ? ($totalDefinitivas / $countDefinitivas) : 0;
+    @endphp
+
+    @if($promedioGeneral > 0)
+        <table style="width: 100%; margin-bottom: 10px;">
+            <tr>
+                <td style="text-align: right; font-weight: bold; font-size: 11px;">PROMEDIO GENERAL: {{ number_format($promedioGeneral, 1) }}</td>
+                <td style="width: 10%;"></td>
+            </tr>
+        </table>
+    @endif
+
     <table class="scale-table">
         <tr>
             <th colspan="4">ESCALA DE VALORACION NACIONAL:</th>

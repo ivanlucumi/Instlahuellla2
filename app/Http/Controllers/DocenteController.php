@@ -442,14 +442,6 @@ class DocenteController extends Controller
                 continue;
             }
 
-            // --- REQUERIMIENTO: Solo obligatorio para Grado Cero/Transición ---
-            if ($esGradoCero && empty($observaciones)) {
-                $estudiante = Estudiante::find($estudianteId);
-                $nombre = $estudiante ? $estudiante->user->name : "ID: $estudianteId";
-                $errors[] = "Las observaciones son obligatorias para el estudiante $nombre en este grado.";
-                continue;
-            }
-
             $estudiante = Estudiante::findOrFail($estudianteId);
             
             // Buscar la matrícula oficial del estudiante en este año y grado
