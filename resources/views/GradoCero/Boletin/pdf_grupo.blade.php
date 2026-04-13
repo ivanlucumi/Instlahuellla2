@@ -4,12 +4,13 @@
     <meta charset="utf-8">
     <title>Boletines Transición - Grupo</title>
     <style>
-        body { font-family: 'Helvetica', sans-serif; font-size: 11px; margin: 0; padding: 0; color: #333; }
-        .header { text-align: center; margin-bottom: 20px; padding-top: 10px; }
-        .logo { position: absolute; left: 30px; top: 15px; width: 100px; }
-        .inst-name { font-size: 22px; color: #00AEEF; font-weight: bold; margin-bottom: 2px; font-family: 'Times New Roman', serif; italic; }
-        .inst-info { font-size: 10px; line-height: 1.2; font-weight: bold; color: #00AEEF; }
-        .boletin-title { font-size: 14px; font-weight: bold; margin-top: 25px; font-family: 'Comic Sans MS', cursive, sans-serif; }
+    <style>
+        body { font-family: 'Helvetica', sans-serif; font-size: 10px; margin: 0; padding: 0; color: #333; }
+        .header { text-align: center; margin-bottom: 10px; position: relative; }
+        .logo { position: absolute; left: 0; top: 0; width: 70px; }
+        .header-text { display: inline-block; width: 80%; }
+        .header h1 { margin: 0; font-size: 16px; font-weight: bold; }
+        .header p { margin: 2px 0; font-size: 10px; font-weight: normal; }
         
         .student-box { border: 2px solid #00AEEF; padding: 10px; margin-bottom: 20px; border-radius: 8px; }
         .student-box table { width: 100%; }
@@ -30,6 +31,9 @@
     </style>
 </head>
 <body>
+    @php
+        $inst = $institucion ?? \App\Models\Institucion::first();
+    @endphp
     @foreach($bulkData as $data)
         @php
             $estudiante = $data['estudiante'];
@@ -38,21 +42,21 @@
         @endphp
 
         <div class="header">
-            <img src="{{ public_path('storage/colegio/logo_huella.png') }}" class="logo" onerror="this.style.display='none'">
-            <div class="inst-name">Institución Educativa</div>
-            <div class="inst-name" style="margin-top: -5px;">Técnica Agropecuaria "La Huella"</div>
-            <div class="inst-info">
-                Resolución 07790-del 30 de agosto del-2013<br>
-                CÓDIGO DANE 219142000506<br>
-                RESGUARDO INDÍGENA DE HUELLAS CALOTO<br>
-                MUNICIPIO DE CALOTO CAUCA<br>
-                NIT: 900718652-1
+            <img src="{{ public_path('panelAdmin/img/LOGOROMBO1.png') }}" class="logo">
+            <div class="header-text">
+                <h1>{{ strtoupper($inst->nombre_institucion ?? 'INSTITUCIÓN EDUCATIVA TÉCNICA AGROPECUARIA LA HUELLA') }}</h1>
+                <p>{{ $inst->resolucion_institucion ?? 'Resolución 0434 del 26 de abril del 2004 y 10695 del 30 de diciembre de 2009' }}</p>
+                <p>CODIGO DANE {{ $inst->codigo_dane ?? '219142000506' }}</p>
+                <p>{{ $inst->descripcion_institucion ?? 'RESGUARDO INDIGENA DE HUELLAS CALOTO' }}</p>
+                <p>MUNICIPIO DE {{ strtoupper($inst->ciudad_institucion ?? 'CALOTO') }} {{ strtoupper($inst->departamento_institucion ?? 'CAUCA') }}</p>
+                <p>Sede: {{ $grado->sede->nombre_sede ?? 'C.E.R.M LA HUELLA' }}</p>
             </div>
+        </div>
 
-            <div class="boletin-title">BOLETIN DESCRIPTIVO DE LAS NIÑAS Y NIÑOS DEL</div>
-            <div style="font-size: 18px; font-weight: bold; margin: 5px 0;">GRADO {{ strtoupper($grado->nombre_grado) }}</div>
-            <div style="font-size: 16px; margin-bottom: 5px;">AÑO LECTIVO {{ $anho->nombre_anho_escolar }}</div>
-            <div style="font-size: 14px; font-weight: bold;">{{ strtoupper($periodo->nombre_periodo) }} EPOCA (SAAKHELU)</div>
+        <div style="text-align: center; margin-top: 15px; border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 5px 0;">
+            <div style="font-size: 14px; font-weight: bold;">BOLETÍN DESCRIPTIVO DE LAS NIÑAS Y NIÑOS DEL</div>
+            <div style="font-size: 16px; font-weight: bold; margin: 2px 0;">GRADO {{ strtoupper($grado->nombre_grado) }}</div>
+            <div style="font-size: 12px;">AÑO LECTIVO {{ $anho->nombre_anho_escolar }} | {{ strtoupper($periodo->nombre_periodo) }} EPOCA (SAAKHELU)</div>
         </div>
 
         <div class="student-box">

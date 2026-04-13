@@ -42,8 +42,11 @@ trait Auditable
         }
 
         try {
+            $user = Auth::user();
             Audit::create([
-                'user_id' => Auth::check() ? Auth::id() : null,
+                'user_id' => $user->id ?? null,
+                'user_name' => $user->name ?? null,
+                'user_email' => $user->email ?? null,
                 'event' => $event,
                 'auditable_type' => get_class($model),
                 'auditable_id' => $model->id ?? ($model->numero_identificacion_estudiante ?? null), // Handle custom PKs if any

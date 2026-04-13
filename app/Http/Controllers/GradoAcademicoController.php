@@ -216,9 +216,9 @@ class GradoAcademicoController extends Controller
             ->with('curso')
             ->get();
 
-        $isGradoCero = (str_contains(strtoupper($gradoAcademico->nombre_grado), 'TRANSICION') || 
-                        str_contains(strtoupper($gradoAcademico->nombre_grado), 'CERO') ||
-                        str_contains(strtoupper($gradoAcademico->nombre_grado), 'DIMENSION'));
+        $isGradoCero = (preg_match('/\bTRANSICION\b/i', $gradoAcademico->nombre_grado) || 
+                        preg_match('/\bCERO\b/i', $gradoAcademico->nombre_grado) ||
+                        preg_match('/\bDIMENSION\b/i', $gradoAcademico->nombre_grado));
 
 
 

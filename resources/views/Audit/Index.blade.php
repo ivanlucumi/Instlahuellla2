@@ -24,7 +24,13 @@
                             @forelse($audits as $audit)
                                 <tr>
                                     <td>{{ $audit->created_at->format('d/m/Y H:i:s') }}</td>
-                                    <td>{{ $audit->user->name ?? 'Sistema' }}</td>
+                                    <td>
+                                        <strong>{{ $audit->user_name ?? ($audit->user->name ?? 'Sistema') }}</strong><br>
+                                        @php $email = $audit->user_email ?? ($audit->user->email ?? null); @endphp
+                                        @if($email)
+                                            <small class="text-white-50">{{ $email }}</small>
+                                        @endif
+                                    </td>
                                     <td>
                                         @if($audit->event == 'created') <span class="badge bg-success">Creación</span>
                                         @elseif($audit->event == 'updated') <span class="badge bg-primary">Edición</span>
@@ -51,11 +57,39 @@
                                                         <div class="row">
                                                             <div class="col-md-6">
                                                                 <h6>Valores Anteriores</h6>
-                                                                <pre class="bg-dark p-2 rounded text-white" style="max-height: 200px; overflow-y: auto;">{{ json_encode(json_decode($audit->old_values), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+                                                                @php $oldVals = json_decode($audit->old_values, true) ?: []; @endphp
+                                                                @if(count($oldVals) > 0)
+                                                                    <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+                                                                        <table class="table table-sm table-dark table-bordered">
+                                                                            @foreach($oldVals as $key => $val)
+                                                                                <tr>
+                                                                                    <th style="width: 40%;">{{ $key }}</th>
+                                                                                    <td class="text-wrap text-break">{{ is_array($val) ? json_encode($val) : $val }}</td>
+                                                                                </tr>
+                                                                            @endforeach
+                                                                        </table>
+                                                                    </div>
+                                                                @else
+                                                                    <p class="text-white-50">N/A</p>
+                                                                @endif
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <h6>Valores Nuevos</h6>
-                                                                <pre class="bg-dark p-2 rounded text-white" style="max-height: 200px; overflow-y: auto;">{{ json_encode(json_decode($audit->new_values), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+                                                                @php $newVals = json_decode($audit->new_values, true) ?: []; @endphp
+                                                                @if(count($newVals) > 0)
+                                                                    <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+                                                                        <table class="table table-sm table-dark table-bordered">
+                                                                            @foreach($newVals as $key => $val)
+                                                                                <tr>
+                                                                                    <th style="width: 40%;">{{ $key }}</th>
+                                                                                    <td class="text-wrap text-break">{{ is_array($val) ? json_encode($val) : $val }}</td>
+                                                                                </tr>
+                                                                            @endforeach
+                                                                        </table>
+                                                                    </div>
+                                                                @else
+                                                                    <p class="text-white-50">N/A</p>
+                                                                @endif
                                                             </div>
                                                         </div>
                                                         <hr>
