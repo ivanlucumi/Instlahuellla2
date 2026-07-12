@@ -12,13 +12,13 @@
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
             color: #000;
-            line-height: 1.2;
-            font-size: 10px;
+            line-height: 1.3;
+            font-size: 14px;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             position: relative;
         }
 
@@ -26,7 +26,7 @@
             position: absolute;
             left: 0;
             top: 0;
-            width: 70px;
+            width: 80px;
         }
 
         .header-text {
@@ -36,33 +36,35 @@
 
         .header h1 {
             margin: 0;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
         }
 
         .header p {
-            margin: 2px 0;
-            font-size: 10px;
+            margin: 3px 0;
+            font-size: 12px;
             font-weight: normal;
         }
 
         .sub-header {
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             border-top: 1px solid #000;
             border-bottom: 1px solid #000;
-            padding: 5px 0;
+            padding: 8px 0;
             text-transform: uppercase;
             font-weight: bold;
+            font-size: 15px;
         }
 
         .info-table {
             width: 100%;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         .info-table td {
-            padding: 2px 0;
+            padding: 4px 0;
+            font-size: 13px;
         }
 
         .label {
@@ -73,23 +75,24 @@
         .grades-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .grades-table th {
             background-color: #f2f2f2;
             color: #000;
             font-weight: bold;
-            padding: 5px;
+            padding: 8px;
             border: 1px solid #000;
             text-align: center;
-            font-size: 9px;
+            font-size: 12px;
         }
 
         .grades-table td {
-            padding: 4px;
+            padding: 6px;
             border: 1px solid #000;
             text-align: center;
+            font-size: 13px;
         }
 
         .subject-col {
@@ -99,14 +102,14 @@
 
         .scale-table {
             width: 100%;
-            margin-top: 20px;
-            font-size: 9px;
+            margin-top: 25px;
+            font-size: 12px;
             border-collapse: collapse;
         }
 
         .scale-table th {
             text-align: left;
-            padding-bottom: 5px;
+            padding-bottom: 8px;
         }
 
         .scale-table td {
@@ -114,24 +117,26 @@
         }
 
         .observations {
-            margin-top: 30px;
+            margin-top: 40px;
         }
 
         .observations p {
             margin: 0;
             font-weight: bold;
+            font-size: 14px;
         }
 
         .line {
             border-bottom: 1px solid #000;
-            height: 15px;
-            margin-bottom: 5px;
+            height: 20px;
+            margin-bottom: 8px;
         }
 
         .footer-sign {
-            margin-top: 15px;
+            margin-top: 25px;
             text-align: center;
             font-weight: bold;
+            font-size: 13px;
         }
     </style>
 </head>
@@ -169,17 +174,17 @@
     <table class="info-table">
         <tr>
             <td class="label">Grado:</td>
-            <td style="font-weight: bold; font-size: 11px;">{{ strtoupper($grado_solicitado) }}</td>
-            <td class="label" style="width: 50px;">Grupo:</td>
-            <td>{{ $notas->first()->curso ?? '1' }}</td>
+            <td style="font-weight: bold; font-size: 14px;">{{ strtoupper($grado_solicitado) }}</td>
+            <td class="label" style="width: 60px;">Grupo:</td>
+            <td style="font-size: 14px; font-weight: bold;">{{ $notas->first()->curso ?? '1' }}</td>
         </tr>
         <tr>
             <td class="label">Nombres y Apellidos Del Estudiante:</td>
-            <td colspan="3" style="font-weight: bold; font-size: 12px;">{{ strtoupper($estudiante->user->name) }}</td>
+            <td colspan="3" style="font-weight: bold; font-size: 15px;">{{ strtoupper($estudiante->user->name) }}</td>
         </tr>
         <tr>
             <td class="label">Documento:</td>
-            <td colspan="3">{{ $estudiante->numero_identificacion_estudiante }}</td>
+            <td colspan="3" style="font-size: 14px;">{{ $estudiante->numero_identificacion_estudiante }}</td>
         </tr>
     </table>
 
@@ -195,14 +200,47 @@
             </tr>
         </thead>
         <tbody>
-            @php $currentNucleo = null; @endphp
+            @php 
+                $currentNucleo = null; 
+                $hilosAverages = [];
+                $notasAgrupadas = collect($notas)->groupBy('nucleo');
+                foreach($notasAgrupadas as $nucleo => $notasDelNucleo) {
+                    $sumPeriodo1 = 0; $countPeriodo1 = 0;
+                    $sumPeriodo2 = 0; $countPeriodo2 = 0;
+                    $sumPeriodo3 = 0; $countPeriodo3 = 0;
+                    $sumPeriodo4 = 0; $countPeriodo4 = 0;
+                    $sumDefinitiva = 0; $countDefinitiva = 0;
+
+                    foreach($notasDelNucleo as $n) {
+                        // Sumamos la nota_perX siempre y cuando sea > 0
+                        if($n->nota_per1 > 0) { $sumPeriodo1 += $n->nota_per1; $countPeriodo1++; }
+                        if($n->nota_per2 > 0) { $sumPeriodo2 += $n->nota_per2; $countPeriodo2++; }
+                        if($n->nota_per3 > 0) { $sumPeriodo3 += $n->nota_per3; $countPeriodo3++; }
+                        if($n->nota_per4 > 0) { $sumPeriodo4 += $n->nota_per4; $countPeriodo4++; }
+                        if($n->nota_definitiva > 0) { $sumDefinitiva += $n->nota_definitiva; $countDefinitiva++; }
+                    }
+
+                    $hilosAverages[$nucleo] = [
+                        'per1' => $countPeriodo1 > 0 ? ($sumPeriodo1 / $countPeriodo1) : 0,
+                        'per2' => $countPeriodo2 > 0 ? ($sumPeriodo2 / $countPeriodo2) : 0,
+                        'per3' => $countPeriodo3 > 0 ? ($sumPeriodo3 / $countPeriodo3) : 0,
+                        'per4' => $countPeriodo4 > 0 ? ($sumPeriodo4 / $countPeriodo4) : 0,
+                        'definitiva' => $countDefinitiva > 0 ? ($sumDefinitiva / $countDefinitiva) : 0,
+                    ];
+                }
+            @endphp
             @foreach($notas as $nota)
                 @if($nota->nucleo != $currentNucleo)
-                    <tr style="background-color: #f9f9f9;">
-                        <td colspan="6"
-                            style="text-align: left; padding-left: 10px; font-weight: bold; border-top: 2px solid #000;">
-                            {{ strtoupper($nota->nucleo) }}
+                    <tr style="background-color: #e6e6e6;">
+                        @php $avg = $hilosAverages[$nota->nucleo]; @endphp
+                        <td style="text-align: left; padding-left: 10px; font-weight: bold; border-top: 2px solid #000; font-size: 13px;">
+                            {{ strtoupper($nota->nucleo) }} <span style="font-size: 10px; font-weight: normal; color: #333;">(PROMEDIO)</span>
                         </td>
+                        <td style="font-weight: bold; border-top: 2px solid #000; text-align: center;">{{ $avg['per1'] > 0 ? number_format($avg['per1'], 1) : '-' }}</td>
+                        <td style="font-weight: bold; border-top: 2px solid #000; text-align: center;">{{ $avg['per2'] > 0 ? number_format($avg['per2'], 1) : '-' }}</td>
+                        <td style="font-weight: bold; border-top: 2px solid #000; text-align: center;">{{ $avg['per3'] > 0 ? number_format($avg['per3'], 1) : '-' }}</td>
+                        <td style="font-weight: bold; border-top: 2px solid #000; text-align: center;">{{ $avg['per4'] > 0 ? number_format($avg['per4'], 1) : '-' }}</td>
+                        <td style="font-weight: bold; border-top: 2px solid #000; text-align: center;">{{ $avg['definitiva'] > 0 ? number_format($avg['definitiva'], 1) : '-' }}</td>
                     </tr>
                     @php $currentNucleo = $nota->nucleo; @endphp
                 @endif
@@ -239,7 +277,7 @@
     @if($promedioGeneral > 0)
         <table style="width: 100%; margin-bottom: 10px;">
             <tr>
-                <td style="text-align: right; font-weight: bold; font-size: 11px;">PROMEDIO GENERAL:
+                <td style="text-align: right; font-weight: bold; font-size: 14px;">PROMEDIO GENERAL:
                     {{ number_format($promedioGeneral, 1) }}
                 </td>
                 <td style="width: 10%;"></td>
