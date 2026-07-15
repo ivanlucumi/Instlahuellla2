@@ -464,14 +464,7 @@ class DocenteController extends Controller
             $n3 = is_numeric($nota3) && $nota3 > 0 ? (float)$nota3 : 0;
             $n4 = is_numeric($nota4) && $nota4 > 0 ? (float)$nota4 : 0;
 
-            $definitiva = 0;
-            if ($n3 > 0) {
-                if ($n4 > 0) {
-                    $definitiva = ($n1 + $n2 + $n3 + $n4) / 4;
-                } else {
-                    $definitiva = ($n1 + $n2 + $n3) / 3;
-                }
-            }
+            $definitiva = ($n1 + $n2 + $n3 + $n4) / 4;
 
             // --------------------------
 
@@ -770,12 +763,7 @@ class DocenteController extends Controller
             $n3 = $notaExistente->nota3 ?? 0;
             $n4 = $notaExistente->nota4 ?? 0;
 
-            $rawNotes = [$n1, $n2, $n3, $n4];
-            $validNotes = array_filter($rawNotes, fn($n) => is_numeric($n) && (float)$n > 0);
-            
-            $updateData['nota_definitiva'] = count($validNotes) >= 3 
-                ? array_sum($validNotes) / count($validNotes) 
-                : 0; // Solo promediar si hay 3 o más notas válidas
+            $updateData['nota_definitiva'] = ($n1 + $n2 + $n3 + $n4) / 4;
 
             $newNota = Notas::updateOrCreate(
                 [

@@ -209,23 +209,26 @@
                     $sumPeriodo2 = 0; $countPeriodo2 = 0;
                     $sumPeriodo3 = 0; $countPeriodo3 = 0;
                     $sumPeriodo4 = 0; $countPeriodo4 = 0;
-                    $sumDefinitiva = 0; $countDefinitiva = 0;
 
                     foreach($notasDelNucleo as $n) {
-                        // Sumamos la nota_perX siempre y cuando sea > 0
+                        // Omitir guiones (-) mostrando, pero sumar valores para el cálculo
                         if($n->nota_per1 > 0) { $sumPeriodo1 += $n->nota_per1; $countPeriodo1++; }
                         if($n->nota_per2 > 0) { $sumPeriodo2 += $n->nota_per2; $countPeriodo2++; }
                         if($n->nota_per3 > 0) { $sumPeriodo3 += $n->nota_per3; $countPeriodo3++; }
                         if($n->nota_per4 > 0) { $sumPeriodo4 += $n->nota_per4; $countPeriodo4++; }
-                        if($n->nota_definitiva > 0) { $sumDefinitiva += $n->nota_definitiva; $countDefinitiva++; }
                     }
+                    
+                    $p1 = $countPeriodo1 > 0 ? ($sumPeriodo1 / $countPeriodo1) : 0;
+                    $p2 = $countPeriodo2 > 0 ? ($sumPeriodo2 / $countPeriodo2) : 0;
+                    $p3 = $countPeriodo3 > 0 ? ($sumPeriodo3 / $countPeriodo3) : 0;
+                    $p4 = $countPeriodo4 > 0 ? ($sumPeriodo4 / $countPeriodo4) : 0;
 
                     $hilosAverages[$nucleo] = [
-                        'per1' => $countPeriodo1 > 0 ? ($sumPeriodo1 / $countPeriodo1) : 0,
-                        'per2' => $countPeriodo2 > 0 ? ($sumPeriodo2 / $countPeriodo2) : 0,
-                        'per3' => $countPeriodo3 > 0 ? ($sumPeriodo3 / $countPeriodo3) : 0,
-                        'per4' => $countPeriodo4 > 0 ? ($sumPeriodo4 / $countPeriodo4) : 0,
-                        'definitiva' => $countDefinitiva > 0 ? ($sumDefinitiva / $countDefinitiva) : 0,
+                        'per1' => $p1,
+                        'per2' => $p2,
+                        'per3' => $p3,
+                        'per4' => $p4,
+                        'definitiva' => ($p1 + $p2 + $p3 + $p4) / 4,
                     ];
                 }
             @endphp
@@ -251,11 +254,14 @@
                     <td>{{ $nota->nota_per3 > 0 ? number_format($nota->nota_per3, 1) : '-' }}</td>
                     <td>{{ $nota->nota_per4 > 0 ? number_format($nota->nota_per4, 1) : '-' }}</td>
                     <td style="font-weight: bold;">
-                        @if($nota->nota_per3 > 0)
-                            {{ number_format($nota->nota_definitiva, 1) }}
-                        @else
-                            -
-                        @endif
+                        @php
+                            $n1 = $nota->nota_per1 > 0 ? $nota->nota_per1 : 0;
+                            $n2 = $nota->nota_per2 > 0 ? $nota->nota_per2 : 0;
+                            $n3 = $nota->nota_per3 > 0 ? $nota->nota_per3 : 0;
+                            $n4 = $nota->nota_per4 > 0 ? $nota->nota_per4 : 0;
+                            $def_calculada = ($n1 + $n2 + $n3 + $n4) / 4;
+                        @endphp
+                        {{ number_format($def_calculada, 1) }}
                     </td>
                 </tr>
             @endforeach
@@ -266,8 +272,13 @@
         $totalDefinitivas = 0;
         $countDefinitivas = 0;
         foreach ($notas as $itemNota) {
-            if ($itemNota->nota_per3 > 0) {
-                $totalDefinitivas += $itemNota->nota_definitiva;
+            $n1 = $itemNota->nota_per1 > 0 ? $itemNota->nota_per1 : 0;
+            $n2 = $itemNota->nota_per2 > 0 ? $itemNota->nota_per2 : 0;
+            $n3 = $itemNota->nota_per3 > 0 ? $itemNota->nota_per3 : 0;
+            $n4 = $itemNota->nota_per4 > 0 ? $itemNota->nota_per4 : 0;
+            
+            if ($n1 > 0 || $n2 > 0 || $n3 > 0 || $n4 > 0) {
+                $totalDefinitivas += ($n1 + $n2 + $n3 + $n4) / 4;
                 $countDefinitivas++;
             }
         }
