@@ -52,6 +52,9 @@
                             <a href="{{ route('admin.notas-definitivas.create') }}" class="btn btn-primary d-flex align-items-center">
                                 <i class="fa fa-plus me-1"></i> Nuevo
                             </a>
+                            <button type="button" class="btn btn-danger d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modalLimpiezaMasiva" title="Eliminar todas las notas de una asignatura en un grado">
+                                <i class="fa fa-trash-alt me-1"></i> Limpieza Masiva
+                            </button>
                         @endif
                     </div>
                 </form>
@@ -159,4 +162,66 @@
         </div>
     </div>
 </div>
+    <!-- Modal: Limpieza Masiva - Solo SUPERADMIN -->
+    @if(auth()->user()->hasRol('SUPERADMIN'))
+    <div class="modal fade" id="modalLimpiezaMasiva" tabindex="-1" aria-labelledby="modalLimpiezaMasivaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-white border border-danger">
+                <div class="modal-header border-danger">
+                    <h5 class="modal-title text-danger" id="modalLimpiezaMasivaLabel">
+                        <i class="fa fa-exclamation-triangle me-2"></i> Limpieza Masiva de Notas
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <form action="{{ route('admin.notas-definitivas.bulk-delete') }}" method="POST" id="formLimpiezaMasiva">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="alert alert-danger small mb-3">
+                            <i class="fa fa-exclamation-circle me-1"></i>
+                            <strong>¡Acción irreversible!</strong> Esta operación eliminará permanentemente <strong>todos</strong> los registros de la asignatura seleccionada para el grado indicado.
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-white-50 small">Grado a Limpiar</label>
+                            <select name="grado_aprobado" id="bulk_grado" class="form-select bg-dark text-white border-secondary" required>
+                                <option value="">— Seleccione un Grado —</option>
+                                @foreach($grados as $grado)
+                                    <option value="{{ $grado }}">{{ $grado }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-white-50 small">Asignatura a Eliminar</label>
+                            <select name="nombre_asignatura" id="bulk_asignatura" class="form-select bg-dark text-white border-secondary" required>
+                                <option value="">— Seleccione una Asignatura —</option>
+                                @foreach($asignaturas as $asig)
+                                    <option value="{{ $asig }}">{{ $asig }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label text-white-50 small">Confirmar escribiendo <span class="text-danger fw-bold">ELIMINAR</span>:</label>
+                            <input type="text" id="confirmacionTexto" class="form-control bg-dark text-white border-secondary" placeholder="Escriba ELIMINAR para confirmar">
+                        </div>
+                    </div>
+                    <div class="modal-footer border-secondary">
+                        <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" id="btnConfirmarLimpieza" class="btn btn-danger" disabled>
+                            <i class="fa fa-trash me-1"></i> Confirmar Eliminación
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <script>
+        document.getElementById('confirmacionTexto')?.addEventListener('input', function() {
+            const btn = document.getElementById('btnConfirmarLimpieza');
+            btn.disabled = this.value.trim() !== 'ELIMINAR';
+        });
+    </script>
 @endsection

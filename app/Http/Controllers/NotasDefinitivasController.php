@@ -176,4 +176,24 @@ class NotasDefinitivasController extends Controller
             'text'  => 'El registro fue eliminado correctamente.'
         ]);
     }
+
+    public function bulkDelete(Request $request)
+    {
+        abort_unless(auth()->user()->hasRol('SUPERADMIN'), 403, 'Solo el Súper Administrador puede realizar limpiezas masivas.');
+
+        $request->validate([
+            'grado_aprobado'    => 'required|string',
+            'nombre_asignatura' => 'required|string',
+        ]);
+
+        $deleted = NotasDefinitivas::where('grado_aprobado', $request->grado_aprobado)
+            ->where('nombre_asignatura', $request->nombre_asignatura)
+            ->delete();
+
+        return redirect()->route('admin.notas-definitivas.index')->with('swal', [
+            'icon'  => 'success',
+            'title' => 'Limpieza Completada',
+            'text'  => "Se eliminaron {$deleted} registros de \"{$request->nombre_asignatura}\" del grado \"{$request->grado_aprobado}\".",
+        ]);
+    }
 }

@@ -156,9 +156,11 @@ Route::middleware(['auth', 'role_secure:SUPERADMIN,ADMIN,DIRECTOR'])
         Route::get('/anho-escolar/list', [App\Http\Controllers\AnhoEscolarController::class, 'list'])->name('admin.anhoescolar.list');
 
         Route::get('/matriculado/search', [App\Http\Controllers\MatriculadoController::class, 'searchStudents'])->name('admin.matriculado.search');
+        Route::get('/matriculado/datos-estudiante', [App\Http\Controllers\MatriculadoController::class, 'datosEstudiante'])->name('admin.matriculado.datos-estudiante');
         Route::resource('matriculado', App\Http\Controllers\MatriculadoController::class)->names('admin.matriculado');
         Route::resource('notas', App\Http\Controllers\NotasController::class)->names('admin.notas');
         Route::resource('notas-definitivas', App\Http\Controllers\NotasDefinitivasController::class)->names('admin.notas-definitivas');
+        Route::post('notas-definitivas/bulk-delete', [App\Http\Controllers\NotasDefinitivasController::class, 'bulkDelete'])->name('admin.notas-definitivas.bulk-delete');
 
         // Rutas de Promoción de Grado
         Route::get('/promocion', [App\Http\Controllers\PromocionController::class, 'index'])->name('admin.promocion.index');
@@ -183,6 +185,10 @@ Route::middleware(['auth', 'role_secure:SUPERADMIN,ADMIN,DIRECTOR'])
             Route::get('/calificaciones/matriz', [App\Http\Controllers\CalificacionGradoCeroController::class, 'matrix'])->name('admin.grado-cero.calificaciones.matrix');
             Route::post('/calificaciones/guardar', [App\Http\Controllers\CalificacionGradoCeroController::class, 'store'])->name('admin.grado-cero.calificaciones.store');
             
+            // Gestión de Épocas (Activación)
+            Route::get('/config/epocas', [App\Http\Controllers\CalificacionGradoCeroController::class, 'configEpocas'])->name('admin.grado-cero.config.epocas');
+            Route::post('/config/epocas/toggle', [App\Http\Controllers\CalificacionGradoCeroController::class, 'toggleEpoca'])->name('admin.grado-cero.config.toggle-epoca');
+
             // Descargas de Boletines
             Route::get('/boletin/estudiante/{estudiante}/{periodo}/{anho}', [App\Http\Controllers\CalificacionGradoCeroController::class, 'descargarBoletin'])->name('admin.grado-cero.boletin.descargar');
             Route::get('/boletin/grupo/{grado}/{periodo}/{anho}', [App\Http\Controllers\CalificacionGradoCeroController::class, 'descargarGrupo'])->name('admin.grado-cero.boletin.grupo');
