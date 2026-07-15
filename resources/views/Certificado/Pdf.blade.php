@@ -239,11 +239,11 @@
                         <td style="text-align: left; padding-left: 10px; font-weight: bold; border-top: 2px solid #000; font-size: 13px;">
                             {{ strtoupper($nota->nucleo) }} <span style="font-size: 10px; font-weight: normal; color: #333;">(PROMEDIO)</span>
                         </td>
-                        <td style="font-weight: bold; border-top: 2px solid #000; text-align: center;">{{ $avg['per1'] > 0 ? number_format($avg['per1'], 1) : '-' }}</td>
-                        <td style="font-weight: bold; border-top: 2px solid #000; text-align: center;">{{ $avg['per2'] > 0 ? number_format($avg['per2'], 1) : '-' }}</td>
-                        <td style="font-weight: bold; border-top: 2px solid #000; text-align: center;">{{ $avg['per3'] > 0 ? number_format($avg['per3'], 1) : '-' }}</td>
-                        <td style="font-weight: bold; border-top: 2px solid #000; text-align: center;">{{ $avg['per4'] > 0 ? number_format($avg['per4'], 1) : '-' }}</td>
-                        <td style="font-weight: bold; border-top: 2px solid #000; text-align: center;">{{ $avg['definitiva'] > 0 ? number_format($avg['definitiva'], 1) : '-' }}</td>
+                        <td style="font-weight: bold; border-top: 2px solid #000; text-align: center;">{{ $avg['per1'] > 0 ? number_format($avg['per1'], 2) : '-' }}</td>
+                        <td style="font-weight: bold; border-top: 2px solid #000; text-align: center;">{{ $avg['per2'] > 0 ? number_format($avg['per2'], 2) : '-' }}</td>
+                        <td style="font-weight: bold; border-top: 2px solid #000; text-align: center;">{{ $avg['per3'] > 0 ? number_format($avg['per3'], 2) : '-' }}</td>
+                        <td style="font-weight: bold; border-top: 2px solid #000; text-align: center;">{{ $avg['per4'] > 0 ? number_format($avg['per4'], 2) : '-' }}</td>
+                        <td style="font-weight: bold; border-top: 2px solid #000; text-align: center;">{{ $avg['definitiva'] > 0 ? number_format($avg['definitiva'], 2) : '-' }}</td>
                     </tr>
                     @php $currentNucleo = $nota->nucleo; @endphp
                 @endif
@@ -261,7 +261,7 @@
                             $n4 = $nota->nota_per4 > 0 ? $nota->nota_per4 : 0;
                             $def_calculada = ($n1 + $n2 + $n3 + $n4) / 4;
                         @endphp
-                        {{ number_format($def_calculada, 1) }}
+                        {{ number_format($def_calculada, 2) }}
                     </td>
                 </tr>
             @endforeach
@@ -289,7 +289,7 @@
         <table style="width: 100%; margin-bottom: 10px;">
             <tr>
                 <td style="text-align: right; font-weight: bold; font-size: 14px;">PROMEDIO GENERAL:
-                    {{ number_format($promedioGeneral, 1) }}
+                    {{ number_format($promedioGeneral, 2) }}
                 </td>
                 <td style="width: 10%;"></td>
             </tr>
