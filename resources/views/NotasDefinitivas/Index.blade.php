@@ -67,12 +67,27 @@
             <div class="bg-secondary rounded h-100 p-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h6 class="mb-0">Histórico de Notas Definitivas</h6>
+                    @if(auth()->user()->hasRol('SUPERADMIN'))
+                    <form id="formEliminarSeleccionados" action="{{ route('admin.notas-definitivas.bulk-delete') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="ids" id="inputIdsSeleccionados" value="">
+                        <button type="button" id="btnEliminarSeleccionados" class="btn btn-danger btn-sm" disabled
+                            onclick="confirmarEliminacionSeleccionados()">
+                            <i class="fa fa-trash me-1"></i> Eliminar Seleccionados (<span id="countSeleccionados">0</span>)
+                        </button>
+                    </form>
+                    @endif
                 </div>
 
                 <div class="table-responsive">
                     <table class="table text-start align-middle table-bordered table-hover mb-0">
                         <thead>
                             <tr class="text-white">
+                                @if(auth()->user()->hasRol('SUPERADMIN'))
+                                    <th scope="col" style="width:36px;">
+                                        <input type="checkbox" id="checkAll" title="Seleccionar todo" style="cursor:pointer;">
+                                    </th>
+                                @endif
                                 <th scope="col">Doc.</th>
                                 <th scope="col">Estudiante</th>
                                 <th scope="col">Grado</th>
@@ -83,14 +98,19 @@
                                 <th scope="col" class="text-center">P3</th>
                                 <th scope="col" class="text-center">P4</th>
                                 <th scope="col" class="text-center">Def.</th>
-                                @if(auth()->user()->hasRol('SUPERADMIN1'))
-                                    <th scope="col">Acciones</th>
+                                @if(auth()->user()->hasRol('SUPERADMIN'))
+                                    <th scope="col" class="text-center">Eliminar</th>
                                 @endif
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($notasDefinitivas as $nota)
                                 <tr>
+                                    @if(auth()->user()->hasRol('SUPERADMIN'))
+                                        <td class="text-center">
+                                            <input type="checkbox" class="row-check" value="{{ $nota->id }}" style="cursor:pointer;">
+                                        </td>
+                                    @endif
                                     <td><small>{{ $nota->documento_estudiante }}</small></td>
                                     <td>{{ $nota->nombre_estudiante }}</td>
                                     <td>{{ $nota->grado_aprobado }}</td>
@@ -101,28 +121,19 @@
                                     <td class="text-center">{{ $nota->nota_per3 }}</td>
                                     <td class="text-center">{{ $nota->nota_per4 }}</td>
                                     <td class="text-center fw-bold text-primary">{{ $nota->nota_definitiva }}</td>
-                                    @if(auth()->user()->hasRol('SUPERADMIN1'))
-                                        <td>
-                                            <div class="btn-group" role="group">
-                                                <a href="{{ route('admin.notas-definitivas.edit', $nota->id) }}" 
-                                                   class="btn btn-sm btn-warning me-1"
-                                                   title="Editar">
-                                                    <i class="fa fa-pen" disabled></i>
-                                                </a>
-                                                
-                                                <form action="{{ route('admin.notas-definitivas.destroy', $nota->id) }}" 
-                                                      method="POST" 
-                                                      class="d-inline delete-form">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" 
-                                                            class="btn btn-sm btn-danger"
-                                                            title="Eliminar"
-                                                            onclick="return confirm('¿Está seguro de eliminar este registro?')">
-                                                        <i class="fa fa-trash" disabled></i>
-                                                    </button>
-                                                </form>
-                                            </div>
+                                    @if(auth()->user()->hasRol('SUPERADMIN'))
+                                        <td class="text-center">
+                                            <form action="{{ route('admin.notas-definitivas.destroy', $nota->id) }}"
+                                                  method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-danger"
+                                                        title="Eliminar este registro"
+                                                        onclick="return confirm('¿Eliminar esta nota de {{ $nota->nombre_asignatura }} para {{ $nota->nombre_estudiante }}?')">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </form>
                                         </td>
                                     @endif
                                 </tr>
@@ -162,66 +173,42 @@
         </div>
     </div>
 </div>
-    <!-- Modal: Limpieza Masiva - Solo SUPERADMIN -->
-    @if(auth()->user()->hasRol('SUPERADMIN'))
-    <div class="modal fade" id="modalLimpiezaMasiva" tabindex="-1" aria-labelledby="modalLimpiezaMasivaLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content bg-dark text-white border border-danger">
-                <div class="modal-header border-danger">
-                    <h5 class="modal-title text-danger" id="modalLimpiezaMasivaLabel">
-                        <i class="fa fa-exclamation-triangle me-2"></i> Limpieza Masiva de Notas
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <form action="{{ route('admin.notas-definitivas.bulk-delete') }}" method="POST" id="formLimpiezaMasiva">
-                    @csrf
-                    <div class="modal-body">
-                        <div class="alert alert-danger small mb-3">
-                            <i class="fa fa-exclamation-circle me-1"></i>
-                            <strong>¡Acción irreversible!</strong> Esta operación eliminará permanentemente <strong>todos</strong> los registros de la asignatura seleccionada para el grado indicado.
-                        </div>
+@if(auth()->user()->hasRol('SUPERADMIN'))
+<script>
+    // Seleccionar/deseleccionar todos
+    document.getElementById('checkAll')?.addEventListener('change', function () {
+        document.querySelectorAll('.row-check').forEach(cb => cb.checked = this.checked);
+        actualizarBotonEliminar();
+    });
 
-                        <div class="mb-3">
-                            <label class="form-label text-white-50 small">Grado a Limpiar</label>
-                            <select name="grado_aprobado" id="bulk_grado" class="form-select bg-dark text-white border-secondary" required>
-                                <option value="">— Seleccione un Grado —</option>
-                                @foreach($grados as $grado)
-                                    <option value="{{ $grado }}">{{ $grado }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label text-white-50 small">Asignatura a Eliminar</label>
-                            <select name="nombre_asignatura" id="bulk_asignatura" class="form-select bg-dark text-white border-secondary" required>
-                                <option value="">— Seleccione una Asignatura —</option>
-                                @foreach($asignaturas as $asig)
-                                    <option value="{{ $asig }}">{{ $asig }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="mb-2">
-                            <label class="form-label text-white-50 small">Confirmar escribiendo <span class="text-danger fw-bold">ELIMINAR</span>:</label>
-                            <input type="text" id="confirmacionTexto" class="form-control bg-dark text-white border-secondary" placeholder="Escriba ELIMINAR para confirmar">
-                        </div>
-                    </div>
-                    <div class="modal-footer border-secondary">
-                        <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" id="btnConfirmarLimpieza" class="btn btn-danger" disabled>
-                            <i class="fa fa-trash me-1"></i> Confirmar Eliminación
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    @endif
-
-    <script>
-        document.getElementById('confirmacionTexto')?.addEventListener('input', function() {
-            const btn = document.getElementById('btnConfirmarLimpieza');
-            btn.disabled = this.value.trim() !== 'ELIMINAR';
+    // Actualizar contador al cambiar cada checkbox individual
+    document.querySelectorAll('.row-check').forEach(cb => {
+        cb.addEventListener('change', function() {
+            // Si alguno se desmarca, desmarcar el "seleccionar todo"
+            const total = document.querySelectorAll('.row-check').length;
+            const checked = document.querySelectorAll('.row-check:checked').length;
+            document.getElementById('checkAll').checked = (total === checked);
+            actualizarBotonEliminar();
         });
-    </script>
+    });
+
+    function actualizarBotonEliminar() {
+        const checked = document.querySelectorAll('.row-check:checked').length;
+        const btn = document.getElementById('btnEliminarSeleccionados');
+        document.getElementById('countSeleccionados').textContent = checked;
+        btn.disabled = checked === 0;
+    }
+
+    function confirmarEliminacionSeleccionados() {
+        const checkedBoxes = document.querySelectorAll('.row-check:checked');
+        if (checkedBoxes.length === 0) return;
+
+        if (!confirm(`¿Está seguro de eliminar ${checkedBoxes.length} registro(s)? Esta acción es irreversible.`)) return;
+
+        const ids = Array.from(checkedBoxes).map(cb => cb.value).join(',');
+        document.getElementById('inputIdsSeleccionados').value = ids;
+        document.getElementById('formEliminarSeleccionados').submit();
+    }
+</script>
+@endif
 @endsection

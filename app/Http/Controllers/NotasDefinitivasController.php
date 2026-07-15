@@ -179,21 +179,28 @@ class NotasDefinitivasController extends Controller
 
     public function bulkDelete(Request $request)
     {
-        abort_unless(auth()->user()->hasRol('SUPERADMIN'), 403, 'Solo el Súper Administrador puede realizar limpiezas masivas.');
+        abort_unless(auth()->user()->hasRol('SUPERADMIN'), 403, 'Solo el Súper Administrador puede realizar eliminaciones masivas.');
 
         $request->validate([
-            'grado_aprobado'    => 'required|string',
-            'nombre_asignatura' => 'required|string',
+            'ids' => 'required|string',
         ]);
 
-        $deleted = NotasDefinitivas::where('grado_aprobado', $request->grado_aprobado)
-            ->where('nombre_asignatura', $request->nombre_asignatura)
-            ->delete();
+        $ids = array_filter(explode(',', $request->ids), fn($id) => is_numeric($id));
+
+        if (empty($ids)) {
+            return redirect()->route('admin.notas-definitivas.index')->with('swal', [
+                'icon'  => 'warning',
+                'title' => 'Sin selección',
+                'text'  => 'No se seleccionaron registros para eliminar.',
+            ]);
+        }
+
+        $deleted = NotasDefinitivas::whereIn('id', $ids)->delete();
 
         return redirect()->route('admin.notas-definitivas.index')->with('swal', [
             'icon'  => 'success',
-            'title' => 'Limpieza Completada',
-            'text'  => "Se eliminaron {$deleted} registros de \"{$request->nombre_asignatura}\" del grado \"{$request->grado_aprobado}\".",
+            'title' => 'Eliminación Completada',
+            'text'  => "Se eliminaron {$deleted} registro(s) seleccionados.",
         ]);
     }
 }
