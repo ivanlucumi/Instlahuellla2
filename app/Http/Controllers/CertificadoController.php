@@ -123,11 +123,11 @@ class CertificadoController extends Controller
             $asignatura = \App\Models\Asignatura::with('hilo')
                 ->where('nombre_asignatura', $nota->nombre_asignatura)
                 ->first();
-            
+
             if ($asignatura && strtolower($asignatura->estado) === 'inactivo') {
                 return false;
             }
-            
+
             $nota->nucleo = $asignatura->hilo->nombre_hilo ?? 'N/A';
             return true;
         })->sortBy('nucleo');
@@ -145,7 +145,7 @@ class CertificadoController extends Controller
         ];
 
         $pdf = Pdf::loadView('Certificado.Pdf', $viewData);
-        $pdf->setPaper('legal', 'portrait');
+        $pdf->setPaper('folio', 'portrait');
 
         return $pdf->download("Certificado_{$request->identificacion}_{$matricula->ano_lectivo}.pdf");
     }
@@ -210,11 +210,11 @@ class CertificadoController extends Controller
             $asignatura = \App\Models\Asignatura::with('hilo')
                 ->where('nombre_asignatura', $nota->nombre_asignatura)
                 ->first();
-            
+
             if ($asignatura && strtolower($asignatura->estado) === 'inactivo') {
                 return false;
             }
-            
+
             $nota->nucleo = $asignatura?->hilo?->nombre_hilo ?? 'N/A';
             return true;
         })->sortBy('nucleo');
@@ -239,7 +239,7 @@ class CertificadoController extends Controller
         $nombreArchivo = str_replace([' ', '/'], '_', $nombreArchivo);
 
         $pdf = Pdf::loadView('Certificado.Pdf', $viewData);
-        $pdf->setPaper('legal', 'portrait');
+        $pdf->setPaper('folio', 'portrait');
 
         return $pdf->download($nombreArchivo);
     }
@@ -296,7 +296,7 @@ class CertificadoController extends Controller
                         $q->where('id_matricula', $matricula->id)
                             ->orWhere(function ($sq) use ($matricula) {
                                 $sq->where('curso', $matricula->curso)
-                                    ->where(function($ssq) use ($matricula) {
+                                    ->where(function ($ssq) use ($matricula) {
                                         $ssq->whereHas('matriculaFinal', function ($q3) use ($matricula) {
                                             $q3->where('ano_lectivo', $matricula->ano_lectivo);
                                         })->orWhereNull('id_matricula');
@@ -317,11 +317,11 @@ class CertificadoController extends Controller
                 $asignatura = \App\Models\Asignatura::with('hilo')
                     ->where('nombre_asignatura', $nota->nombre_asignatura)
                     ->first();
-                
+
                 if ($asignatura && strtolower($asignatura->estado) === 'inactivo') {
                     return false;
                 }
-                
+
                 $nota->nucleo = $asignatura?->hilo?->nombre_hilo ?? 'N/A';
                 return true;
             })->sortBy('nucleo');
@@ -355,7 +355,7 @@ class CertificadoController extends Controller
             'periodo' => $periodo,
             'institucion' => $institucion,
         ]);
-        $pdf->setPaper('legal', 'portrait');
+        $pdf->setPaper('folio', 'portrait');
 
         return $pdf->download($nombreArchivo);
     }
