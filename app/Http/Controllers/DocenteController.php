@@ -823,7 +823,7 @@ class DocenteController extends Controller
                 'nota_per3'         => $nota->nota3 ?? 0,
                 'nota_per4'         => $nota->nota4 ?? 0,
                 'nota_definitiva'   => $nota->nota_definitiva,
-                'curso'             => $nota->grado->bloque ?? '1',
+                'curso'             => $matriculaFinal->curso ?? ($nota->grado->curso->nombre_curso ?? $nota->grado->bloque ?? '1'),
             ]
         );
     }

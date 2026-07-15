@@ -102,8 +102,10 @@ class CertificadoController extends Controller
             $notasDefinitivas = \App\Models\NotasDefinitivas::where('documento_estudiante', $request->identificacion)
                 ->where('grado_aprobado', 'LIKE', '%' . ($matricula->grado->nombre_grado ?? $request->grado_aprobado) . '%')
                 ->where('curso', (string) $matricula->curso)
-                ->whereHas('matriculaFinal', function ($q) use ($matricula) {
-                    $q->where('ano_lectivo', $matricula->ano_lectivo);
+                ->where(function ($q) use ($matricula) {
+                    $q->whereHas('matriculaFinal', function ($q_rel) use ($matricula) {
+                        $q_rel->where('ano_lectivo', $matricula->ano_lectivo);
+                    })->orWhereNull('id_matricula');
                 })
                 ->get();
         }
@@ -116,15 +118,19 @@ class CertificadoController extends Controller
             ]);
         }
 
-        // 6. Enriquecer las notas con el "Nucleo" (Hilo) de la asignatura
-        foreach ($notasDefinitivas as $nota) {
+        // 6. Enriquecer las notas con el "Nucleo" (Hilo) de la asignatura y filtrar inactivas
+        $notasDefinitivas = $notasDefinitivas->filter(function ($nota) {
             $asignatura = \App\Models\Asignatura::with('hilo')
                 ->where('nombre_asignatura', $nota->nombre_asignatura)
                 ->first();
+            
+            if ($asignatura && strtolower($asignatura->estado) === 'inactivo') {
+                return false;
+            }
+            
             $nota->nucleo = $asignatura->hilo->nombre_hilo ?? 'N/A';
-        }
-
-        $notasDefinitivas = $notasDefinitivas->sortBy('nucleo');
+            return true;
+        })->sortBy('nucleo');
 
         $institucion = \App\Models\Institucion::first();
 
@@ -183,8 +189,10 @@ class CertificadoController extends Controller
             $notas = \App\Models\NotasDefinitivas::where('documento_estudiante', $matricula->documento_estudiante)
                 ->where('grado_aprobado', 'LIKE', '%' . ($matricula->grado->nombre_grado ?? '') . '%')
                 ->where('curso', (string) $matricula->curso)
-                ->whereHas('matriculaFinal', function ($q) use ($matricula) {
-                    $q->where('ano_lectivo', $matricula->ano_lectivo);
+                ->where(function ($q) use ($matricula) {
+                    $q->whereHas('matriculaFinal', function ($q_rel) use ($matricula) {
+                        $q_rel->where('ano_lectivo', $matricula->ano_lectivo);
+                    })->orWhereNull('id_matricula');
                 })
                 ->get();
         }
@@ -197,15 +205,19 @@ class CertificadoController extends Controller
             ]);
         }
 
-        // Enriquecer notas con Nucleo (Hilo)
-        foreach ($notas as $nota) {
+        // Enriquecer notas con Nucleo (Hilo) y filtrar inactivas
+        $notas = $notas->filter(function ($nota) {
             $asignatura = \App\Models\Asignatura::with('hilo')
                 ->where('nombre_asignatura', $nota->nombre_asignatura)
                 ->first();
+            
+            if ($asignatura && strtolower($asignatura->estado) === 'inactivo') {
+                return false;
+            }
+            
             $nota->nucleo = $asignatura?->hilo?->nombre_hilo ?? 'N/A';
-        }
-
-        $notas = $notas->sortBy('nucleo');
+            return true;
+        })->sortBy('nucleo');
 
         $grado = $matricula->grado;
         $gradoAprobado = trim(($grado->nombre_grado ?? '') . ' - ' . ($grado->bloque ?? ''));
@@ -284,8 +296,10 @@ class CertificadoController extends Controller
                         $q->where('id_matricula', $matricula->id)
                             ->orWhere(function ($sq) use ($matricula) {
                                 $sq->where('curso', $matricula->curso)
-                                    ->whereHas('matriculaFinal', function ($ssq) use ($matricula) {
-                                        $ssq->where('ano_lectivo', $matricula->ano_lectivo);
+                                    ->where(function($ssq) use ($matricula) {
+                                        $ssq->whereHas('matriculaFinal', function ($q3) use ($matricula) {
+                                            $q3->where('ano_lectivo', $matricula->ano_lectivo);
+                                        })->orWhereNull('id_matricula');
                                     });
                             });
                     })
@@ -298,15 +312,19 @@ class CertificadoController extends Controller
                 continue;
             }
 
-            // Enriquecer notas con Nucleo (Hilo)
-            foreach ($notas as $nota) {
+            // Enriquecer notas con Nucleo (Hilo) y filtrar inactivas
+            $notas = $notas->filter(function ($nota) {
                 $asignatura = \App\Models\Asignatura::with('hilo')
                     ->where('nombre_asignatura', $nota->nombre_asignatura)
                     ->first();
+                
+                if ($asignatura && strtolower($asignatura->estado) === 'inactivo') {
+                    return false;
+                }
+                
                 $nota->nucleo = $asignatura?->hilo?->nombre_hilo ?? 'N/A';
-            }
-
-            $notas = $notas->sortBy('nucleo');
+                return true;
+            })->sortBy('nucleo');
 
             $bulkData[] = [
                 'estudiante' => $estudiante,
