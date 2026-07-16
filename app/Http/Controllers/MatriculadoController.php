@@ -92,12 +92,6 @@ class MatriculadoController extends Controller
             'fecha_nacimiento_estudiante.required' => 'La fecha de nacimiento es obligatoria para registros nuevos.',
         ]);
 
-        // Verificar duplicado exacto (mismo grado + ano)
-        $matriculaExacta = MatriculaFinal::where('documento_estudiante', $docEstudiante)
-            ->where('id_grado', $request->id_grado)
-            ->where('ano_lectivo', $request->ano_lectivo)
-            ->first();
-
         // Validar email unico solo para estudiantes nuevos
         if (!$estudianteExistente && $request->filled('email')) {
             if (User::where('email', $request->email)->exists()) {
@@ -105,7 +99,7 @@ class MatriculadoController extends Controller
             }
         }
 
-        \DB::transaction(function () use ($request, $docEstudiante, $estudianteExistente, $matriculaExacta) {
+        \DB::transaction(function () use ($request, $docEstudiante, $estudianteExistente) {
 
             $grado  = GradoAcademico::with(['docente.user', 'asignaturas'])->findOrFail($request->id_grado);
             $sedeId = $grado->sede_id;
@@ -238,34 +232,19 @@ class MatriculadoController extends Controller
             // =============================================
             // PASO 3: MATRICULA FINAL
             // =============================================
-            $matriculaFinalInstance = null;
-            if ($matriculaExacta) {
-                // Actualizar matricula existente
-                $matriculaExacta->update([
-                    'id_sede'              => $sedeId,
-                    'curso'                => $request->curso,
-                    'fecha'                => $request->fecha,
-                    'estado'               => $request->estado,
-                    'id_profesor'          => $docenteUserId,
-                    'documento_acudiente'  => $docAcudiente ?: null,
-                    'parentezco_acudiente' => $request->parentezco_acudiente ?? null,
-                ]);
-                $matriculaFinalInstance = $matriculaExacta;
-            } else {
-                // Crear nueva matricula
-                $matriculaFinalInstance = MatriculaFinal::create([
-                    'documento_estudiante' => $docEstudiante,
-                    'id_sede'              => $sedeId,
-                    'id_grado'             => (int) $request->id_grado,
-                    'curso'                => $request->curso,
-                    'ano_lectivo'          => $request->ano_lectivo,
-                    'fecha'                => $request->fecha,
-                    'estado'               => $request->estado,
-                    'id_profesor'          => $docenteUserId,
-                    'documento_acudiente'  => $docAcudiente ?: null,
-                    'parentezco_acudiente' => $request->parentezco_acudiente ?? null,
-                ]);
-            }
+            // Insertar siempre como nuevo para no borrar el registro histórico de matriculados listados.
+            $matriculaFinalInstance = MatriculaFinal::create([
+                'documento_estudiante' => $docEstudiante,
+                'id_sede'              => $sedeId,
+                'id_grado'             => (int) $request->id_grado,
+                'curso'                => $request->curso,
+                'ano_lectivo'          => $request->ano_lectivo,
+                'fecha'                => $request->fecha,
+                'estado'               => $request->estado,
+                'id_profesor'          => $docenteUserId,
+                'documento_acudiente'  => $docAcudiente ?: null,
+                'parentezco_acudiente' => $request->parentezco_acudiente ?? null,
+            ]);
 
             // =============================================
             // PASO 4: PRE-POBULAR MATERIAS EN NOTAS DEFINITIVAS
@@ -295,9 +274,7 @@ class MatriculadoController extends Controller
         }); // fin transaction
 
         $esNuevo = !$estudianteExistente;
-        $msg = $matriculaExacta
-            ? "La matricula del ano {$request->ano_lectivo} fue actualizada correctamente."
-            : "Estudiante matriculado exitosamente en {$request->ano_lectivo}.";
+        $msg = "Estudiante matriculado exitosamente en {$request->ano_lectivo}.";
         if ($esNuevo) {
             $msg .= " Se creo el usuario en el sistema. Contrasena de acceso: {$docEstudiante}";
         }
