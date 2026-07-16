@@ -84,7 +84,7 @@
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Grado Académico y Curso</label>
                             <div class="input-group">
-                                <select name="id_grado" id="id_grado" class="form-select select-grado @error('id_grado') is-invalid @enderror" required onchange="matchCursoAndSede()">
+                                <select name="id_grado" id="id_grado" class="form-select select-grado @error('id_grado') is-invalid @enderror" required>
                                     <option value="">Seleccione grado</option>
                                     @foreach($grados as $grado)
                                         <option value="{{ $grado->id }}" data-bloque="{{ $grado->bloque }}" data-sede="{{ $grado->sede_id }}" data-docente-user-id="{{ $grado->docente?->user_id }}" @selected(old('id_grado') == $grado->id)>
@@ -190,32 +190,33 @@
                     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
                     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
                     <script>
-                        function matchCursoAndSede() {
-                            let el = $('#id_grado');
-                            if(el.find(':selected').length > 0 && el[0].selectedIndex > 0) {
-                                let option = el.find(':selected');
-                                let bloque = option.data('bloque');
-                                let sedeId = option.data('sede');
-                                let docenteUserId = option.data('docente-user-id');
+                        $(document).ready(function() {
+                            $('#id_grado').on('change', function() {
+                                let el = $(this);
+                                let option = el.find('option:selected');
                                 
-                                if (bloque) {
-                                    $('#curso').val(bloque);
-                                }
-                                if (sedeId) {
-                                    $('#id_sede').val(sedeId).trigger('change');
-                                }
-                                if (docenteUserId) {
-                                    $('#id_profesor').val(docenteUserId).trigger('change');
+                                if(option.val() !== "") {
+                                    let bloque = option.data('bloque');
+                                    let sedeId = option.data('sede');
+                                    let docenteUserId = option.data('docente-user-id');
+                                    
+                                    if (bloque) {
+                                        $('#curso').val(bloque);
+                                    }
+                                    if (sedeId) {
+                                        $('#id_sede').val(sedeId).trigger('change');
+                                    }
+                                    if (docenteUserId) {
+                                        $('#id_profesor').val(docenteUserId).trigger('change');
+                                    } else {
+                                        $('#id_profesor').val('').trigger('change');
+                                    }
                                 } else {
+                                    $('#id_sede').val('').trigger('change');
                                     $('#id_profesor').val('').trigger('change');
                                 }
-                            } else {
-                                $('#id_sede').val('').trigger('change');
-                                $('#id_profesor').val('').trigger('change');
-                            }
-                        }
+                            });
 
-                        $(document).ready(function() {
                             // Buscar Estudiante
                             $('#documento_estudiante').on('change blur', function() {
                                 let doc = $(this).val();
