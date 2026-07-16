@@ -99,7 +99,7 @@
                                 <select name="id_grado" id="id_grado" class="form-select select-grado @error('id_grado') is-invalid @enderror" required onchange="matchCursoAndSede()">
                                     <option value="">Seleccione grado</option>
                                     @foreach($grados as $grado)
-                                        <option value="{{ $grado->id }}" data-bloque="{{ $grado->bloque }}" data-sede="{{ $grado->sede_id }}" @selected(old('id_grado', $matriculado->id_grado ?? '') == $grado->id)>
+                                        <option value="{{ $grado->id }}" data-bloque="{{ $grado->bloque }}" data-sede="{{ $grado->sede_id }}" data-docente-user-id="{{ $grado->docente?->user_id }}" @selected(old('id_grado', $matriculado->id_grado ?? '') == $grado->id)>
                                             {{ $grado->nombre_grado }} - {{ $grado->bloque }} ({{ $grado->sede->nombre_sede ?? 'Sin Sede' }})
                                         </option>
                                     @endforeach
@@ -191,6 +191,7 @@
                                 let option = el.options[el.selectedIndex];
                                 let bloque = option.getAttribute('data-bloque');
                                 let sedeId = option.getAttribute('data-sede');
+                                let docenteUserId = option.getAttribute('data-docente-user-id');
                                 
                                 if (bloque) {
                                     document.getElementById('curso').value = bloque;
@@ -198,8 +199,14 @@
                                 if (sedeId) {
                                     document.getElementById('id_sede').value = sedeId;
                                 }
+                                if (docenteUserId) {
+                                    document.getElementById('id_profesor').value = docenteUserId;
+                                } else {
+                                    document.getElementById('id_profesor').value = '';
+                                }
                             } else {
                                 document.getElementById('id_sede').value = '';
+                                document.getElementById('id_profesor').value = '';
                             }
                         }
                         $(document).ready(function() {

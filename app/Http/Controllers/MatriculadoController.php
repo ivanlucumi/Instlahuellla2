@@ -44,7 +44,7 @@ class MatriculadoController extends Controller
         $matriculado    = new MatriculaFinal();
         $estudiantes    = Estudiante::with('user')->orderBy('id')->get();
         $sedes          = Sede::orderBy('nombre_sede')->get();
-        $grados         = GradoAcademico::where('estado_grado_academico', true)->orderBy('nombre_grado')->get();
+        $grados         = GradoAcademico::with('docente')->where('estado_grado_academico', true)->orderBy('nombre_grado')->get();
         $currentYear    = date('Y');
         $anhosEscolares = AnhoEscolar::orderBy('nombre_anho_escolar', 'asc')->get();
         $docentes       = User::whereHas('roles', fn($q) => $q->where('name', 'Docente'))->orderBy('name')->get();
@@ -105,8 +105,20 @@ class MatriculadoController extends Controller
 
         \DB::transaction(function () use ($request, $docEstudiante, $estudianteExistente, $matriculaExacta) {
 
-            $grado  = GradoAcademico::findOrFail($request->id_grado);
+            $grado  = GradoAcademico::with(['docente.user', 'asignaturas'])->findOrFail($request->id_grado);
             $sedeId = $grado->sede_id;
+
+            // Resolve id_profesor to avoid null integrity constraint
+            $docenteUserId = $request->id_profesor;
+            if (!$docenteUserId && $grado->docente) {
+                $docenteUserId = $grado->docente->user_id;
+            }
+            if (!$docenteUserId) {
+                $docenteUserId = User::whereHas('roles', fn($q) => $q->where('name', 'Docente'))->value('id');
+            }
+            if (!$docenteUserId) {
+                $docenteUserId = auth()->id();
+            }
 
             // =============================================
             // PASO 1: ACUDIENTE
@@ -221,6 +233,7 @@ class MatriculadoController extends Controller
             // =============================================
             // PASO 3: MATRICULA FINAL
             // =============================================
+            $matriculaFinalInstance = null;
             if ($matriculaExacta) {
                 // Actualizar matricula existente
                 $matriculaExacta->update([
@@ -228,13 +241,14 @@ class MatriculadoController extends Controller
                     'curso'                => $request->curso,
                     'fecha'                => $request->fecha,
                     'estado'               => $request->estado,
-                    'id_profesor'          => $request->id_profesor ?: null,
+                    'id_profesor'          => $docenteUserId,
                     'documento_acudiente'  => $docAcudiente ?: null,
                     'parentezco_acudiente' => $request->parentezco_acudiente ?? null,
                 ]);
+                $matriculaFinalInstance = $matriculaExacta;
             } else {
                 // Crear nueva matricula
-                MatriculaFinal::create([
+                $matriculaFinalInstance = MatriculaFinal::create([
                     'documento_estudiante' => $docEstudiante,
                     'id_sede'              => $sedeId,
                     'id_grado'             => (int) $request->id_grado,
@@ -242,10 +256,36 @@ class MatriculadoController extends Controller
                     'ano_lectivo'          => $request->ano_lectivo,
                     'fecha'                => $request->fecha,
                     'estado'               => $request->estado,
-                    'id_profesor'          => $request->id_profesor ?: null,
+                    'id_profesor'          => $docenteUserId,
                     'documento_acudiente'  => $docAcudiente ?: null,
                     'parentezco_acudiente' => $request->parentezco_acudiente ?? null,
                 ]);
+            }
+
+            // =============================================
+            // PASO 4: PRE-POBULAR MATERIAS EN NOTAS DEFINITIVAS
+            // =============================================
+            $asignaturas = $grado->asignaturas;
+            foreach ($asignaturas as $asignatura) {
+                $nd = \App\Models\NotasDefinitivas::firstOrNew([
+                    'id_matricula'  => $matriculaFinalInstance->id,
+                    'asignatura_id' => $asignatura->id,
+                ]);
+
+                if (!$nd->exists) {
+                    $nd->nota_per1 = 0.00;
+                    $nd->nota_per2 = 0.00;
+                    $nd->nota_per3 = 0.00;
+                    $nd->nota_per4 = 0.00;
+                    $nd->nota_definitiva = 0.00;
+                }
+
+                $nd->documento_estudiante = $docEstudiante;
+                $nd->nombre_estudiante    = $estudiante->user->name;
+                $nd->grado_aprobado       = $grado->nombre_grado . ' - ' . ($grado->bloque ?? '');
+                $nd->nombre_asignatura    = $asignatura->nombre_asignatura;
+                $nd->curso                = $request->curso;
+                $nd->save();
             }
         }); // fin transaction
 
@@ -275,7 +315,7 @@ class MatriculadoController extends Controller
         $matriculado    = MatriculaFinal::findOrFail($id);
         $estudiantes    = Estudiante::with('user')->orderBy('id')->get();
         $sedes          = Sede::orderBy('nombre_sede')->get();
-        $grados         = GradoAcademico::where('estado_grado_academico', true)->orderBy('nombre_grado')->get();
+        $grados         = GradoAcademico::with('docente')->where('estado_grado_academico', true)->orderBy('nombre_grado')->get();
         $currentYear    = date('Y');
         $anhosEscolares = AnhoEscolar::orderBy('nombre_anho_escolar', 'asc')->get();
         $docentes       = User::whereHas('roles', fn($q) => $q->where('name', 'Docente'))->orderBy('name')->get();
@@ -334,7 +374,7 @@ class MatriculadoController extends Controller
         }
 
         \DB::transaction(function () use ($request, $matricula) {
-            $grado   = GradoAcademico::find($request->id_grado);
+            $grado   = GradoAcademico::with(['docente.user', 'asignaturas'])->findOrFail($request->id_grado);
             $sedeId  = $grado ? $grado->sede_id : null;
 
             if ($matricula->estudiante && $matricula->estudiante->user) {
@@ -392,6 +432,18 @@ class MatriculadoController extends Controller
                 }
             }
 
+            // Resolve id_profesor to avoid null integrity constraint
+            $docenteUserId = $request->id_profesor;
+            if (!$docenteUserId && $grado->docente) {
+                $docenteUserId = $grado->docente->user_id;
+            }
+            if (!$docenteUserId) {
+                $docenteUserId = User::whereHas('roles', fn($q) => $q->where('name', 'Docente'))->value('id');
+            }
+            if (!$docenteUserId) {
+                $docenteUserId = auth()->id();
+            }
+
             $matricula->update([
                 'id_sede'              => $sedeId,
                 'id_grado'             => $request->id_grado,
@@ -399,10 +451,36 @@ class MatriculadoController extends Controller
                 'ano_lectivo'          => $request->ano_lectivo,
                 'fecha'                => $request->fecha,
                 'estado'               => $request->estado,
-                'id_profesor'          => $request->id_profesor ?: null,
+                'id_profesor'          => $docenteUserId,
                 'documento_acudiente'  => $docAcudiente ?: null,
                 'parentezco_acudiente' => $request->parentezco_acudiente ?? null,
             ]);
+
+            // =============================================
+            // PASO 4: PRE-POBULAR MATERIAS EN NOTAS DEFINITIVAS
+            // =============================================
+            $asignaturas = $grado->asignaturas;
+            foreach ($asignaturas as $asignatura) {
+                $nd = \App\Models\NotasDefinitivas::firstOrNew([
+                    'id_matricula'  => $matricula->id,
+                    'asignatura_id' => $asignatura->id,
+                ]);
+
+                if (!$nd->exists) {
+                    $nd->nota_per1 = 0.00;
+                    $nd->nota_per2 = 0.00;
+                    $nd->nota_per3 = 0.00;
+                    $nd->nota_per4 = 0.00;
+                    $nd->nota_definitiva = 0.00;
+                }
+
+                $nd->documento_estudiante = $matricula->documento_estudiante;
+                $nd->nombre_estudiante    = $matricula->estudiante->user->name ?? '';
+                $nd->grado_aprobado       = $grado->nombre_grado . ' - ' . ($grado->bloque ?? '');
+                $nd->nombre_asignatura    = $asignatura->nombre_asignatura;
+                $nd->curso                = $request->curso;
+                $nd->save();
+            }
         });
 
         return redirect()->route('admin.matriculado.index')->with('swal', [

@@ -87,7 +87,7 @@
                                 <select name="id_grado" id="id_grado" class="form-select select-grado @error('id_grado') is-invalid @enderror" required onchange="matchCursoAndSede()">
                                     <option value="">Seleccione grado</option>
                                     @foreach($grados as $grado)
-                                        <option value="{{ $grado->id }}" data-bloque="{{ $grado->bloque }}" data-sede="{{ $grado->sede_id }}" @selected(old('id_grado') == $grado->id)>
+                                        <option value="{{ $grado->id }}" data-bloque="{{ $grado->bloque }}" data-sede="{{ $grado->sede_id }}" data-docente-user-id="{{ $grado->docente?->user_id }}" @selected(old('id_grado') == $grado->id)>
                                             {{ $grado->nombre_grado }} - {{ $grado->bloque }} ({{ $grado->sede->nombre_sede ?? 'Sin Sede' }})
                                         </option>
                                     @endforeach
@@ -196,6 +196,7 @@
                                 let option = el.options[el.selectedIndex];
                                 let bloque = option.getAttribute('data-bloque');
                                 let sedeId = option.getAttribute('data-sede');
+                                let docenteUserId = option.getAttribute('data-docente-user-id');
                                 
                                 if (bloque) {
                                     document.getElementById('curso').value = bloque;
@@ -203,12 +204,59 @@
                                 if (sedeId) {
                                     document.getElementById('id_sede').value = sedeId;
                                 }
+                                if (docenteUserId) {
+                                    document.getElementById('id_profesor').value = docenteUserId;
+                                } else {
+                                    document.getElementById('id_profesor').value = '';
+                                }
                             } else {
                                 document.getElementById('id_sede').value = '';
+                                document.getElementById('id_profesor').value = '';
                             }
                         }
 
                         $(document).ready(function() {
+                            // Buscar Estudiante
+                            $('#documento_estudiante').on('change blur', function() {
+                                let doc = $(this).val();
+                                if (!doc) return;
+
+                                let icon = $('<i class="fa fa-spinner fa-spin ms-2 text-primary" id="spinner-estudiante"></i>');
+                                $('#documento_estudiante').next('small').append(icon);
+
+                                $.ajax({
+                                    url: "{{ route('admin.matriculado.datos-estudiante') }}",
+                                    type: 'GET',
+                                    data: { documento: doc },
+                                    success: function(response) {
+                                        $('#spinner-estudiante').remove();
+                                        if(response.encontrado) {
+                                            Swal.fire({icon: 'success', title: 'Estudiante Encontrado', text: 'Datos pre-cargados automáticamente.', timer: 1500, showConfirmButton: false, toast: true, position: 'top-end'});
+                                            
+                                            // Llenar datos de estudiante
+                                            $('#estudiante_name').val(response.name);
+                                            $('#estudiante_email').val(response.email);
+                                            $('#estudiante_tipo_id').val(response.tipo_id);
+                                            $('#estudiante_celular').val(response.celular_estudiante);
+                                            $('#estudiante_direccion').val(response.direccion_estudiante);
+                                            $('#estudiante_genero').val(response.genero_estudiante);
+                                            $('#estudiante_fecha_nacimiento').val(response.fecha_nacimiento);
+
+                                            // Llenar datos de la última matrícula si existen
+                                            if (response.ultima_matricula) {
+                                                $('#id_grado').val(response.ultima_matricula.id_grado).trigger('change');
+                                                $('#curso').val(response.ultima_matricula.curso);
+                                                $('#ano_lectivo').val(response.ultima_matricula.ano_lectivo);
+                                                // El estado siempre lo dejamos en activo por defecto para nueva matrícula o renovación
+                                            }
+                                        }
+                                    },
+                                    error: function() {
+                                        $('#spinner-estudiante').remove();
+                                    }
+                                });
+                            });
+
                             // Buscar Acudiente
                             $('#btn_buscar_acudiente').click(function() {
                                 let cc = $('#documento_acudiente').val();
