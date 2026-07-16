@@ -186,27 +186,27 @@
                             document.getElementById('parentezco_acudiente').value = parentesco || 'Acudiente';
                         }
                         function matchCursoAndSede() {
-                            let el = document.getElementById('id_grado');
-                            if(el.selectedIndex > 0) {
-                                let option = el.options[el.selectedIndex];
-                                let bloque = option.getAttribute('data-bloque');
-                                let sedeId = option.getAttribute('data-sede');
-                                let docenteUserId = option.getAttribute('data-docente-user-id');
+                            let el = $('#id_grado');
+                            if(el.find(':selected').length > 0 && el[0].selectedIndex > 0) {
+                                let option = el.find(':selected');
+                                let bloque = option.data('bloque');
+                                let sedeId = option.data('sede');
+                                let docenteUserId = option.data('docente-user-id');
                                 
                                 if (bloque) {
-                                    document.getElementById('curso').value = bloque;
+                                    $('#curso').val(bloque);
                                 }
                                 if (sedeId) {
-                                    document.getElementById('id_sede').value = sedeId;
+                                    $('#id_sede').val(sedeId).trigger('change');
                                 }
                                 if (docenteUserId) {
-                                    document.getElementById('id_profesor').value = docenteUserId;
+                                    $('#id_profesor').val(docenteUserId).trigger('change');
                                 } else {
-                                    document.getElementById('id_profesor').value = '';
+                                    $('#id_profesor').val('').trigger('change');
                                 }
                             } else {
-                                document.getElementById('id_sede').value = '';
-                                document.getElementById('id_profesor').value = '';
+                                $('#id_sede').val('').trigger('change');
+                                $('#id_profesor').val('').trigger('change');
                             }
                         }
                         $(document).ready(function() {
