@@ -87,7 +87,7 @@
                                 <select name="id_grado" id="id_grado" class="form-select select-grado @error('id_grado') is-invalid @enderror" required>
                                     <option value="">Seleccione grado</option>
                                     @foreach($grados as $grado)
-                                        <option value="{{ $grado->id }}" data-bloque="{{ $grado->bloque }}" data-sede="{{ $grado->sede_id }}" data-docente-user-id="{{ $grado->docente?->user_id }}" @selected(old('id_grado') == $grado->id)>
+                                        <option value="{{ $grado->id }}" data-bloque="{{ $grado->bloque }}" data-sede="{{ $grado->sede_id }}" data-docente-user-id="{{ $grado->docente?->user_id }}" data-docente-name="{{ $grado->docente?->user?->name }}" @selected(old('id_grado') == $grado->id)>
                                             {{ $grado->nombre_grado }} - {{ $grado->bloque }} ({{ $grado->sede->nombre_sede ?? 'Sin Sede' }})
                                         </option>
                                     @endforeach
@@ -147,15 +147,9 @@
 
                         <!-- Director de Grado -->
                         <div class="col-md-4 mb-3">
-                            <label class="form-label">Director (Opcional)</label>
-                            <select name="id_profesor" id="id_profesor" class="form-select @error('id_profesor') is-invalid @enderror">
-                                <option value="">Seleccione director...</option>
-                                @foreach($docentes as $docente)
-                                    <option value="{{ $docente->id }}" @selected(old('id_profesor') == $docente->id)>
-                                        {{ $docente->name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            <label class="form-label">Director de Grado</label>
+                            <input type="text" id="nombre_director" class="form-control" readonly placeholder="Asignado automáticamente por grado">
+                            <input type="hidden" name="id_profesor" id="id_profesor" value="{{ old('id_profesor') }}">
                             @error('id_profesor') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                         </div>
 
@@ -199,6 +193,7 @@
                                     let bloque = option.data('bloque');
                                     let sedeId = option.data('sede');
                                     let docenteUserId = option.data('docente-user-id');
+                                    let docenteName = option.data('docente-name');
                                     
                                     if (bloque) {
                                         $('#curso').val(bloque);
@@ -207,13 +202,16 @@
                                         $('#id_sede').val(sedeId).trigger('change');
                                     }
                                     if (docenteUserId) {
-                                        $('#id_profesor').val(docenteUserId).trigger('change');
+                                        $('#id_profesor').val(docenteUserId);
+                                        $('#nombre_director').val(docenteName || 'Director asignado');
                                     } else {
-                                        $('#id_profesor').val('').trigger('change');
+                                        $('#id_profesor').val('');
+                                        $('#nombre_director').val('Grado sin director asignado');
                                     }
                                 } else {
                                     $('#id_sede').val('').trigger('change');
-                                    $('#id_profesor').val('').trigger('change');
+                                    $('#id_profesor').val('');
+                                    $('#nombre_director').val('');
                                 }
                             });
 

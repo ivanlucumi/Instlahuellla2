@@ -44,7 +44,7 @@ class MatriculadoController extends Controller
         $matriculado    = new MatriculaFinal();
         $estudiantes    = Estudiante::with('user')->orderBy('id')->get();
         $sedes          = Sede::orderBy('nombre_sede')->get();
-        $grados         = GradoAcademico::with('docente')->where('estado_grado_academico', true)->orderBy('nombre_grado')->get();
+        $grados         = GradoAcademico::with('docente.user')->where('estado_grado_academico', true)->orderBy('nombre_grado')->get();
         $currentYear    = date('Y');
         $anhosEscolares = AnhoEscolar::orderBy('nombre_anho_escolar', 'asc')->get();
         $docentes       = User::whereIn('id', \App\Models\Docente::pluck('user_id')->filter())
@@ -297,7 +297,7 @@ class MatriculadoController extends Controller
         $matriculado    = MatriculaFinal::findOrFail($id);
         $estudiantes    = Estudiante::with('user')->orderBy('id')->get();
         $sedes          = Sede::orderBy('nombre_sede')->get();
-        $grados         = GradoAcademico::with('docente')->where('estado_grado_academico', true)->orderBy('nombre_grado')->get();
+        $grados         = GradoAcademico::with('docente.user')->where('estado_grado_academico', true)->orderBy('nombre_grado')->get();
         $currentYear    = date('Y');
         $anhosEscolares = AnhoEscolar::orderBy('nombre_anho_escolar', 'asc')->get();
         $docentes       = User::whereIn('id', \App\Models\Docente::pluck('user_id')->filter())
