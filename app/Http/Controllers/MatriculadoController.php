@@ -47,7 +47,9 @@ class MatriculadoController extends Controller
         $grados         = GradoAcademico::with('docente')->where('estado_grado_academico', true)->orderBy('nombre_grado')->get();
         $currentYear    = date('Y');
         $anhosEscolares = AnhoEscolar::orderBy('nombre_anho_escolar', 'asc')->get();
-        $docentes       = User::whereHas('roles', fn($q) => $q->where('name', 'Docente'))->orderBy('name')->get();
+        $docentes       = User::whereIn('id', \App\Models\Docente::pluck('user_id')->filter())
+            ->orWhereHas('roles', fn($q) => $q->where('name', 'Docente'))
+            ->orderBy('name')->get();
         $acudientes     = Acudiente::with('user')->orderBy('id')->get();
 
         return view('Matriculado.Create', compact(
@@ -108,10 +110,13 @@ class MatriculadoController extends Controller
             $grado  = GradoAcademico::with(['docente.user', 'asignaturas'])->findOrFail($request->id_grado);
             $sedeId = $grado->sede_id;
 
-            // Resolve id_profesor to avoid null integrity constraint
+            // Resolve id_profesor to avoid null or invalid integrity constraint
             $docenteUserId = $request->id_profesor;
             if (!$docenteUserId && $grado->docente) {
                 $docenteUserId = $grado->docente->user_id;
+            }
+            if ($docenteUserId && !User::find($docenteUserId)) {
+                $docenteUserId = null;
             }
             if (!$docenteUserId) {
                 $docenteUserId = User::whereHas('roles', fn($q) => $q->where('name', 'Docente'))->value('id');
@@ -318,7 +323,9 @@ class MatriculadoController extends Controller
         $grados         = GradoAcademico::with('docente')->where('estado_grado_academico', true)->orderBy('nombre_grado')->get();
         $currentYear    = date('Y');
         $anhosEscolares = AnhoEscolar::orderBy('nombre_anho_escolar', 'asc')->get();
-        $docentes       = User::whereHas('roles', fn($q) => $q->where('name', 'Docente'))->orderBy('name')->get();
+        $docentes       = User::whereIn('id', \App\Models\Docente::pluck('user_id')->filter())
+            ->orWhereHas('roles', fn($q) => $q->where('name', 'Docente'))
+            ->orderBy('name')->get();
         $acudientes     = Acudiente::with('user')->orderBy('id')->get();
 
         return view('Matriculado.Edit', compact(
@@ -432,10 +439,13 @@ class MatriculadoController extends Controller
                 }
             }
 
-            // Resolve id_profesor to avoid null integrity constraint
+            // Resolve id_profesor to avoid null or invalid integrity constraint
             $docenteUserId = $request->id_profesor;
             if (!$docenteUserId && $grado->docente) {
                 $docenteUserId = $grado->docente->user_id;
+            }
+            if ($docenteUserId && !User::find($docenteUserId)) {
+                $docenteUserId = null;
             }
             if (!$docenteUserId) {
                 $docenteUserId = User::whereHas('roles', fn($q) => $q->where('name', 'Docente'))->value('id');
