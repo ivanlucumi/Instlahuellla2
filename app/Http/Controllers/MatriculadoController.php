@@ -19,279 +19,324 @@ class MatriculadoController extends Controller
         $query = MatriculaFinal::with([
             'estudiante.user',
             'sede',
+            'grado.sede',
             'grado',
+            'acudiente.user',
             'profesor'
         ]);
 
-        // Si es DIRECTOR y no SUPERADMIN/ADMIN, solo ve matrículas de sus grados asignados
         if (auth()->user()->hasRol('DIRECTOR') && !auth()->user()->hasRol('SUPERADMIN') && !auth()->user()->hasRol('ADMIN')) {
             $directorId = auth()->id();
-            $query->whereHas('grado', function($q) use ($directorId) {
-                $q->whereHas('docente', function($sq) use ($directorId) {
+            $query->whereHas('grado', function ($q) use ($directorId) {
+                $q->whereHas('docente', function ($sq) use ($directorId) {
                     $sq->where('user_id', $directorId);
                 });
             });
         }
 
         $matriculados = $query->orderBy('id', 'desc')->paginate(15);
-        
         return view('Matriculado.Index', compact('matriculados'));
     }
 
     public function create()
     {
-        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'ADMIN']), 403, 'No tiene permisos para crear matrículas.');
-        $matriculado = new MatriculaFinal(); 
-        $estudiantes = Estudiante::with('user')->orderBy('id')->get();
-        // Cargar todos los catálogos para los dropdowns
-        $sedes = Sede::orderBy('nombre_sede')->get();
-        $grados = GradoAcademico::where('estado_grado_academico', true)->orderBy('nombre_grado')->get();
-        
-        $currentYear = date('Y');
-        $anhosEscolares = AnhoEscolar::where('estado_anho_escolar', true)
-            ->where('nombre_anho_escolar', '>=', $currentYear)
-            ->orderBy('nombre_anho_escolar', 'asc')
-            ->get();
-            
-        $docentes = User::whereHas('roles', fn($q) => $q->where('name', 'Docente'))->orderBy('name')->get();
-        $acudientes = Acudiente::with('user')->orderBy('id')->get();
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'ADMIN']), 403, 'No tiene permisos para crear matriculas.');
+        $matriculado    = new MatriculaFinal();
+        $estudiantes    = Estudiante::with('user')->orderBy('id')->get();
+        $sedes          = Sede::orderBy('nombre_sede')->get();
+        $grados         = GradoAcademico::where('estado_grado_academico', true)->orderBy('nombre_grado')->get();
+        $currentYear    = date('Y');
+        $anhosEscolares = AnhoEscolar::orderBy('nombre_anho_escolar', 'asc')->get();
+        $docentes       = User::whereHas('roles', fn($q) => $q->where('name', 'Docente'))->orderBy('name')->get();
+        $acudientes     = Acudiente::with('user')->orderBy('id')->get();
 
         return view('Matriculado.Create', compact(
-            'matriculado', 'estudiantes', 'sedes', 'grados', 'anhosEscolares', 'docentes', 'acudientes'
+            'matriculado', 'estudiantes', 'sedes', 'grados',
+            'anhosEscolares', 'docentes', 'acudientes'
         ));
     }
 
     public function store(Request $request)
     {
-        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'ADMIN']), 403, 'No tiene permisos para crear matrículas.');
-        $docEstudiante = $request->documento_estudiante;
-        $estudiante = \App\Models\Estudiante::where('numero_identificacion_estudiante', $docEstudiante)->first();
-        $userId = $estudiante ? $estudiante->user_id : null;
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'ADMIN']), 403, 'No tiene permisos para crear matriculas.');
 
-        $request->validate([
-            'documento_estudiante' => 'required|string',
+        $docEstudiante       = trim($request->documento_estudiante);
+        $estudianteExistente = Estudiante::with('user')
+            ->where('numero_identificacion_estudiante', $docEstudiante)
+            ->first();
+
+        // --- Reglas de validacion ---
+        $rules = [
+            'documento_estudiante' => 'required|string|max:20',
             'id_grado'             => 'required|exists:grado_academicos,id',
-            'curso'                => 'required|string',
-            'ano_lectivo'          => 'required|string',
+            'curso'                => 'required|string|max:20',
+            'ano_lectivo'          => 'required|string|max:10',
             'fecha'                => 'required|date',
             'estado'               => 'required|in:activo,inactivo,retirado',
             'id_profesor'          => 'nullable|exists:users,id',
-            'documento_acudiente'  => 'nullable|string',
-            // student profile - only required if student DOES NOT exist
-            'name'                        => 'required_without_all:estudiante_id,documento_estudiante_exists|string',
-            'email'                       => 'nullable|email|unique:users,email,' . $userId,
-            'fecha_nacimiento_estudiante'  => 'required_without_all:estudiante_id,documento_estudiante_exists|date',
-        ], [
-            'email.unique' => 'Este correo electrónico ya está registrado por otro usuario en el sistema. Debe usar uno distinto o dejarlo vacío si el estudiante no cuenta con uno.'
+            'documento_acudiente'  => 'nullable|string|max:20',
+        ];
+
+        // Solo requerir nombre y nacimiento si el estudiante NO existe
+        if (!$estudianteExistente) {
+            $rules['name']                       = 'required|string|max:255';
+            $rules['fecha_nacimiento_estudiante'] = 'required|date';
+        }
+
+        $request->validate($rules, [
+            'id_grado.required'                   => 'Seleccione un grado academico.',
+            'ano_lectivo.required'                => 'Seleccione el ano lectivo.',
+            'name.required'                       => 'El nombre del estudiante es obligatorio para registros nuevos.',
+            'fecha_nacimiento_estudiante.required' => 'La fecha de nacimiento es obligatoria para registros nuevos.',
         ]);
 
-        // --- VALIDACIÓN MEJORADA ---
-        $matriculaExistente = MatriculaFinal::with('grado')
-            ->where('documento_estudiante', $request->documento_estudiante)
+        // Verificar duplicado exacto (mismo grado + ano)
+        $matriculaExacta = MatriculaFinal::where('documento_estudiante', $docEstudiante)
+            ->where('id_grado', $request->id_grado)
             ->where('ano_lectivo', $request->ano_lectivo)
             ->first();
 
-        if ($matriculaExistente) {
-            $msg = "El estudiante ya cuenta con una matrícula para el año {$request->ano_lectivo}";
-            if ($matriculaExistente->grado) {
-                $msg .= " en el grado {$matriculaExistente->grado->nombre_grado} - {$matriculaExistente->curso}.";
-            } else {
-                $msg .= ".";
+        // Validar email unico solo para estudiantes nuevos
+        if (!$estudianteExistente && $request->filled('email')) {
+            if (User::where('email', $request->email)->exists()) {
+                return back()->withErrors(['email' => 'El correo ya esta registrado. Use otro o dejelo vacio.'])->withInput();
             }
-            
-            return back()->with('swal', [
-                'icon'  => 'warning',
-                'title' => 'Estudiante ya matriculado',
-                'text'  => $msg
-            ])->withInput();
         }
 
-        \DB::transaction(function() use ($request) {
-            // Determinar Sede basado en el Grado Académico
-            $grado = \App\Models\GradoAcademico::find($request->id_grado);
-            $realSedeId = $grado ? $grado->sede_id : null;
+        \DB::transaction(function () use ($request, $docEstudiante, $estudianteExistente, $matriculaExacta) {
 
-            $docEstudiante = $request->documento_estudiante;
-            $estudiante = \App\Models\Estudiante::with('user')->where('numero_identificacion_estudiante', $docEstudiante)->first();
+            $grado  = GradoAcademico::findOrFail($request->id_grado);
+            $sedeId = $grado->sede_id;
 
-            if (!$estudiante) {
-                // 1. Crear Usuario Estudiante
-                $userEstudiante = \App\Models\User::create([
-                    'name'     => $request->name,
-                    'email'    => $request->email ?? 'estudiante_'.$docEstudiante.'@colegio.local',
-                    'password' => \Hash::make($docEstudiante),
-                    'genero'   => $request->genero_estudiante ?? 'no definido',
-                ]);
-
-                $rolEstudiante = \App\Models\Rol::where('nombre', 'ESTUDIANTE')->first();
-                if ($rolEstudiante) {
-                    $userEstudiante->roles()->attach($rolEstudiante->id);
-                }
-
-                // 2. Crear Estudiante
-                $estudiante = \App\Models\Estudiante::create([
-                    'user_id'                          => $userEstudiante->id,
-                    'codigo_estudiante'                => 'ES' . $docEstudiante,
-                    'tipo_identificacion_estudiante'   => $request->tipo_identificacion_estudiante ?? 'CC',
-                    'numero_identificacion_estudiante' => $docEstudiante,
-                    'fecha_nacimiento_estudiante'      => $request->fecha_nacimiento_estudiante,
-                    'celular_estudiante'               => $request->celular_estudiante ?? '00000',
-                    'direccion_estudiante'             => $request->direccion_estudiante ?? 'N/A',
-                    'genero_estudiante'                => $request->genero_estudiante ?? 'no definido',
-                    'estado_estudiante'                => 1,
-                    'grado_academico_id'               => $request->id_grado,
-                 ]);
-            } else {
-                // Actualizar info si ya existía y se pasaron datos
-                if ($estudiante->user) {
-                    $estudiante->user->update([
-                        'name' => $request->name ?? $estudiante->user->name,
-                        'email' => $request->email ?? $estudiante->user->email
-                    ]);
-                }
-                $estudiante->update([
-                    'fecha_nacimiento_estudiante'    => $request->fecha_nacimiento_estudiante ?? $estudiante->fecha_nacimiento_estudiante,
-                    'celular_estudiante'             => $request->celular_estudiante ?? $estudiante->celular_estudiante,
-                    'direccion_estudiante'           => $request->direccion_estudiante ?? $estudiante->direccion_estudiante,
-                    'tipo_identificacion_estudiante' => $request->tipo_identificacion_estudiante ?? $estudiante->tipo_identificacion_estudiante,
-                    'genero_estudiante'              => $request->genero_estudiante ?? $estudiante->genero_estudiante,
-                ]);
-            }
-
-            $docAcudiente = $request->documento_acudiente;
-            $acudienteId = null;
+            // =============================================
+            // PASO 1: ACUDIENTE
+            // =============================================
+            $acudienteId  = null;
+            $docAcudiente = trim($request->documento_acudiente ?? '');
 
             if ($docAcudiente) {
-                $acudienteObj = \App\Models\Acudiente::where('id_documento', $docAcudiente)->first();
+                $acudienteObj = Acudiente::where('id_documento', $docAcudiente)->first();
 
                 if (!$acudienteObj) {
-                    // 1. Crear Usuario Acudiente
-                    $userAcudiente = \App\Models\User::create([
+                    // Acudiente nuevo: crear usuario
+                    $emailAcud = 'acudiente_' . $docAcudiente . '@colegio.local';
+                    if (User::where('email', $emailAcud)->exists()) {
+                        $emailAcud = 'acudiente_' . $docAcudiente . '_' . time() . '@colegio.local';
+                    }
+
+                    $userAcud = User::create([
                         'name'     => $request->nombre_acudiente ?? 'Acudiente ' . $docAcudiente,
-                        'email'    => 'acudiente_'.$docAcudiente.'@colegio.local',
+                        'email'    => $emailAcud,
                         'password' => \Hash::make($docAcudiente),
                         'genero'   => 'no definido',
                     ]);
+                    $rolAcud = \App\Models\Rol::where('nombre', 'ACUDIENTE')->first();
+                    if ($rolAcud) $userAcud->roles()->attach($rolAcud->id);
 
-                    $rolAcudiente = \App\Models\Rol::where('nombre', 'ACUDIENTE')->first();
-                    if ($rolAcudiente) {
-                        $userAcudiente->roles()->attach($rolAcudiente->id);
-                    }
-
-                    // 2. Crear Perfil Acudiente
-                    $acudienteObj = \App\Models\Acudiente::create([
-                        'user_id'              => $userAcudiente->id,
+                    $acudienteObj = Acudiente::create([
+                        'user_id'              => $userAcud->id,
                         'id_documento'         => $docAcudiente,
-                        'celular_acudiente'    => $request->celular_acudiente ?? '00000',
+                        'celular_acudiente'    => $request->celular_acudiente ?? '0000000000',
                         'direccion_acudiente'  => 'N/A',
                         'genero_acudiente'     => 'no definido',
                         'parentesco_acudiente' => $request->parentezco_acudiente ?? 'Acudiente',
                         'estado_acudiente'     => 1,
                     ]);
                 } else {
-                    // Actualizar Acudiente si existe y mandaron datos nuevos
-                    if ($acudienteObj->user && $request->nombre_acudiente) {
+                    // Acudiente existente: actualizar si vinieron datos
+                    if ($request->nombre_acudiente && $acudienteObj->user) {
                         $acudienteObj->user->update(['name' => $request->nombre_acudiente]);
                     }
-                    if ($request->celular_acudiente || $request->parentezco_acudiente) {
-                       $acudienteObj->update([
-                           'celular_acudiente' => $request->celular_acudiente ?? $acudienteObj->celular_acudiente,
-                           'parentesco_acudiente' => $request->parentezco_acudiente ?? $acudienteObj->parentesco_acudiente
-                       ]);
+                    if ($request->celular_acudiente) {
+                        $acudienteObj->update(['celular_acudiente' => $request->celular_acudiente]);
+                    }
+                    if ($request->parentezco_acudiente) {
+                        $acudienteObj->update(['parentesco_acudiente' => $request->parentezco_acudiente]);
                     }
                 }
-
                 $acudienteId = $acudienteObj->id;
+            }
+
+            // =============================================
+            // PASO 2: ESTUDIANTE + USUARIO
+            // =============================================
+            if (!$estudianteExistente) {
+                // Estudiante NUEVO -> crear usuario + perfil
+                $emailEst = $request->filled('email')
+                    ? $request->email
+                    : 'est_' . $docEstudiante . '@colegio.local';
+                if (User::where('email', $emailEst)->exists()) {
+                    $emailEst = 'est_' . $docEstudiante . '_' . time() . '@colegio.local';
+                }
+
+                $userEst = User::create([
+                    'name'     => $request->name,
+                    'email'    => $emailEst,
+                    'password' => \Hash::make($docEstudiante), // contrasena = documento
+                    'genero'   => $request->genero_estudiante ?? 'no definido',
+                ]);
+                $rolEst = \App\Models\Rol::where('nombre', 'ESTUDIANTE')->first();
+                if ($rolEst) $userEst->roles()->attach($rolEst->id);
+
+                $estudiante = Estudiante::create([
+                    'user_id'                         => $userEst->id,
+                    'codigo_estudiante'               => 'ES' . $docEstudiante,
+                    'tipo_identificacion_estudiante'  => $request->tipo_identificacion_estudiante ?? 'TI',
+                    'numero_identificacion_estudiante' => $docEstudiante,
+                    'fecha_nacimiento_estudiante'     => $request->fecha_nacimiento_estudiante,
+                    'genero_estudiante'               => $request->genero_estudiante ?? 'no definido',
+                    'direccion_estudiante'            => $request->direccion_estudiante ?? 'N/A',
+                    'telefono_estudiante'             => $request->celular_estudiante ?? '0000000000',
+                    'estado_estudiante'               => 1,
+                    'grado_academico_id'              => (int) $request->id_grado,
+                    'acudiente_id'                   => $acudienteId,
+                ]);
+
+            } else {
+                // Estudiante EXISTENTE -> actualizar datos si vinieron
+                $estudiante = $estudianteExistente;
+
+                if ($estudiante->user) {
+                    $upUser = [];
+                    if ($request->filled('name'))  $upUser['name']  = $request->name;
+                    if ($request->filled('email')) $upUser['email'] = $request->email;
+                    if (!empty($upUser)) $estudiante->user->update($upUser);
+                }
+
+                $estudiante->update([
+                    'grado_academico_id'             => (int) $request->id_grado,
+                    'acudiente_id'                   => $acudienteId ?? $estudiante->acudiente_id,
+                    'fecha_nacimiento_estudiante'    => $request->fecha_nacimiento_estudiante ?? $estudiante->fecha_nacimiento_estudiante,
+                    'direccion_estudiante'           => $request->direccion_estudiante ?? $estudiante->direccion_estudiante,
+                    'genero_estudiante'              => $request->genero_estudiante ?? $estudiante->genero_estudiante,
+                    'tipo_identificacion_estudiante' => $request->tipo_identificacion_estudiante ?? $estudiante->tipo_identificacion_estudiante,
+                ]);
+            }
+
+            // Vincular acudiente al estudiante si corresponde
+            if ($acudienteId) {
                 $estudiante->update(['acudiente_id' => $acudienteId]);
             }
 
-            // Crear Matrícula
-            MatriculaFinal::create([
-                'documento_estudiante' => $docEstudiante,
-                'id_sede'              => $realSedeId,
-                'id_grado'             => $request->id_grado,
-                'curso'                => $request->curso,
-                'ano_lectivo'          => $request->ano_lectivo,
-                'fecha'                => $request->fecha,
-                'estado'               => $request->estado,
-                'id_profesor'          => $request->id_profesor,
-                'documento_acudiente'  => $docAcudiente,
-                'parentezco_acudiente' => $request->parentezco_acudiente,
-            ]);
-        });
+            // =============================================
+            // PASO 3: MATRICULA FINAL
+            // =============================================
+            if ($matriculaExacta) {
+                // Actualizar matricula existente
+                $matriculaExacta->update([
+                    'id_sede'              => $sedeId,
+                    'curso'                => $request->curso,
+                    'fecha'                => $request->fecha,
+                    'estado'               => $request->estado,
+                    'id_profesor'          => $request->id_profesor ?: null,
+                    'documento_acudiente'  => $docAcudiente ?: null,
+                    'parentezco_acudiente' => $request->parentezco_acudiente ?? null,
+                ]);
+            } else {
+                // Crear nueva matricula
+                MatriculaFinal::create([
+                    'documento_estudiante' => $docEstudiante,
+                    'id_sede'              => $sedeId,
+                    'id_grado'             => (int) $request->id_grado,
+                    'curso'                => $request->curso,
+                    'ano_lectivo'          => $request->ano_lectivo,
+                    'fecha'                => $request->fecha,
+                    'estado'               => $request->estado,
+                    'id_profesor'          => $request->id_profesor ?: null,
+                    'documento_acudiente'  => $docAcudiente ?: null,
+                    'parentezco_acudiente' => $request->parentezco_acudiente ?? null,
+                ]);
+            }
+        }); // fin transaction
+
+        $esNuevo = !$estudianteExistente;
+        $msg = $matriculaExacta
+            ? "La matricula del ano {$request->ano_lectivo} fue actualizada correctamente."
+            : "Estudiante matriculado exitosamente en {$request->ano_lectivo}.";
+        if ($esNuevo) {
+            $msg .= " Se creo el usuario en el sistema. Contrasena de acceso: {$docEstudiante}";
+        }
 
         return redirect()->route('admin.matriculado.index')->with('swal', [
             'icon'  => 'success',
-            'title' => '¡Éxito!',
-            'text'  => 'El estudiante fue matriculado correctamente.'
+            'title' => 'Matricula Registrada!',
+            'text'  => $msg,
         ]);
     }
 
-    // Adapt the edit, update, delete routing by expecting $id. Laravel might inject Matriculado, but since the model on route could be mismatched, we take $id.
     public function show($id)
     {
-        // 
+        //
     }
 
     public function edit($id)
     {
-        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'ADMIN']), 403, 'No tiene permisos para editar matrículas.');
-        $matriculado = MatriculaFinal::findOrFail($id);
-        $estudiantes = Estudiante::with('user')->orderBy('id')->get();
-        $sedes = Sede::orderBy('nombre_sede')->get();
-        $grados = GradoAcademico::where('estado_grado_academico', true)->orderBy('nombre_grado')->get();
-
-        $currentYear = date('Y');
-        $anhosEscolares = AnhoEscolar::where('estado_anho_escolar', true)
-            ->where('nombre_anho_escolar', '>=', $currentYear)
-            ->orderBy('nombre_anho_escolar', 'asc')
-            ->get();
-            
-        $docentes = User::whereHas('roles', fn($q) => $q->where('name', 'Docente'))->orderBy('name')->get();
-        $acudientes = Acudiente::with('user')->orderBy('id')->get();
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'ADMIN']), 403, 'No tiene permisos para editar matriculas.');
+        $matriculado    = MatriculaFinal::findOrFail($id);
+        $estudiantes    = Estudiante::with('user')->orderBy('id')->get();
+        $sedes          = Sede::orderBy('nombre_sede')->get();
+        $grados         = GradoAcademico::where('estado_grado_academico', true)->orderBy('nombre_grado')->get();
+        $currentYear    = date('Y');
+        $anhosEscolares = AnhoEscolar::orderBy('nombre_anho_escolar', 'asc')->get();
+        $docentes       = User::whereHas('roles', fn($q) => $q->where('name', 'Docente'))->orderBy('name')->get();
+        $acudientes     = Acudiente::with('user')->orderBy('id')->get();
 
         return view('Matriculado.Edit', compact(
-            'matriculado', 'estudiantes', 'sedes', 'grados', 'anhosEscolares', 'docentes', 'acudientes'
+            'matriculado', 'estudiantes', 'sedes', 'grados',
+            'anhosEscolares', 'docentes', 'acudientes'
         ));
     }
 
     public function update(Request $request, $id)
     {
-        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'ADMIN']), 403, 'No tiene permisos para editar matrículas.');
+        abort_unless(auth()->user()->hasAnyRol(['SUPERADMIN', 'RECTOR', 'SECRETARIO', 'ADMIN']), 403, 'No tiene permisos para editar matriculas.');
+
         $matricula = MatriculaFinal::with('estudiante.user')->findOrFail($id);
 
-        $request->validate([
-            'name'                 => 'required|string|max:255',
-            'email'                => 'nullable|string|email|max:255|unique:users,email,' . ($matricula->estudiante->user->id ?? ''),
-            'fecha_nacimiento_estudiante' => 'required|date',
-            'celular_estudiante'   => 'nullable|string|max:20',
-            'direccion_estudiante' => 'nullable|string|max:255',
-            'id_grado'             => 'required|exists:grado_academicos,id',
-            'curso'                => 'required|string',
-            'ano_lectivo'          => 'required|string',
-            'fecha'                => 'required|date',
-            'estado'               => 'required|in:activo,inactivo,retirado',
-            'id_profesor'          => 'nullable|exists:users,id',
-            'documento_acudiente'  => 'nullable|string',
-            'parentezco_acudiente' => 'nullable|string',        ]);
-
-        $existe = MatriculaFinal::where('documento_estudiante', $matricula->documento_estudiante)
-            ->where('ano_lectivo', $request->ano_lectivo)
-            ->where('id', '!=', $id)
-            ->exists();
-
-        if ($existe) {
-            return back()->withErrors([
-                'ano_lectivo' => 'Este estudiante ya tiene otra matrícula para el año escolar seleccionado.'
+        if ($matricula->estado !== 'activo') {
+            return back()->with('swal', [
+                'icon'  => 'warning',
+                'title' => 'Matricula no editable',
+                'text'  => 'Solo se pueden modificar matriculas en estado ACTIVO. Esta esta en estado: ' . strtoupper($matricula->estado) . '.',
             ])->withInput();
         }
 
-        \DB::transaction(function() use ($request, $matricula) {
-            // Determinar Sede basado en el Grado Académico
-            $grado = \App\Models\GradoAcademico::find($request->id_grado);
-            $realSedeId = $grado ? $grado->sede_id : null;
+        $docEstudiante = $matricula->documento_estudiante;
+        $userId        = $matricula->estudiante?->user?->id ?? '';
 
-            // Actualizar User
+        $request->validate([
+            'name'                       => 'required|string|max:255',
+            'email'                      => 'nullable|string|email|max:255|unique:users,email,' . $userId,
+            'fecha_nacimiento_estudiante' => 'required|date',
+            'celular_estudiante'         => 'nullable|string|max:20',
+            'direccion_estudiante'       => 'nullable|string|max:255',
+            'id_grado'                   => 'required|exists:grado_academicos,id',
+            'curso'                      => 'required|string',
+            'ano_lectivo'                => 'required|string',
+            'fecha'                      => 'required|date',
+            'estado'                     => 'required|in:activo,inactivo,retirado',
+            'id_profesor'                => 'nullable|exists:users,id',
+            'documento_acudiente'        => 'nullable|string',
+            'parentezco_acudiente'       => 'nullable|string',
+        ], [
+            'email.unique' => 'El correo electronico ya pertenece a otro usuario registrado en el sistema.',
+        ]);
+
+        $conflicto = MatriculaFinal::where('documento_estudiante', $docEstudiante)
+            ->where('ano_lectivo', $request->ano_lectivo)
+            ->where('id', '!=', $id)
+            ->first();
+
+        if ($conflicto) {
+            return back()->withErrors([
+                'ano_lectivo' => "El estudiante con documento {$docEstudiante} ya tiene una matricula registrada para el ano {$request->ano_lectivo}."
+            ])->withInput();
+        }
+
+        \DB::transaction(function () use ($request, $matricula) {
+            $grado   = GradoAcademico::find($request->id_grado);
+            $sedeId  = $grado ? $grado->sede_id : null;
+
             if ($matricula->estudiante && $matricula->estudiante->user) {
                 $matricula->estudiante->user->update([
                     'name'  => $request->name,
@@ -299,128 +344,164 @@ class MatriculadoController extends Controller
                 ]);
             }
 
-            // Actualizar Estudiante Profile
             if ($matricula->estudiante) {
                 $matricula->estudiante->update([
                     'fecha_nacimiento_estudiante' => $request->fecha_nacimiento_estudiante,
-                    'celular_estudiante'          => $request->celular_estudiante,
+                    'telefono_estudiante'         => $request->celular_estudiante,
                     'direccion_estudiante'        => $request->direccion_estudiante,
                     'genero_estudiante'           => $request->genero_estudiante,
+                    'grado_academico_id'          => (int) $request->id_grado,
                 ]);
             }
 
-            // Procesar Acudiente
             $docAcudiente = $request->documento_acudiente;
             if ($docAcudiente) {
                 $acudiente = Acudiente::where('id_documento', $docAcudiente)->first();
 
                 if (!$acudiente) {
-                    // 1. Crear Usuario Acudiente
-                    $userAcudiente = \App\Models\User::create([
+                    $emailAcud = 'acudiente_' . $docAcudiente . '@colegio.local';
+                    if (User::where('email', $emailAcud)->exists()) {
+                        $emailAcud = 'acudiente_' . $docAcudiente . '_' . time() . '@colegio.local';
+                    }
+                    $userAcud = User::create([
                         'name'     => $request->nombre_acudiente ?? 'Acudiente ' . $docAcudiente,
-                        'email'    => 'acudiente_'.$docAcudiente.'@colegio.local',
+                        'email'    => $emailAcud,
                         'password' => \Hash::make($docAcudiente),
                         'genero'   => 'no definido',
                     ]);
+                    $rolAcud = \App\Models\Rol::where('nombre', 'ACUDIENTE')->first();
+                    if ($rolAcud) $userAcud->roles()->attach($rolAcud->id);
 
-                    // 2. Asignar Rol ACUDIENTE
-                    $rolAcudiente = \App\Models\Rol::where('nombre', 'ACUDIENTE')->first();
-                    if ($rolAcudiente) {
-                        $userAcudiente->roles()->attach($rolAcudiente->id);
-                    }
-
-                    // 3. Crear Perfil Acudiente
                     $acudiente = Acudiente::create([
-                        'user_id'              => $userAcudiente->id,
-                        'id_documento'         => $docAcudiente, // <- Ensure Acudiente model matches this, check migration/model. Actually, the table uses id_documento per previous inquiry.
-                        'celular_acudiente'    => $request->celular_acudiente ?? '00000',
+                        'user_id'              => $userAcud->id,
+                        'id_documento'         => $docAcudiente,
+                        'celular_acudiente'    => $request->celular_acudiente ?? '0000000000',
                         'direccion_acudiente'  => 'N/A',
                         'genero_acudiente'     => 'no definido',
                         'parentesco_acudiente' => $request->parentezco_acudiente ?? 'Acudiente',
                         'estado_acudiente'     => 1,
                     ]);
                 } else {
-                    // If exists but they typed a name or phone in the readonly (disabled via inspector), we could update but better to respect original.
-                    // Just update parentesco if changed.
-                    if($request->parentezco_acudiente){
-                         $acudiente->update(['parentesco_acudiente' => $request->parentezco_acudiente]);
+                    if ($request->parentezco_acudiente) {
+                        $acudiente->update(['parentesco_acudiente' => $request->parentezco_acudiente]);
                     }
                 }
 
-                // Asegurar que el estudiante se vincule con el ID del Acudiente
                 if ($matricula->estudiante) {
-                    $matricula->estudiante->update([
-                        'acudiente_id' => $acudiente->id
-                    ]);
+                    $matricula->estudiante->update(['acudiente_id' => $acudiente->id]);
                 }
             }
 
-            // Actualizar Matrícula
             $matricula->update([
-                'id_sede'              => $realSedeId,
+                'id_sede'              => $sedeId,
                 'id_grado'             => $request->id_grado,
                 'curso'                => $request->curso,
                 'ano_lectivo'          => $request->ano_lectivo,
                 'fecha'                => $request->fecha,
                 'estado'               => $request->estado,
-                'id_profesor'          => $request->id_profesor,
-                'documento_acudiente'  => $docAcudiente,
-                'parentezco_acudiente' => $request->parentezco_acudiente,
+                'id_profesor'          => $request->id_profesor ?: null,
+                'documento_acudiente'  => $docAcudiente ?: null,
+                'parentezco_acudiente' => $request->parentezco_acudiente ?? null,
             ]);
         });
 
         return redirect()->route('admin.matriculado.index')->with('swal', [
             'icon'  => 'success',
-            'title' => '¡Actualizado!',
-            'text'  => 'La matrícula y los datos del estudiante fueron actualizados correctamente.'
+            'title' => 'Actualizado!',
+            'text'  => 'La matricula y los datos del estudiante fueron actualizados correctamente.'
         ]);
     }
 
     public function destroy($id)
     {
-        abort_unless(auth()->user()->hasRol('SUPERADMIN'), 403, 'Solo el Súper Administrador puede eliminar registros.');
-
+        abort_unless(auth()->user()->hasRol('SUPERADMIN'), 403, 'Solo el Super Administrador puede eliminar registros.');
         $matricula = MatriculaFinal::findOrFail($id);
         $matricula->delete();
 
         return redirect()->route('admin.matriculado.index')->with('swal', [
             'icon'  => 'success',
             'title' => 'Eliminada',
-            'text'  => 'La matrícula fue eliminada correctamente.'
+            'text'  => 'La matricula fue eliminada correctamente.'
         ]);
     }
 
     /**
-     * Endpoint para búsqueda AJAX de estudiantes en Select2.
+     * AJAX: Busqueda de estudiantes para Select2.
      */
     public function searchStudents(Request $request)
     {
         $term = $request->get('q');
-        
+
         $estudiantes = Estudiante::with('user')
-            ->where(function($query) use ($term) {
+            ->where(function ($query) use ($term) {
                 $query->where('numero_identificacion_estudiante', 'LIKE', "%$term%")
-                      ->orWhereHas('user', function($q) use ($term) {
-                          $q->where('name', 'LIKE', "%$term%");
-                      });
+                    ->orWhereHas('user', function ($q) use ($term) {
+                        $q->where('name', 'LIKE', "%$term%");
+                    });
             })
             ->limit(20)
             ->get();
 
-        $results = $estudiantes->map(function($e) {
+        $results = $estudiantes->map(function ($e) {
             return [
-                'id' => $e->numero_identificacion_estudiante, // Usamos el documento como ID para el select
-                'text' => ($e->user->name ?? 'Sin Nombre') . " (" . $e->numero_identificacion_estudiante . ")",
-                'name' => $e->user->name ?? '',
+                'id'               => $e->numero_identificacion_estudiante,
+                'text'             => ($e->user->name ?? 'Sin Nombre') . " (" . $e->numero_identificacion_estudiante . ")",
+                'name'             => $e->user->name ?? '',
                 'fecha_nacimiento' => $e->fecha_nacimiento_estudiante,
-                'email' => $e->user->email ?? '',
-                'tipo_id' => $e->tipo_identificacion_estudiante,
-                'celular' => $e->celular_estudiante,
-                'genero' => $e->genero_estudiante,
-                'direccion' => $e->direccion_estudiante
+                'email'            => $e->user->email ?? '',
+                'tipo_id'          => $e->tipo_identificacion_estudiante,
+                'celular'          => $e->telefono_estudiante,
+                'genero'           => $e->genero_estudiante,
+                'direccion'        => $e->direccion_estudiante,
             ];
         });
 
         return response()->json(['results' => $results]);
+    }
+
+    /**
+     * AJAX: Pre-poblar formulario de matricula al buscar por documento.
+     */
+    public function datosEstudiante(Request $request)
+    {
+        $documento = $request->query('documento');
+
+        if (!$documento) {
+            return response()->json(['encontrado' => false], 400);
+        }
+
+        $estudiante = Estudiante::with('user')
+            ->where('numero_identificacion_estudiante', $documento)
+            ->first();
+
+        $ultimaMatricula = MatriculaFinal::with('grado.sede')
+            ->where('documento_estudiante', $documento)
+            ->latest()
+            ->first();
+
+        if (!$estudiante && !$ultimaMatricula) {
+            return response()->json(['encontrado' => false]);
+        }
+
+        return response()->json([
+            'encontrado'           => true,
+            'name'                 => $estudiante?->user?->name ?? '',
+            'email'                => $estudiante?->user?->email ?? '',
+            'genero_estudiante'    => $estudiante?->genero_estudiante ?? '',
+            'celular_estudiante'   => $estudiante?->telefono_estudiante ?? '',
+            'direccion_estudiante' => $estudiante?->direccion_estudiante ?? '',
+            'fecha_nacimiento'     => $estudiante?->fecha_nacimiento_estudiante
+                ? \Carbon\Carbon::parse($estudiante->fecha_nacimiento_estudiante)->format('Y-m-d')
+                : '',
+            'tipo_id'              => $estudiante?->tipo_identificacion_estudiante ?? 'TI',
+            'ultima_matricula'     => $ultimaMatricula ? [
+                'id_grado'     => $ultimaMatricula->id_grado,
+                'nombre_grado' => $ultimaMatricula->grado?->nombre_grado ?? '',
+                'sede'         => $ultimaMatricula->grado?->sede?->nombre_sede ?? '',
+                'curso'        => $ultimaMatricula->curso,
+                'ano_lectivo'  => $ultimaMatricula->ano_lectivo,
+                'estado'       => $ultimaMatricula->estado,
+            ] : null,
+        ]);
     }
 }

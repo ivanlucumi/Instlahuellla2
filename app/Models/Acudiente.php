@@ -13,11 +13,12 @@ class Acudiente extends Model
     protected $table = 'acudientes';
     protected $fillable = [
         'user_id',
+        'id_documento',
         'celular_acudiente',
         'direccion_acudiente',
         'genero_acudiente',
         'parentesco_acudiente',
-        'estado_acudiente'
+        'estado_acudiente',
     ];
 
     protected $casts = [
