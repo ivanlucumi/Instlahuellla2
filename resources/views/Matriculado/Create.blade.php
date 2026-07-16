@@ -87,7 +87,7 @@
                                 <select name="id_grado" id="id_grado" class="form-select select-grado @error('id_grado') is-invalid @enderror" required>
                                     <option value="">Seleccione grado</option>
                                     @foreach($grados as $grado)
-                                        <option value="{{ $grado->id }}" data-bloque="{{ $grado->bloque }}" data-sede="{{ $grado->sede_id }}" data-docente-user-id="{{ $grado->docente?->user_id }}" data-docente-name="{{ $grado->docente?->user?->name }}" @selected(old('id_grado') == $grado->id)>
+                                        <option value="{{ $grado->id }}" data-bloque="{{ $grado->bloque }}" data-sede="{{ $grado->sede_id }}" data-docente-user-id="{{ $grado->docente?->id }}" data-docente-name="{{ $grado->docente?->user?->name }}" @selected(old('id_grado') == $grado->id)>
                                             {{ $grado->nombre_grado }} - {{ $grado->bloque }} ({{ $grado->sede->nombre_sede ?? 'Sin Sede' }})
                                         </option>
                                     @endforeach

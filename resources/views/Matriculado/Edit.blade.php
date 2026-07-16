@@ -99,7 +99,7 @@
                                 <select name="id_grado" id="id_grado" class="form-select select-grado @error('id_grado') is-invalid @enderror" required>
                                     <option value="">Seleccione grado</option>
                                     @foreach($grados as $grado)
-                                        <option value="{{ $grado->id }}" data-bloque="{{ $grado->bloque }}" data-sede="{{ $grado->sede_id }}" data-docente-user-id="{{ $grado->docente?->user_id }}" data-docente-name="{{ $grado->docente?->user?->name }}" @selected(old('id_grado', $matriculado->id_grado ?? '') == $grado->id)>
+                                        <option value="{{ $grado->id }}" data-bloque="{{ $grado->bloque }}" data-sede="{{ $grado->sede_id }}" data-docente-user-id="{{ $grado->docente?->id }}" data-docente-name="{{ $grado->docente?->user?->name }}" @selected(old('id_grado', $matriculado->id_grado ?? '') == $grado->id)>
                                             {{ $grado->nombre_grado }} - {{ $grado->bloque }} ({{ $grado->sede->nombre_sede ?? 'Sin Sede' }})
                                         </option>
                                     @endforeach
@@ -139,7 +139,7 @@
                         <!-- Director de Grado -->
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Director de Grado</label>
-                            <input type="text" id="nombre_director" class="form-control" readonly placeholder="Asignado automáticamente por grado" value="{{ $matriculado->profesor?->name }}">
+                            <input type="text" id="nombre_director" class="form-control" readonly placeholder="Asignado automáticamente por grado" value="{{ $matriculado->profesor?->user?->name }}">
                             <input type="hidden" name="id_profesor" id="id_profesor" value="{{ old('id_profesor', $matriculado->id_profesor ?? '') }}">
                             @error('id_profesor') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                         </div>

@@ -22,7 +22,7 @@ class MatriculadoController extends Controller
             'grado.sede',
             'grado',
             'acudiente.user',
-            'profesor'
+            'profesor.user'
         ]);
 
         if (auth()->user()->hasRol('DIRECTOR') && !auth()->user()->hasRol('SUPERADMIN') && !auth()->user()->hasRol('ADMIN')) {
@@ -75,7 +75,7 @@ class MatriculadoController extends Controller
             'ano_lectivo'          => 'required|string|max:10',
             'fecha'                => 'required|date',
             'estado'               => 'required|in:activo,inactivo,retirado',
-            'id_profesor'          => 'nullable|exists:users,id',
+            'id_profesor'          => 'nullable|exists:docentes,id',
             'documento_acudiente'  => 'nullable|string|max:20',
         ];
 
@@ -107,16 +107,13 @@ class MatriculadoController extends Controller
             // Resolve id_profesor to avoid null or invalid integrity constraint
             $docenteUserId = $request->id_profesor;
             if (!$docenteUserId && $grado->docente) {
-                $docenteUserId = $grado->docente->user_id;
+                $docenteUserId = $grado->docente->id;
             }
-            if ($docenteUserId && !User::find($docenteUserId)) {
+            if ($docenteUserId && !\App\Models\Docente::find($docenteUserId)) {
                 $docenteUserId = null;
             }
             if (!$docenteUserId) {
-                $docenteUserId = User::whereHas('roles', fn($q) => $q->where('name', 'Docente'))->value('id');
-            }
-            if (!$docenteUserId) {
-                $docenteUserId = auth()->id();
+                $docenteUserId = \App\Models\Docente::value('id');
             }
 
             // =============================================
@@ -339,7 +336,7 @@ class MatriculadoController extends Controller
             'ano_lectivo'                => 'required|string',
             'fecha'                      => 'required|date',
             'estado'                     => 'required|in:activo,inactivo,retirado',
-            'id_profesor'                => 'nullable|exists:users,id',
+            'id_profesor'                => 'nullable|exists:docentes,id',
             'documento_acudiente'        => 'nullable|string',
             'parentezco_acudiente'       => 'nullable|string',
         ], [
@@ -419,16 +416,13 @@ class MatriculadoController extends Controller
             // Resolve id_profesor to avoid null or invalid integrity constraint
             $docenteUserId = $request->id_profesor;
             if (!$docenteUserId && $grado->docente) {
-                $docenteUserId = $grado->docente->user_id;
+                $docenteUserId = $grado->docente->id;
             }
-            if ($docenteUserId && !User::find($docenteUserId)) {
+            if ($docenteUserId && !\App\Models\Docente::find($docenteUserId)) {
                 $docenteUserId = null;
             }
             if (!$docenteUserId) {
-                $docenteUserId = User::whereHas('roles', fn($q) => $q->where('name', 'Docente'))->value('id');
-            }
-            if (!$docenteUserId) {
-                $docenteUserId = auth()->id();
+                $docenteUserId = \App\Models\Docente::value('id');
             }
 
             $matricula->update([

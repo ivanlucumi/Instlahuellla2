@@ -42,7 +42,8 @@ class MatriculaFinal extends Model
 
     public function profesor()
     {
-        return $this->belongsTo(User::class, 'id_profesor');
+        //return $this->belongsTo(User::class, 'id_profesor');
+        return $this->belongsTo(Docente::class, 'id_profesor');
     }
 
     public function estudiante()
