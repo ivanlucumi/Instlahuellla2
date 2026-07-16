@@ -99,8 +99,11 @@
                         <!-- Curso/Bloque -->
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Curso o Subgrupo</label>
-                            <input type="text" name="curso" id="curso" class="form-control @error('curso') is-invalid @enderror" 
-                                value="{{ old('curso', 'A') }}" required placeholder="1, 2, A, B...">
+                            <select name="curso" id="curso" class="form-select @error('curso') is-invalid @enderror" required>
+                                <option value="1" @selected(old('curso', '1') == '1')>1</option>
+                                <option value="2" @selected(old('curso') == '2')>2</option>
+                                <option value="3" @selected(old('curso') == '3')>3</option>
+                            </select>
                             @error('curso') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                         </div>
 
