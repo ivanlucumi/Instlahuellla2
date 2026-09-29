@@ -60,7 +60,7 @@
                                         <th class="text-center">P3</th>
                                         <th class="text-center">P4</th>
                                         <th class="text-center">Definitiva</th>
-                                        <th>Observaciones</th>
+                                        <th>Observaciones por Época</th>
                                         <th class="text-center">Acciones</th>
                                     </tr>
                                 </thead>
@@ -115,7 +115,22 @@
                                                 </span>
                                             </td>
                                             <td>
-                                                <input type="text" name="notas[{{ $estudiante->id }}][observaciones]" id="obs-{{ $estudiante->id }}" class="form-control form-control-sm border-0 bg-light obs-input" value="{{ $notaObj->observaciones ?? '' }}" placeholder="..." readonly>
+                                                <div class="d-flex flex-column gap-1" style="min-width: 280px;">
+                                                    @foreach([1 => $notaObj->obs_p1 ?? '', 2 => $notaObj->obs_p2 ?? '', 3 => $notaObj->obs_p3 ?? '', 4 => $notaObj->obs_p4 ?? ''] as $ep => $obsVal)
+                                                        <div class="input-group input-group-sm">
+                                                            <span class="input-group-text bg-light border-0 text-muted fw-bold" style="width:38px; font-size:11px;">É{{ $ep }}</span>
+                                                            <input type="text"
+                                                                name="notas[{{ $estudiante->id }}][obs_p{{ $ep }}]"
+                                                                id="obs_p{{ $ep }}-{{ $estudiante->id }}"
+                                                                class="form-control form-control-sm border-0 bg-light obs_p{{ $ep }}_input"
+                                                                data-student="{{ $estudiante->id }}"
+                                                                data-epoca="{{ $ep }}"
+                                                                value="{{ $obsVal }}"
+                                                                placeholder="Época {{ $ep }}..."
+                                                                readonly>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
                                             </td>
                                             <td class="text-center">
                                                 @if($esAnoActual)
@@ -141,9 +156,7 @@
                                 <button type="submit" class="btn btn-dark px-4 rounded-pill shadow-sm" id="save-btn" disabled>
                                     <i class="bi bi-save me-1"></i> Guardar Cambios
                                 </button>
-                                <span class="ms-3 text-muted small" id="edit-warning" style="display: none;">
-                                    <i class="bi bi-info-circle me-1 text-warning"></i> Complete las observaciones para guardar.
-                                </span>
+                                <span class="ms-3 text-muted small" id="edit-warning" style="display: none;"></span>
                             </div>
                         @elseif($esAnoActual && !$canEdit)
                             <div class="mt-4 p-3 bg-light rounded text-muted small">
@@ -184,7 +197,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function calculateRow(studentId) {
         const studentInputs = document.querySelectorAll(`.nota-input[data-student="${studentId}"]`);
         const badge = document.getElementById(`def-${studentId}`);
-        const obsInput = document.getElementById(`obs-${studentId}`);
         const checkbox = document.querySelector(`.student-checkbox[value="${studentId}"]`);
         const row = document.getElementById(`row-${studentId}`);
         
@@ -192,106 +204,52 @@ document.addEventListener('DOMContentLoaded', function() {
         const n2 = parseFloat(document.querySelector(`input[name="notas[${studentId}][nota2]"]`).value) || 0;
         const n3 = parseFloat(document.querySelector(`input[name="notas[${studentId}][nota3]"]`).value) || 0;
         const n4 = parseFloat(document.querySelector(`input[name="notas[${studentId}][nota4]"]`).value) || 0;
-        
-        // Verifica si hay algun campo llenado (para las observaciones)
-        let hasValues = false;
-        studentInputs.forEach(input => {
-            if (input.value !== '') hasValues = true;
-        });
 
-        let avg = 0;
-        if (n3 > 0) {
-            if (n4 > 0) {
-                avg = (n1 + n2 + n3 + n4) / 4;
-            } else {
-                avg = (n1 + n2 + n3) / 3;
-            }
-        }
+        // Siempre divido entre 4
+        const avg = (n1 + n2 + n3 + n4) / 4;
 
-        if (n3 > 0) {
+        if (n1 > 0 || n2 > 0 || n3 > 0 || n4 > 0) {
             const isApto = avg >= 3;
             badge.textContent = avg.toFixed(2);
-            badge.classList.remove('bg-danger', 'bg-success');
+            badge.classList.remove('bg-danger', 'bg-success', 'bg-secondary');
             badge.classList.add(isApto ? 'bg-success' : 'bg-danger');
-            
-            // Actualizar elegibilidad
             checkbox.dataset.apto = isApto ? '1' : '0';
-            const icon = row.querySelector('.bi-exclamation-circle-fill, .bi-check-circle-fill');
+            const icon = row.querySelector('.bi-exclamation-circle-fill, .bi-check-circle-fill, .bi-dash-circle');
             if (icon) {
                 icon.className = isApto ? 'bi bi-check-circle-fill text-success ms-1' : 'bi bi-exclamation-circle-fill text-danger ms-1';
                 icon.title = isApto ? 'Apto para promoción' : 'No apto para promoción (Nota < 3.0)';
             }
         } else {
-            // Si P3 no se ha llenado (n3 <= 0), no hay definitiva real aún (0)
             badge.textContent = '0.00';
-            badge.classList.remove('bg-success');
+            badge.classList.remove('bg-success', 'bg-danger');
             badge.classList.add('bg-secondary');
-            
             checkbox.dataset.apto = '0';
-            const icon = row.querySelector('.bi-exclamation-circle-fill, .bi-check-circle-fill');
-            if (icon) {
-                icon.className = 'bi bi-dash-circle text-muted ms-1';
-                icon.title = 'Requiere al menos 3 periodos para promoción';
-            }
         }
 
-        // Requerir observaciones SOLO para Grado Cero y si P3 tiene nota
-        const isEditingRow = row.classList.contains('row-editing');
-        
-        if (esGradoCero && n3 > 0) {
-            if (isEditingRow) {
-                obsInput.readOnly = false;
-                obsInput.classList.remove('bg-light');
-                obsInput.classList.add('bg-white');
-            }
-            if (obsInput.value.trim() === '') {
-                obsInput.classList.add('border', 'border-warning');
-                obsInput.classList.remove('border-0', 'border-secondary');
-            } else {
-                obsInput.classList.remove('border', 'border-warning');
-                obsInput.classList.add('border-0');
-            }
-        } else {
-            // Para grados 1-11 o si no hay nota en P3, habilitamos edición pero no es obligatorio
-            if (isEditingRow) {
-                obsInput.readOnly = false;
-                obsInput.classList.remove('bg-light');
-                obsInput.classList.add('bg-white');
-            } else {
-                obsInput.readOnly = true;
-                obsInput.classList.add('bg-light');
-                obsInput.classList.remove('bg-white');
-            }
-            obsInput.classList.remove('border', 'border-warning', 'border-secondary');
-            obsInput.classList.add('border-0');
+        // Si la fila está en modo edición, asegurar que los campos de obs para epocas con nota estén desbloqueados
+        if (row.classList.contains('row-editing')) {
+            [1, 2, 3, 4].forEach(ep => {
+                const obsEl = document.getElementById(`obs_p${ep}-${studentId}`);
+                if (!obsEl) return;
+                const notaVal = [n1, n2, n3, n4][ep - 1];
+                if (notaVal > 0) {
+                    obsEl.readOnly = false;
+                    obsEl.classList.remove('bg-light');
+                    obsEl.classList.add('bg-white');
+                }
+            });
         }
 
         validateForm();
     }
 
     function validateForm() {
-        let anyChanges = false;
-        let allValid = true;
-
         const editedRows = document.querySelectorAll('.row-editing');
-        anyChanges = editedRows.length > 0;
+        const anyChanges = editedRows.length > 0;
 
-        editedRows.forEach(row => {
-            const studentId = row.id.replace('row-', '');
-            const n3Val = parseFloat(row.querySelector(`input[name="notas[${studentId}][nota3]"]`).value) || 0;
-            const obsInput = row.querySelector('.obs-input');
-            
-            // Solo invalidar si es Grado Cero y falta la observación en P3
-            if (esGradoCero && n3Val > 0 && obsInput.value.trim() === '') {
-                allValid = false;
-            }
-        });
-
-        saveBtn.disabled = !anyChanges || !allValid;
-        editWarning.style.display = (anyChanges && !allValid) ? 'inline' : 'none';
-        if (anyChanges && !allValid) {
-            editWarning.innerHTML = '<i class="bi bi-info-circle me-1 text-warning"></i> Complete las observaciones en P3 para guardar.';
-        }
+        // Las observaciones son opcionales: solo se requiere tener filas en edición para guardar
+        saveBtn.disabled = !anyChanges;
+        editWarning.style.display = 'none';
     }
 
     inputs.forEach(input => {
@@ -303,11 +261,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    document.querySelectorAll('.obs-input').forEach(input => {
-        input.addEventListener('input', function() {
-            const studentId = this.id.replace('obs-', '');
-            calculateRow(studentId);
-        });
+    // Registrar cambios en obs para revalidar el formulario
+    document.querySelectorAll('[id^="obs_p"]').forEach(input => {
+        input.addEventListener('input', validateForm);
     });
 
     window.enableMassEdit = function() {
@@ -376,8 +332,23 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.classList.add('text-muted');
         }
 
-        // Trigger calculaterow to update visual state correctly based on P3 dynamically
+        // Trigger calculateRow to update badges and obs fields
         calculateRow(studentId);
+
+        // Desbloquear SIEMPRE todos los campos de obs para la fila en edicion
+        // (el docente puede escribir en cualquier época que ya tenga nota)
+        [1, 2, 3, 4].forEach(ep => {
+            const notaInput = row.querySelector(`input[name="notas[${studentId}][nota${ep}]"]`);
+            const obsEl     = document.getElementById(`obs_p${ep}-${studentId}`);
+            if (!obsEl) return;
+            const hasNota = parseFloat(notaInput?.value) > 0;
+            // Liberar si la nota existe, o si es admin (puede editar todo)
+            if (hasNota || isAdmin) {
+                obsEl.readOnly = false;
+                obsEl.classList.remove('bg-light', 'border-0');
+                obsEl.classList.add('bg-white', 'border-secondary');
+            }
+        });
     };
 });
 
