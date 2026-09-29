@@ -433,4 +433,5 @@ function submitPromotion(type) {
     form.submit();
 }
 </script>
+
 @endsection
