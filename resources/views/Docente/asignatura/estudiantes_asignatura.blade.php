@@ -60,7 +60,7 @@
                                         <th class="text-center">P3</th>
                                         <th class="text-center">P4</th>
                                         <th class="text-center">Definitiva</th>
-                                        <th>Observaciones por Época</th>
+                                        <th>Observación</th>
                                         <th class="text-center">Acciones</th>
                                     </tr>
                                 </thead>
@@ -115,21 +115,73 @@
                                                 </span>
                                             </td>
                                             <td>
-                                                <div class="d-flex flex-column gap-1" style="min-width: 280px;">
-                                                    @foreach([1 => $notaObj->obs_p1 ?? '', 2 => $notaObj->obs_p2 ?? '', 3 => $notaObj->obs_p3 ?? '', 4 => $notaObj->obs_p4 ?? ''] as $ep => $obsVal)
-                                                        <div class="input-group input-group-sm">
-                                                            <span class="input-group-text bg-light border-0 text-muted fw-bold" style="width:38px; font-size:11px;">É{{ $ep }}</span>
+                                                @php
+                                                    // Determinar la época activa (próximo período a calificar)
+                                                    $obsMap = [
+                                                        1 => $notaObj->obs_p1 ?? '',
+                                                        2 => $notaObj->obs_p2 ?? '',
+                                                        3 => $notaObj->obs_p3 ?? '',
+                                                        4 => $notaObj->obs_p4 ?? '',
+                                                    ];
+                                                    $notaMap = [
+                                                        1 => $notaObj->nota1 ?? 0,
+                                                        2 => $notaObj->nota2 ?? 0,
+                                                        3 => $notaObj->nota3 ?? 0,
+                                                        4 => $notaObj->nota4 ?? 0,
+                                                    ];
+                                                    // Época activa = el primero sin nota; si todos tienen nota, es el último
+                                                    $epocaActiva = 1;
+                                                    foreach($notaMap as $ep => $n) {
+                                                        if($n > 0) { $epocaActiva = $ep + 1 <= 4 ? $ep + 1 : 4; }
+                                                    }
+                                                    // Si ninguno tiene nota, la activa es 1
+                                                    if(!array_filter($notaMap)) $epocaActiva = 1;
+                                                    // Si todos tienen nota, la activa es 4
+                                                    if(array_filter(array_map(fn($n) => $n > 0, $notaMap)) === [1=>true,2=>true,3=>true,4=>true]) $epocaActiva = 4;
+                                                @endphp
+                                                <div class="obs-cell" style="min-width: 180px;">
+                                                    {{-- Campo oculto para todas las épocas con valores existentes --}}
+                                                    @foreach([1,2,3,4] as $ep)
+                                                        <input type="hidden"
+                                                            name="notas[{{ $estudiante->id }}][obs_p{{ $ep }}]"
+                                                            id="obs_p{{ $ep }}-{{ $estudiante->id }}"
+                                                            data-student="{{ $estudiante->id }}"
+                                                            data-epoca="{{ $ep }}"
+                                                            value="{{ $obsMap[$ep] }}"
+                                                            class="obs-hidden-input">
+                                                    @endforeach
+
+                                                    {{-- Vista compacta: badges de épocas pasadas + input de época activa --}}
+                                                    <div class="obs-compact-view">
+                                                        {{-- Badges de observaciones anteriores (lectura) --}}
+                                                        @foreach([1,2,3,4] as $ep)
+                                                            @if($notaMap[$ep] > 0 && $ep != $epocaActiva && $obsMap[$ep] !== '')
+                                                                <span class="badge bg-light border text-muted me-1 mb-1 d-inline-flex align-items-center"
+                                                                      style="font-size:10px; max-width:160px;"
+                                                                      title="Época {{ $ep }}: {{ $obsMap[$ep] }}">
+                                                                    <span class="fw-bold text-primary me-1">É{{ $ep }}</span>
+                                                                    <span class="text-truncate" style="max-width:110px;">{{ Str::limit($obsMap[$ep], 25) }}</span>
+                                                                </span>
+                                                            @elseif($notaMap[$ep] > 0 && $ep != $epocaActiva && $obsMap[$ep] === '')
+                                                                <span class="badge bg-light border text-muted me-1 mb-1" style="font-size:10px;">
+                                                                    <span class="fw-bold text-primary me-1">É{{ $ep }}</span> —
+                                                                </span>
+                                                            @endif
+                                                        @endforeach
+
+                                                        {{-- Input visible de la época activa --}}
+                                                        <div class="input-group input-group-sm mt-1 obs-active-group">
+                                                            <span class="input-group-text fw-bold text-primary border-primary" style="font-size:11px; background:#e8f0fe;">É{{ $epocaActiva }}</span>
                                                             <input type="text"
-                                                                name="notas[{{ $estudiante->id }}][obs_p{{ $ep }}]"
-                                                                id="obs_p{{ $ep }}-{{ $estudiante->id }}"
-                                                                class="form-control form-control-sm border-0 bg-light obs_p{{ $ep }}_input"
+                                                                id="obs_visible_p{{ $epocaActiva }}-{{ $estudiante->id }}"
+                                                                class="form-control form-control-sm border-0 bg-light obs-active-input"
                                                                 data-student="{{ $estudiante->id }}"
-                                                                data-epoca="{{ $ep }}"
-                                                                value="{{ $obsVal }}"
-                                                                placeholder="Época {{ $ep }}..."
+                                                                data-epoca="{{ $epocaActiva }}"
+                                                                value="{{ $obsMap[$epocaActiva] }}"
+                                                                placeholder="Época {{ $epocaActiva }}... (opcional)"
                                                                 readonly>
                                                         </div>
-                                                    @endforeach
+                                                    </div>
                                                 </div>
                                             </td>
                                             <td class="text-center">
@@ -246,8 +298,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function validateForm() {
         const editedRows = document.querySelectorAll('.row-editing');
         const anyChanges = editedRows.length > 0;
-
-        // Las observaciones son opcionales: solo se requiere tener filas en edición para guardar
+        // Las observaciones son opcionales: solo se requiere tener filas en edición
         saveBtn.disabled = !anyChanges;
         editWarning.style.display = 'none';
     }
@@ -335,20 +386,31 @@ document.addEventListener('DOMContentLoaded', function() {
         // Trigger calculateRow to update badges and obs fields
         calculateRow(studentId);
 
-        // Desbloquear SIEMPRE todos los campos de obs para la fila en edicion
-        // (el docente puede escribir en cualquier época que ya tenga nota)
-        [1, 2, 3, 4].forEach(ep => {
-            const notaInput = row.querySelector(`input[name="notas[${studentId}][nota${ep}]"]`);
-            const obsEl     = document.getElementById(`obs_p${ep}-${studentId}`);
-            if (!obsEl) return;
-            const hasNota = parseFloat(notaInput?.value) > 0;
-            // Liberar si la nota existe, o si es admin (puede editar todo)
-            if (hasNota || isAdmin) {
-                obsEl.readOnly = false;
-                obsEl.classList.remove('bg-light', 'border-0');
-                obsEl.classList.add('bg-white', 'border-secondary');
+        // Desbloquear el input visible de la época activa
+        const obsActiveInput = row.querySelector('.obs-active-input');
+        if (obsActiveInput) {
+            const epocaActiva = parseInt(obsActiveInput.dataset.epoca);
+            const notaInput = row.querySelector(`input[name="notas[${studentId}][nota${epocaActiva}]"]`);
+            // Para admin, siempre editable; para docente, si hay nota en la época activa o en la anterior
+            const prevEp = epocaActiva > 1 ? epocaActiva - 1 : null;
+            const prevHasNota = prevEp ? parseFloat(row.querySelector(`input[name="notas[${studentId}][nota${prevEp}]"]`)?.value) > 0 : true;
+            if (isAdmin || prevHasNota || parseFloat(notaInput?.value) > 0) {
+                obsActiveInput.readOnly = false;
+                obsActiveInput.classList.remove('bg-light', 'border-0');
+                obsActiveInput.classList.add('bg-white', 'border-secondary');
+                obsActiveInput.focus();
             }
-        });
+        }
+
+        // Sincronizar el input visible con el hidden al escribir
+        if (obsActiveInput) {
+            const epocaActiva = parseInt(obsActiveInput.dataset.epoca);
+            const hiddenInput = document.getElementById(`obs_p${epocaActiva}-${studentId}`);
+            obsActiveInput.oninput = function() {
+                if (hiddenInput) hiddenInput.value = this.value;
+                validateForm();
+            };
+        }
     };
 });
 
